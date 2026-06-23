@@ -8,7 +8,7 @@ const CardImage = ({ src, alt = "Card Image", className = "" }) => {
           src={src}
           alt={alt}
           className="w-full h-full
-        object-cover"
+        object-contain"
         />
       ) : (
         <div

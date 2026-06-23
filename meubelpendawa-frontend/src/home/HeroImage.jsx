@@ -17,8 +17,7 @@ function HomeImage() {
 
         mx-auto lg:mx-0
 
-        transform
-        lg:-translate-x-10 xl:-translate-x-16
+        
       "
     >
       <img

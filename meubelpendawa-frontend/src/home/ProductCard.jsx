@@ -1,6 +1,10 @@
-import React from "react";
 import Card from "../components/Card";
 import CardImage from "../components/CardImage";
+import CardTitle from "../components/CardTitle";
+import CardHeader from "../components/CardHeader";
+import CardFooter from "../components/CardFooter";
+import CardBody from "../components/CardBody";
+import {cardsData} from "../data-produk/cardsData";
 
 const ProductCard = () => {
   return (
@@ -18,6 +22,14 @@ const ProductCard = () => {
             padding="none"
            >
             {card.image && <CardImage src={card.image} alt={card.title} />}
+            <div className="p-6">
+              <CardHeader>
+                {card.category && <span className="inline-block px-3 py-1
+                bg-blue-100 text-blue-700 text-sm font-semibold
+                rounded-full mb-2">
+                  {card.category}</span>}
+              </CardHeader>
+            </div>
             </Card>
           ))}
         </div>

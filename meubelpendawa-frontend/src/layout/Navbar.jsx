@@ -13,7 +13,7 @@ function Navbar() {
     }`;
 
   return (
-    <nav className="w-full bg-white shadow-sm fixed top-0 left-0 z-50 h-20 md:h-24 flex items-center shadow-[0_5px_5px_rgba(0,0,0,0.25)]">
+    <nav className="w-full bg-white shadow-[0_5px_5px_rgba(0,0,0,0.25)] fixed top-0 left-0 z-50 h-20 md:h-24 flex items-center">
 
       {/* CONTAINER */}
       <div className="w-full flex items-center justify-between px-3 sm:px-4 md:px-6 h-full">
@@ -79,7 +79,7 @@ function Navbar() {
               Contact
             </li>
 
-            <button className="bg-[#5F04E8] text-white px-4 py-2 rounded-lg mt-3 w-full">
+            <button className="bg-[#5F04E8] hover:bg-purple-800 text-white px-4 py-2 rounded-lg mt-3 w-full">
               Portal Management
             </button>
 

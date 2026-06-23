@@ -8,6 +8,7 @@ function App() {
       style={{minHeight: "100vh", background:"#5F04E8",}} >
       <Navbar />
       <HeroSection />
+      <ProductCard />
     </div>
   );
 }

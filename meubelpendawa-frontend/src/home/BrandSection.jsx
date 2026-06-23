@@ -5,7 +5,7 @@ import napolly from "../assets/Merek_Napoly_Logo.png";
 
 function BrandSection() {
   return (
-    <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4">
+    <div className="mt-6 w-full flex justify-center gap-4">
 
       {/* BRAND 1 */}
       <div className="bg-white px-3 sm:px-4 py-2 rounded-lg shadow-sm flex items-center">
