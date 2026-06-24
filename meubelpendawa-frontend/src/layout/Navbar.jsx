@@ -26,7 +26,10 @@ function Navbar() {
               alt="kursi"
               className="h-12 md:h-16 lg:h-18 w-auto object-contain"
             />
-            <h1 className="ml-[-25px] text-[#5F04E8] font-extrabold text-[14px] text-xl md:text-[22px] lg:text-[28px] xl:text-[32px] leading-none">
+            <h1
+              className="ml-[-25px] text-[#5F04E8] font-extrabold
+                text-[24px] md:text-[24px] lg:text-[30px] leading-none"
+            >
               Toko Meubel Pendawa
             </h1>
           </div>
@@ -67,7 +70,7 @@ function Navbar() {
 
           {/* MOBILE HAMBURGER */}
           <button
-            className="md:hidden text-2xl text-[#5F04E8]"
+            className="hover:scale-125 transition-all duration-300 md:hidden text-2xl text-[#5F04E8]"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             ☰
@@ -75,52 +78,62 @@ function Navbar() {
         </div>
 
         {/* MOBILE MENU */}
-        {mobileOpen && (
-          <div className="absolute top-20 left-0 w-full bg-white shadow-lg md:hidden">
-            <ul className="flex flex-col gap-4 p-5">
-              <li
-                onClick={() => {
-                  setActiveMenu("Home");
-                  setMobileOpen(false);
-                }}
-                className={menuClass("Home")}
-              >
-                Home
-              </li>
+        <div
+          className={`absolute top-20 left-0 w-full bg-white shadow-lg md:hidden
+          origin-top transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]
+          
+          ${
+            mobileOpen
+              ? "opacity-100 scale-y-100 translate-y-0"
+              : "opacity-0 scale-y-0 -translate-y-3 pointer-events-none"
+            }`}
+        
+        >
 
-              <li
-                onClick={() => {
-                  setActiveMenu("Collections");
-                  setMobileOpen(false);
-                }}
-                className={menuClass("Collections")}
-              >
-                Collections
-              </li>
+          <ul className="flex flex-col gap-4 p-5">
+            <li
+              onClick={() => {
+                setActiveMenu("Home");
+                setMobileOpen(false);
+              }}
+              className={menuClass("Home")}
+            >
+              Home
+            </li>
 
-              <li
-                onClick={() => {
-                  setActiveMenu("Contact");
-                  setMobileOpen(false);
-                }}
-                className={menuClass("Contact")}
-              >
-                Contact
-              </li>
+            <li
+              onClick={() => {
+                setActiveMenu("Collections");
+                setMobileOpen(false);
+              }}
+              className={menuClass("Collections")}
+            >
+              Collections
+            </li>
 
-              {/* BUTTON PORTAL - MOBILE */}
-              <button
-                onClick={() => {
-                  setShowLogin(true);
-                  setMobileOpen(false);
-                }}
-                className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8] hover:bg-purple-800 text-white px-4 py-2 rounded-lg mt-3 w-full"
-              >
-                Portal Management
-              </button>
-            </ul>
-          </div>
-        )}
+            <li
+              onClick={() => {
+                setActiveMenu("Contact");
+                setMobileOpen(false);
+              }}
+              className={menuClass("Contact")}
+            >
+              Contact
+            </li>
+
+            {/* BUTTON PORTAL - MOBILE */}
+            <button
+              onClick={() => {
+                setShowLogin(true);
+                setMobileOpen(false);
+              }}
+              className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8]
+            hover:bg-purple-800 text-white px-4 py-2 rounded-lg mt-3 w-full"
+            >
+              Portal Management
+            </button>
+          </ul>
+        </div>
       </nav>
 
       {/* FORM LOGIN OVERLAY */}
