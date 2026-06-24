@@ -26,7 +26,7 @@ function Navbar() {
               alt="kursi"
               className="h-12 md:h-16 lg:h-18 w-auto object-contain"
             />
-            <h1 className="ml-[-25px] text-[#5F04E8] font-extrabold text-[14px] sm:text-[16px] md:text-[22px] lg:text-[28px] xl:text-[32px] leading-none">
+            <h1 className="ml-[-25px] text-[#5F04E8] font-extrabold text-[14px] text-xl md:text-[22px] lg:text-[28px] xl:text-[32px] leading-none">
               Toko Meubel Pendawa
             </h1>
           </div>
@@ -59,7 +59,7 @@ function Navbar() {
             {/* BUTTON PORTAL - DESKTOP */}
             <button
               onClick={() => setShowLogin(true)}
-              className="bg-[#5F04E8] hover:bg-purple-800 text-white px-4 md:px-5 py-2 rounded-lg transition shadow-md text-sm md:text-base"
+              className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8] hover:bg-purple-800 text-white px-4 md:px-5 py-2 rounded-lg transition shadow-md text-sm md:text-base"
             >
               Portal Management
             </button>
@@ -114,7 +114,7 @@ function Navbar() {
                   setShowLogin(true);
                   setMobileOpen(false);
                 }}
-                className="bg-[#5F04E8] hover:bg-purple-800 text-white px-4 py-2 rounded-lg mt-3 w-full"
+                className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8] hover:bg-purple-800 text-white px-4 py-2 rounded-lg mt-3 w-full"
               >
                 Portal Management
               </button>
