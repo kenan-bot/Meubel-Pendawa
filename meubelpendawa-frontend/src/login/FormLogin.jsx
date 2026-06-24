@@ -15,23 +15,13 @@ export default function FormLogin({ onClose }) {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#5B21F5] px-4 py-8 relative">
 
-      {/* TOMBOL KEMBALI (×) — muncul hanya jika onClose diberikan */}
+      {/* TOMBOL KEMBALI */}
       {onClose && (
         <button
           onClick={onClose}
-          className="bg-orange-500
-    px-5 py-2
-    rounded-lg
-    absolute top-5 right-5
-    text-white
-    font-medium
-    flex items-center gap-2
-
-    hover:bg-white
-    hover:text-orange-500 transition-all duration-500 ease-in-out
-  hover:bg-white
-  hover:text-orange-500
-  hover:scale-105"
+          className="bg-orange-500 px-5 py-2 rounded-lg absolute top-5 right-5 text-white font-mediummflex items-center gap-2
+          hover:bg-white hover:text-orange-500 transition-all duration-500 ease-in-out hover:bg-white hover:text-orange-500
+          hover:scale-105"
           aria-label="Tutup"
         >
           Kembali
