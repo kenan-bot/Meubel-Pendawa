@@ -19,7 +19,7 @@ export default function FormLogin({ onClose }) {
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-white/70 hover:text-white text-3xl leading-none transition"
+          className="bg-orange-500 rounded-lg absolute top-5 right-5 text-white/70 hover:text-white text-3xl leading-none transition"
           aria-label="Tutup"
         >
           &times;
