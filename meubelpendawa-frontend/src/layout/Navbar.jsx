@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import FormLogin from "../login/FormLogin";
-import kursi from "../assets/LOGO_KURSI_MeubelPendawa.png";
+import kursi from "../assets/LOGO_KURSI_MeubelPendawa.svg";
 
 function Navbar() {
   const [activeMenu, setActiveMenu] = useState("Home");
@@ -15,7 +15,7 @@ function Navbar() {
     }`;
 
   return (
-    <>
+    <> 
       <nav className="w-full bg-white shadow-[0_5px_5px_rgba(0,0,0,0.25)] fixed top-0 left-0 z-50 h-20 md:h-24 flex items-center">
         {/* CONTAINER */}
         <div className="w-full flex items-center justify-between px-3 sm:px-4 md:px-6 h-full">

@@ -1,6 +1,6 @@
 import Navbar from "./layout/Navbar";
 import HeroSection from "./home/HeroSection";
-import ProductCard from "./home/ProductCard";
+import ProductSection from "./home/ProductSection";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       style={{minHeight: "100vh", background:"#5F04E8",}} >
       <Navbar />
       <HeroSection />
-      <ProductCard />
+      <ProductSection />
     </div>
   );
 }
