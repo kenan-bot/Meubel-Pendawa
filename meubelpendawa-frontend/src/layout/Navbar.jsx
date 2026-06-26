@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FormLogin from "../login/FormLogin";
 import kursi from "../assets/LOGO_KURSI_MeubelPendawa.svg";
+import { motion } from "framer-motion";
 
 function Navbar() {
   const [activeMenu, setActiveMenu] = useState("Home");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
+  const navigate = useNavigate();
 
   const menuClass = (menu) =>
     `cursor-pointer transition pb-1 ${
@@ -13,10 +15,26 @@ function Navbar() {
         ? "text-[#5F04E8] font-bold text-xl md:text-2xl border-b-2 border-purple-700"
         : "text-gray-700 font-medium text-base md:text-lg hover:text-[#5F04E8]"
     }`;
+  
+  const scrollToSection = (id, menu) => {
+    setActiveMenu(menu);
+    
+    document.getElementById(id)?.scrollIntoView({
+      behavior:"smooth",
+      block:"start",
+    });
+    
+    setMobileOpen(false);
+  };
 
   return (
     <> 
-      <nav className="w-full bg-white shadow-[0_5px_5px_rgba(0,0,0,0.25)] fixed top-0 left-0 z-50 h-20 md:h-24 flex items-center">
+      <motion.nav
+      initial={{y:-80, opacity:0}}
+      animate={{y:0, opacity:1}}
+      transition={{duration:0.5}}
+      className="w-full bg-white shadow-[0_5px_5px_rgba(0,0,0,0.25)] 
+      fixed top-0 left-0 z-50 h-20 md:h-24 flex items-center">
         {/* CONTAINER */}
         <div className="w-full flex items-center justify-between px-3 sm:px-4 md:px-6 h-full">
           {/* LEFT - LOGO */}
@@ -34,25 +52,26 @@ function Navbar() {
             </h1>
           </div>
 
+
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center gap-4 lg:gap-6 ml-auto pr-2 lg:pr-4">
             <ul className="flex items-center gap-6 lg:gap-8">
               <li
-                onClick={() => setActiveMenu("Home")}
+                onClick={() => scrollToSection("home", "Home")}
                 className={menuClass("Home")}
               >
                 Home
               </li>
 
               <li
-                onClick={() => setActiveMenu("Collections")}
+                onClick={() => scrollToSection("collections", "Collections")}
                 className={menuClass("Collections")}
               >
                 Collections
               </li>
 
               <li
-                onClick={() => setActiveMenu("Contact")}
+                onClick={() => scrollToSection("contact", "Contact")}
                 className={menuClass("Contact")}
               >
                 Contact
@@ -61,12 +80,13 @@ function Navbar() {
 
             {/* BUTTON PORTAL - DESKTOP */}
             <button
-              onClick={() => setShowLogin(true)}
+              onClick={() => navigate("/login")}
               className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8] hover:bg-purple-800 text-white px-4 md:px-5 py-2 rounded-lg transition shadow-md text-sm md:text-base"
             >
               Portal Management
             </button>
           </div>
+
 
           {/* MOBILE HAMBURGER */}
           <button
@@ -75,7 +95,8 @@ function Navbar() {
           >
             ☰
           </button>
-        </div>
+          </div>
+
 
         {/* MOBILE MENU */}
         <div
@@ -92,30 +113,21 @@ function Navbar() {
 
           <ul className="flex flex-col gap-4 p-5">
             <li
-              onClick={() => {
-                setActiveMenu("Home");
-                setMobileOpen(false);
-              }}
+              onClick={() => scrollToSection("home", "Home")}
               className={menuClass("Home")}
             >
               Home
             </li>
 
             <li
-              onClick={() => {
-                setActiveMenu("Collections");
-                setMobileOpen(false);
-              }}
+              onClick={() => scrollToSection("collections", "Collections")}
               className={menuClass("Collections")}
             >
               Collections
             </li>
 
             <li
-              onClick={() => {
-                setActiveMenu("Contact");
-                setMobileOpen(false);
-              }}
+              onClick={() => scrollToSection("contact", "Contact")}
               className={menuClass("Contact")}
             >
               Contact
@@ -123,10 +135,7 @@ function Navbar() {
 
             {/* BUTTON PORTAL - MOBILE */}
             <button
-              onClick={() => {
-                setShowLogin(true);
-                setMobileOpen(false);
-              }}
+              onClick={() => navigate("/login")}
               className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8]
             hover:bg-purple-800 text-white px-4 py-2 rounded-lg mt-3 w-full"
             >
@@ -134,14 +143,9 @@ function Navbar() {
             </button>
           </ul>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* FORM LOGIN OVERLAY */}
-      {showLogin && (
-        <div className="fixed inset-0 z-[100]">
-          <FormLogin onClose={() => setShowLogin(false)} />
-        </div>
-      )}
+      
     </>
   );
 }

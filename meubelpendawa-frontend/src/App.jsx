@@ -1,15 +1,23 @@
-import Navbar from "./layout/Navbar";
-import HeroSection from "./home/HeroSection";
-import ProductSection from "./home/ProductSection";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+
+import Home from "./home/Home";
+import FormLogin from "./login/FormLogin";
 
 function App() {
+
+  useEffect(() => {
+    window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div
-      style={{minHeight: "100vh", background:"#5F04E8",}} >
-      <Navbar />
-      <HeroSection />
-      <ProductSection />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<FormLogin />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
