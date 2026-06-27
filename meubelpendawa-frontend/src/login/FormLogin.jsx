@@ -14,7 +14,10 @@ export default function FormLogin() {
     setLoading(true);
 
     // nanti panggil API login di sini
-    setTimeout(() => setLoading(false), 2000);
+    setTimeout(() => {
+      setLoading(false);
+      navigate("/owner");
+    }, 1000);
   };
 
   return (

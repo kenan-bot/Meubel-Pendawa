@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 import Home from "./home/Home";
 import FormLogin from "./login/FormLogin";
+import OwnerRoutes from "./route/OwnerRoutes";
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<FormLogin />} />
+        <Route path="/owner/*" element={<OwnerRoutes />} />
       </Routes>
     </BrowserRouter>
   );

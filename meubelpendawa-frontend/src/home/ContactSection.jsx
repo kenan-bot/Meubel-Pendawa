@@ -1,5 +1,6 @@
 import AnimatedSection from "../components/AnimatedSection";
 import { MapPin, MessageCircle, Clock } from "lucide-react";
+import Card from "../components/Card";
 
 const ContactSection = () => {
   return (
@@ -23,7 +24,7 @@ const ContactSection = () => {
         <div className="bg-[#FF6B00] py-14 px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Kartu Lokasi */}
-            <div className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
+            <Card className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
               <div className="bg-[#FF6B00] rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
                 <MapPin className="text-white w-7 h-7" />
               </div>
@@ -39,10 +40,10 @@ const ContactSection = () => {
                   Jawa Tengah 50611
                 </p>
               </div>
-            </div>
+            </Card>
 
             {/* Kartu WhatsApp */}
-            <div className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
+            <Card className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
               <div className="bg-[#FF6B00] rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="text-white w-7 h-7" />
               </div>
@@ -59,10 +60,10 @@ const ContactSection = () => {
                   0836 – 8191 – 192
                 </a>
               </div>
-            </div>
+            </Card>
 
             {/* Kartu Jam Operasional */}
-            <div className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
+            <Card className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
               <div className="bg-[#FF6B00] rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
                 <Clock className="text-white w-7 h-7" />
               </div>
@@ -74,7 +75,7 @@ const ContactSection = () => {
                   08.00 – 18.00 WIB
                 </p>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </AnimatedSection>
