@@ -8,6 +8,8 @@ import com.meubelpendawa.dto.LoginRequest;
 import com.meubelpendawa.dto.LoginResponse;
 import com.meubelpendawa.model.Karyawan;
 import com.meubelpendawa.repository.KaryawanRepository;
+import com.meubelpendawa.security.JwtService;
+import com.meubelpendawa.service.LoginLogService;
 
 @Service
 public class AuthService {
@@ -15,33 +17,50 @@ public class AuthService {
     @Autowired
     private KaryawanRepository karyawanRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder = 
-    new BCryptPasswordEncoder();
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private LoginLogService loginLogService;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public LoginResponse login(LoginRequest request) {
 
-    Optional<Karyawan> optionalKaryawan = karyawanRepository.findByUsername(request.getUsername());
+        Optional<Karyawan> optionalKaryawan = karyawanRepository.findByUsername(request.getUsername());
 
-    if (optionalKaryawan.isEmpty()) {
-        return new LoginResponse(false,"Username atau password salah",null,null,null);
+        if (optionalKaryawan.isEmpty()) {
+            return new LoginResponse(false, "Username atau password salah", null, null, null, null);
+        }
+
+        Karyawan karyawan = optionalKaryawan.get();
+
+        if (!karyawan.getStatusAktif()) {
+            return new LoginResponse(false, "Akun tidak aktif", null, null, null, null);
+        }
+
+        if (!karyawan.getAksesSistem()) {
+            return new LoginResponse(false, "Akses sistem ditolak", null, null, null, null);
+        }
+
+        boolean cocok = passwordEncoder.matches(request.getPassword(), karyawan.getPassword());
+
+        if (!cocok) {
+            return new LoginResponse(false, "Username atau password salah", null, null, null, null);
+        }
+
+        String token = jwtService.generateToken(
+        karyawan.getIdKaryawan(),
+        karyawan.getRole());
+
+        loginLogService.catatLogin(karyawan);
+
+        return new LoginResponse(true, "Login berhasil", token, karyawan.getIdKaryawan(), karyawan.getNamaKaryawan(),
+                karyawan.getRole());
     }
 
-    Karyawan karyawan = optionalKaryawan.get();
-
-    if (!karyawan.getStatusAktif()) {
-        return new LoginResponse(false,"Akun tidak aktif",null,null,null);
+    public void logout(String idKaryawan) {
+        loginLogService.catatLogout(idKaryawan);
     }
 
-    if (!karyawan.getAksesSistem()) {
-        return new LoginResponse(false,"Akses sistem ditolak",null,null,null);
-    }
-
-    boolean cocok = passwordEncoder.matches(request.getPassword(),karyawan.getPassword());
-
-    if (!cocok) {
-        return new LoginResponse(false,"Username atau password salah",null,null,null);
-    }
-
-    return new LoginResponse(true,"Login berhasil",karyawan.getIdKaryawan(),karyawan.getNamaKaryawan(),karyawan.getRole());
-    }
 }

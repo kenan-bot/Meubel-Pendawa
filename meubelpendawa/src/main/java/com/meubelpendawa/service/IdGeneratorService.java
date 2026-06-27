@@ -31,8 +31,12 @@ public class IdGeneratorService {
         return String.format("PNG%03d", nomor);
     }
 
+    public String generateLoginLogId(long nomor) {
+        return String.format("LOG%03d", nomor);
+    }
+
     public String generateOrderId(String lastOrderId) {
-        
+
         String tanggal = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy"));
         String prefix = "ORD" + tanggal;
 

@@ -16,7 +16,18 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(
+            @RequestBody LoginRequest request) {
+
         return authService.login(request);
+    }
+
+    @PostMapping("/logout/{idKaryawan}")
+    public String logout(
+            @PathVariable String idKaryawan) {
+
+        authService.logout(idKaryawan);
+
+        return "Logout berhasil";
     }
 }

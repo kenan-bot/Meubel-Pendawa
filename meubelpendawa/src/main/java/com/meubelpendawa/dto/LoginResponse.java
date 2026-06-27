@@ -4,6 +4,7 @@ public class LoginResponse {
 
     private Boolean success;
     private String message;
+    private String token;
     private String idKaryawan;
     private String namaKaryawan;
     private String role;
@@ -11,9 +12,11 @@ public class LoginResponse {
     public LoginResponse() {
     }
 
-    public LoginResponse(Boolean success, String message, String idKaryawan, String namaKaryawan, String role) {
+    public LoginResponse(Boolean success, String message, String token, String idKaryawan, String namaKaryawan,
+            String role) {
         this.success = success;
         this.message = message;
+        this.token = token;
         this.idKaryawan = idKaryawan;
         this.namaKaryawan = namaKaryawan;
         this.role = role;
@@ -33,6 +36,14 @@ public class LoginResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getRole() {
