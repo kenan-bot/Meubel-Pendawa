@@ -27,7 +27,7 @@ public class LoginLogService {
         LocalTime sekarang = LocalTime.now();
 
         boolean diluarJamOperasional = sekarang.isBefore(LocalTime.of(8, 0))
-                || sekarang.isAfter(LocalTime.of(17, 0));
+                || sekarang.isAfter(LocalTime.of(18, 0));
 
         LoginLog log = new LoginLog();
 

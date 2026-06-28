@@ -22,8 +22,19 @@ public class JwtService {
                 .subject(idKaryawan)
                 .issuedAt(new Date())
                 .expiration(
-                new Date(System.currentTimeMillis() + 86400000))
+                        new Date(System.currentTimeMillis() + 86400000))
                 .signWith(key)
                 .compact();
     }
+
+    public String extractIdKaryawan(String token) {
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("idKaryawan", String.class);
+    }
+
 }

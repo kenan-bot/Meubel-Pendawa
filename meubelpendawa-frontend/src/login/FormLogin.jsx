@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AnimatedSection from "../components/AnimatedSection";
+import axios from "axios";
 
 export default function FormLogin() {
   const navigate = useNavigate();
@@ -11,13 +12,39 @@ export default function FormLogin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    // nanti panggil API login di sini
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/owner");
-    }, 1000);
+    try {setLoading(true);
+
+      const response = await axios.post("http://localhost:8080/auth/login", {
+        username,
+        password,
+      });
+
+      const data = response.data;
+
+      if (!data.success) {alert(data.message);
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("idKaryawan", data.idKaryawan);
+      localStorage.setItem("namaKaryawan", data.namaKaryawan);
+
+      if (data.role === "OWNER") {navigate("/owner");
+      } else if (data.role === "CASHIER_SALES") {navigate("/kasir");
+
+      } else if (data.role === "DRIVER") {navigate("/driver");
+
+      }
+    } catch (error) {
+      if (error.response) {alert(error.response.data.message);
+      }
+      else {alert("Tidak dapat terhubung ke server");
+      }
+    }
+    finally {setLoading(false);
+    }
   };
 
   return (

@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import Home from "./home/Home";
 import FormLogin from "./login/FormLogin";
 import OwnerRoutes from "./route/OwnerRoutes";
+import KasirRoutes from "./route/KasirRoutes";
+import DriverRoutes from "./route/DriverRoutes";
 
 function App() {
 
@@ -18,6 +20,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<FormLogin />} />
         <Route path="/owner/*" element={<OwnerRoutes />} />
+        <Route path="/kasir/*" element={<KasirRoutes />} />
+        <Route path="/driver/*" element={<DriverRoutes />} />
       </Routes>
     </BrowserRouter>
   );

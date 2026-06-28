@@ -50,8 +50,8 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(
-        karyawan.getIdKaryawan(),
-        karyawan.getRole());
+                karyawan.getIdKaryawan(),
+                karyawan.getRole());
 
         loginLogService.catatLogin(karyawan);
 
@@ -63,4 +63,19 @@ public class AuthService {
         loginLogService.catatLogout(idKaryawan);
     }
 
+    public LoginResponse getCurrentUser(String token) {
+
+        String idKaryawan = jwtService.extractIdKaryawan(token);
+
+        Karyawan karyawan = karyawanRepository.findById(idKaryawan)
+                .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
+
+        return new LoginResponse(
+                true,
+                "User ditemukan",
+                null,
+                karyawan.getIdKaryawan(),
+                karyawan.getNamaKaryawan(),
+                karyawan.getRole());
+    }
 }

@@ -7,15 +7,11 @@ function OwnerLayout(){
 
     return(
         <div className="flex">
-
             <Sidebar menus={ownerMenus}/>
-
-            <div className="flex-1">
-
-                <Dashboard/>
-
+            
+            <div className="flex-1 p-8">
+                <Outlet />
             </div>
-
         </div>
     )
 

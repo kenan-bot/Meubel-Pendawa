@@ -30,4 +30,14 @@ public class AuthController {
 
         return "Logout berhasil";
     }
+
+    @GetMapping("/me")
+    public LoginResponse me(
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "");
+
+        return authService.getCurrentUser(token);
+    }
+
 }
