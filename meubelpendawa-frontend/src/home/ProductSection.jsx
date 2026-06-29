@@ -1,35 +1,18 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-
-import ProductCard from "./ProductCard";
+import { useState } from "react";
+import { useProduk } from "../context/ProdukContext";
+import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
 import Pagination from "../components/Pagination";
-import AnimatedSection from "../components/AnimatedSection";
 
 function ProductSection() {
   // ✅ TAMBAHAN BARU - state untuk pagination
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 12;
-  const [produk, setProduk] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { produk, loading } = useProduk();
 
-  useEffect(() => {
-    loadProduk();
-  }, []);
 
-  const loadProduk = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/produk");
-
-      setProduk(response.data);
-    } catch (error) {
-      console.error("Gagal mengambil produk", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <section id="collections" className="scroll-mt-32 max-w-7xl mx-auto">
@@ -40,9 +23,9 @@ function ProductSection() {
       </div>
 
       {loading ? (
-        <div className="text-center py-10">Memuat produk...</div>
+        <div className="text-center py-10 text-white">Memuat produk...</div>
       ) : (
-        <ProductCard produk={produk} />
+        <ProductCard produk={produk} mode="home" />
       )}
 
       {/* ✅ BAGIAN INI DIUBAH - Pagination sekarang pakai props */}

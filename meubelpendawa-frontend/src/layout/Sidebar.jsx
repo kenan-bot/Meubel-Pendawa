@@ -33,14 +33,15 @@ export default function Sidebar({ menus }) {
   return (
     <>
       <nav
-        className={`shadow-md h-screen p-2 flex flex-col duration-500 bg-orange-500 text-white ${open ? "w-60" : "w-16"}`}
+        className={`shadow-md h-screen p-2 flex flex-col duration-500 bg-orange-500 
+          text-white ${open ? "w-40 sm:w-48 md:w-60" : "w-14 sm:w-16"}`}
       >
         {/* Header */}
-        <div className=" px-3 py-2 h-20 flex justify-between items-center">
+        <div className="px-2 md:px-3 py-2 h-16 md:h-20 flex justify-between items-center">
           <img
             src={logo}
             alt="Logo"
-            className={`${open ? "w-10" : "w-0"} rounded-md`}
+            className={`${open ? "w-8 md:w-10" : "w-0"} rounded-md`}
           />
           <div>
             <MdMenuOpen
@@ -63,11 +64,11 @@ export default function Sidebar({ menus }) {
                 }) => `${isActive ? "bg-orange-700" : "hover:bg-orange-700"} 
               rounded-md duration-300 block`}
               >
-                <li className="px-3 py-2 my-2 cursor-pointer flex gap-2 items-center relative group">
+                <li className="px-2 md:px-3 py-2 my-2 cursor-pointer flex gap-2 items-center relative group">
                   <div>{item.icon}</div>
 
                   <p
-                    className={`${!open && "w-0 translate-x-24"} duration-500 overflow-hidden`}
+                    className={`${!open && "w-0 translate-x-24"} duration-500 overflow-hidden text-xs sm:text-sm md:text-base`}
                   >
                     {" "}
                     {item.label}{" "}
@@ -90,17 +91,16 @@ export default function Sidebar({ menus }) {
         {/* footer */}
         <div className="flex items-center gap-2 px-3 py-2 overflow-hidden">
           <div>
-            <FaUserCircle size={30} />
+            <FaUserCircle className="w-6 h-6 md:w-8 md:h-8" />
           </div>
           <div
             className={`leading-5 ${!open && "w-0 translate-x-24"} duration-500 overflow-hidden font-bold`}
           >
-            <p>{namaKaryawan}</p>
-            
+            <p className="text-xs sm:text-sm md:text-base">{namaKaryawan}</p>
 
             <button
               onClick={() => setShowLogoutModal(true)}
-              className="mt-1 text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md duration-300 flex items-center gap-1"
+              className="mt-1 text-[10px] sm:text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md duration-300 flex items-center gap-1"
             >
               <RiLogoutCircleLine size={14} />
               Logout
