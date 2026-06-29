@@ -18,7 +18,7 @@ function ProductSection() {
     <section id="collections" className="scroll-mt-32 max-w-7xl mx-auto">
       <div className="ml-8 flex items-center gap-4 mt-20 px-4 md:px-8 lg:px-12">
         <SearchBar />
-        <FilterKategori />
+        <FilterKategori  mode="home"/>
         <FilterMerek />
       </div>
 

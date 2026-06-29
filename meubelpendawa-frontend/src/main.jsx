@@ -4,9 +4,14 @@ import "./index.css";
 import App from "./App.jsx";
 
 import { ProdukProvider } from "./context/ProdukContext";
+import { KategoriProvider } from "./context/KategoriContext";
 
 createRoot(document.getElementById("root")).render(
-  <ProdukProvider>
-    <App />
-  </ProdukProvider>,
+  <StrictMode>
+    <ProdukProvider>
+      <KategoriProvider>
+        <App />
+      </KategoriProvider>
+    </ProdukProvider>
+  </StrictMode>
 );

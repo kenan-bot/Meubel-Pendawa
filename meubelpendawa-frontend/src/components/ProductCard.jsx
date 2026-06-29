@@ -19,27 +19,10 @@ const ProductCard = ({ produk, mode = "home", onEdit, onDelete }) => {
   const isCashier = mode === "cashier";
 
   return (
-    <div
-      className={
-        mode === "home"
-          ? "min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-8"
-          : "w-full"
-      }
-    >
-      <div
-        className={
-          mode === "home"
-            ? "mt-0 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto"
-            : "w-full"
-        }
-      >
-        <div
-          className={
-            mode === "home"
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-              : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          }
-        >
+    <div className={mode === "home" ? "min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-8" : "w-full"} >
+      <div className={mode === "home" ? "mt-0 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto" : "w-full"} >
+        <div className={ mode === "home" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" 
+        : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"} >
           {produk.map((item, index) => (
             <motion.div
               key={item.idProduk}
