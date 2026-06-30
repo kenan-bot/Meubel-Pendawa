@@ -1,11 +1,8 @@
 import React from "react";
 import { FiSearch } from "react-icons/fi";
 import AnimatedSection from "./AnimatedSection";
-import { useProduk } from "../context/ProdukContext";
 
-const SearchBar = ({ theme = "purple" }) => {
-  const { searchTerm, setSearchTerm } = useProduk();
-
+const SearchBar = ({ theme = "purple", value, onChange, placeholder = "Search" }) => {
   const styles = {
     purple: {
       icon: "text-[#5F04E8]",
@@ -36,9 +33,9 @@ const SearchBar = ({ theme = "purple" }) => {
 
         <input
           type="text"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
           className={`w-[140px] sm:w-[180px] group-hover:w-[200px]
           transition-all duration-300 rounded-full
           ${color.border}

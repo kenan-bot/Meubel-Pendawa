@@ -8,6 +8,7 @@ import com.meubelpendawa.service.TransaksiService;
 
 @RestController
 @RequestMapping("/transaksi")
+@CrossOrigin("*")
 public class TransaksiController {
 
     @Autowired
@@ -26,6 +27,11 @@ public class TransaksiController {
     @PostMapping
     public Transaksi tambahTransaksi(@RequestBody Transaksi transaksi) {
         return transaksiService.simpanTransaksi(transaksi);
+    }
+
+    @PutMapping("/{orderId}/bayar")
+    public Transaksi prosesPembayaran(@PathVariable String orderId, @RequestParam Double jumlahBayar) {
+        return transaksiService.prosesPembayaran(orderId, jumlahBayar);
     }
 
 }
