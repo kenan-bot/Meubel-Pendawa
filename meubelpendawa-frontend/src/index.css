@@ -16,6 +16,9 @@ body {
     transform: scale(1) translateY(0);
   }
 }
+.animate-modal-show {
+  animation: modalShow 0.28s ease-out forwards;
+}
 
 @keyframes slideDown {
   from {

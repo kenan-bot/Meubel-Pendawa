@@ -6,6 +6,7 @@ const Card = ({
   variant = "default",
   hover = true,
   padding = "normal",
+  onClick,
 }) => {
   const baseStyles = "rounded-lg shadow-md transition-all duration-300";
 
@@ -17,7 +18,9 @@ const Card = ({
     orange: "bg-orange-500",
   };
 
-  const hoverStyles = hover ? "hover:shadow-[0_12px_30px_rgba(0,0,0,0.35)] hover:-translate-y-2" : "";
+  const hoverStyles = hover
+    ? "hover:shadow-[0_12px_30px_rgba(0,0,0,0.35)] hover:-translate-y-2"
+    : "";
 
   const paddingStyles = {
     none: "p-0",
@@ -28,6 +31,7 @@ const Card = ({
 
   return (
     <div
+      onClick={onClick}
       className={`${baseStyles} ${variants[variant]} ${hoverStyles} ${paddingStyles[padding]} ${className}`}
     >
       {children}

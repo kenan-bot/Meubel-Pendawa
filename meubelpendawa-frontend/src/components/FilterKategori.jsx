@@ -53,7 +53,7 @@ const FilterKategori = ({ mode = "owner", onSelect }) => {
                   toggleOpen();
                 }}
               >
-                Semua Kategori
+                Semua
               </div>
               {kategori.map((item, index) => (
                 <div key={item.idKategori}>

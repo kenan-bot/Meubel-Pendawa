@@ -51,7 +51,7 @@ const FilterMerek = ({ mode = "owner", onSelect }) => {
                   toggleOpen();
                 }}
               >
-                Semua Merek
+                Semua
               </div>
               {merek.map((item, index) => (
                 <div key={item.idMerek}>

@@ -6,16 +6,27 @@ import FilterMerek from "../components/FilterMerek";
 import FormInput from "../components/FormInput";
 
 import Modal from "../components/Modal";
-import ProductForm from "../components/ProductForm"; 
+import ProductForm from "../components/ProductForm";
 import { useState } from "react";
 
 import { FiPlus } from "react-icons/fi";
 
 export default function Produk() {
+  const [openUpdateProduk, setOpenUpdateProduk] = useState(false);
+  const [selectedProduk, setSelectedProduk] = useState(null);
   const [openTambahProduk, setOpenTambahProduk] = useState(false);
-  const { filteredProduk, loading } = useProduk();
+  const {
+    filteredProduk,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    setSelectedKategori,
+    setSelectedMerek,
+  } = useProduk();
+
   const handleEdit = (item) => {
-    console.log("Edit:", item);
+    setSelectedProduk(item);
+    setOpenUpdateProduk(true);
   };
   const handleDelete = (idProduk) => {
     console.log("Hapus:", idProduk);
@@ -39,10 +50,21 @@ export default function Produk() {
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
-          <SearchBar theme="orange" />
+          <SearchBar
+            theme="orange"
+            placeholder="Cari produk..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto">
-            <FilterKategori />
-            <FilterMerek />
+            <FilterKategori
+              onSelect={(item) =>
+                setSelectedKategori(item ? item.idKategori : null)
+              }
+            />
+            <FilterMerek
+              onSelect={(item) => setSelectedMerek(item ? item.idMerek : null)}
+            />
           </div>
 
           {/* tambah produk */}
@@ -72,7 +94,18 @@ export default function Produk() {
         onClose={() => setOpenTambahProduk(false)}
         title="Tambah Produk"
       >
-        <ProductForm onSuccess={() => setOpenTambahProduk(false)} />
+        <ProductForm />
+      </Modal>
+
+      <Modal
+        isOpen={openUpdateProduk}
+        onClose={() => {
+          setOpenUpdateProduk(false);
+          setSelectedProduk(null);
+        }}
+        title="Update Produk"
+      >
+        <ProductForm mode="edit" produk={selectedProduk} />
       </Modal>
     </>
   );

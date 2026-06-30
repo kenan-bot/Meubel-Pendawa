@@ -11,16 +11,16 @@ import { useMerek } from "../context/MerekContext";
 import { useProduk } from "../context/ProdukContext";
 
 import { uploadGambar } from "../api/uploadApi";
-import { createProduk } from "../api/productApi";
+import { createProduk, updateProduk } from "../api/productApi";
 
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 
-const ProductForm = ({ onSuccess }) => {
+const ProductForm = ({ mode = "create", produk = null }) => {
   const [toast, setToast] = useState(null);
 
   const { kategori } = useKategori();
   const { merek } = useMerek();
-  const { reloadProduk } = useProduk();
+  const { addProduk } = useProduk();
 
   const [namaProduk, setNamaProduk] = useState("");
   const [stok, setStok] = useState("");
@@ -36,6 +36,20 @@ const ProductForm = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (mode !== "edit" || !produk) return;
+
+    setNamaProduk(produk.namaProduk || "");
+    setStok(String(produk.stok || ""));
+    setHargaDefault(String(produk.hargaDefault || ""));
+    setDeskripsi(produk.deskripsi || "");
+
+    setKategoriId(produk.kategori?.idKategori || "");
+    setMerekId(produk.merek?.idMerek || "");
+
+    setGambarUrl(produk.gambarUrl || "");
+  }, [produk, mode]);
+
+  useEffect(() => {
     if (!toast) return;
 
     const timer = setTimeout(() => {
@@ -45,43 +59,68 @@ const ProductForm = ({ onSuccess }) => {
     return () => clearTimeout(timer);
   }, [toast]);
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    setGambar(file);
+
+    try {
+      const url = await uploadGambar(file);
+      setGambarUrl(url);
+    } catch (error) {
+      setToast({
+        type: "error",
+        message: "Upload gambar gagal",
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (mode === "create" && !gambar) {
+      setToast({
+        type: "warning",
+        message: "Gambar produk wajib diisi",
+      });
+      return;
+    }
+
+    if (!namaProduk.trim()) {
+      setToast({
+        type: "warning",
+        message: "Nama produk wajib diisi",
+      });
+      return;
+    }
+
+    if (!kategoriId) {
+      setToast({
+        type: "warning",
+        message: "Kategori wajib dipilih",
+      });
+      return;
+    }
+
+    if (!merekId) {
+      setToast({
+        type: "warning",
+        message: "Merek wajib dipilih",
+      });
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      setLoading(true);
-
-      let finalGambarUrl = gambarUrl;
-
-      if (gambar) {
-        finalGambarUrl = await uploadGambar(gambar);
-      }
-
-      if (!gambar) {
-        setToast({ type: "warning", message: "Gambar produk wajib diisi" });
-        return;
-      }
-
-      if (!namaProduk.trim()) {
-        setToast({ type: "warning", message: "Nama produk wajib diisi" });
-        return;
-      }
-
-      if (!kategoriId) {
-        setToast({ type: "warning", message: "Kategori wajib dipilih" });
-        return;
-      }
-
-      if (!merekId) {
-        setToast({ type: "warning", message: "Merek wajib dipilih" });
-        return;
-      }
-
       const data = {
         namaProduk,
-        stok: Number(stok),
-        hargaDefault: Number(hargaDefault),
+        stok: Number(stok || 0),
+        hargaDefault: Number(hargaDefault || 0),
         deskripsi,
-        gambarUrl: finalGambarUrl,
+        gambarUrl,
 
         kategori: {
           idKategori: kategoriId,
@@ -92,8 +131,28 @@ const ProductForm = ({ onSuccess }) => {
         },
       };
 
-      await createProduk(data);
-      await reloadProduk();
+      if (mode === "create") {
+        const produkBaru = await createProduk(data);
+
+        addProduk(produkBaru);
+
+        setToast({
+          type: "success",
+          message: "Produk berhasil ditambahkan",
+        });
+      } else {
+        const dataUpdate = {
+          ...data,
+          idProduk: produk.idProduk,
+        };
+
+        await updateProduk(produk.idProduk, dataUpdate);
+
+        setToast({
+          type: "success",
+          message: "Produk berhasil diperbarui",
+        });
+      }
 
       setNamaProduk("");
       setStok("");
@@ -105,16 +164,9 @@ const ProductForm = ({ onSuccess }) => {
       setGambarUrl("");
 
       setToast({
-        type: "success",
-        message: "Produk berhasil ditambahkan",
+        type: "error",
+        message: "Gagal menambahkan produk",
       });
-
-      setTimeout(() => {
-        onSuccess?.();
-      }, 1500);
-    } catch (error) {
-      console.error(error);
-      setToast({ type: "error", message: "Gagal menambahkan produk" });
     } finally {
       setLoading(false);
     }
@@ -138,6 +190,12 @@ const ProductForm = ({ onSuccess }) => {
                     alt="Preview"
                     className="w-full h-full object-contain"
                   />
+                ) : gambarUrl ? (
+                  <img
+                    src={gambarUrl}
+                    alt="Preview"
+                    className="w-full h-full object-contain"
+                  />
                 ) : (
                   <span className="text-sm text-gray-400">Preview Gambar</span>
                 )}
@@ -147,7 +205,7 @@ const ProductForm = ({ onSuccess }) => {
                 type="file"
                 accept=".jpg,.jpeg,.png,.webp,.svg"
                 className="mt-2 text-sm w-full"
-                onChange={(e) => setGambar(e.target.files[0])}
+                onChange={handleImageChange}
               />
             </div>
 
@@ -252,7 +310,11 @@ const ProductForm = ({ onSuccess }) => {
                 className="bg-orange-500 text-white px-5 py-2 rounded-md
               hover:bg-orange-600 hover:scale-105 active:scale-95 transition-all duration-20"
               >
-                {loading ? "Menyimpan..." : "Simpan"}
+                {loading
+                  ? "Menyimpan..."
+                  : mode === "edit"
+                    ? "Update"
+                    : "Simpan"}
               </button>
             </div>
           </div>

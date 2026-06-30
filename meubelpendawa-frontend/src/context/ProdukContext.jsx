@@ -23,6 +23,10 @@ export function ProdukProvider({ children }) {
     }
   };
 
+  const addProduk = (newProduk) => {
+    setProduk((prev) => [newProduk, ...prev]);
+  };
+
   const [selectedKategori, setSelectedKategori] = useState(null);
   const [selectedMerek, setSelectedMerek] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,6 +59,7 @@ export function ProdukProvider({ children }) {
         setSearchTerm,
 
         reloadProduk: loadProduk,
+        addProduk,
       }}
     >
       {children}
