@@ -8,6 +8,7 @@ import com.meubelpendawa.service.DetailTransaksiService;
 
 @RestController
 @RequestMapping("/detail-transaksi")
+@CrossOrigin("*")
 public class DetailTransaksiController {
 
     @Autowired
@@ -22,6 +23,5 @@ public class DetailTransaksiController {
     public DetailTransaksi tambahDetailTransaksi(@RequestBody DetailTransaksi detailTransaksi) {
         return detailTransaksiService.simpanDetailTransaksi(detailTransaksi);
     }
-
 
 }
