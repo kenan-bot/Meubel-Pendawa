@@ -102,8 +102,7 @@ public class KaryawanService {
     }
 
     dataLama.setNamaKaryawan(karyawan.getNamaKaryawan());
-    dataLama.setNoHp(karyawan.getNoHp());
-    dataLama.setAlamat(karyawan.getAlamat());
+    dataLama.setEmail(karyawan.getEmail());
     dataLama.setAksesSistem(karyawan.getAksesSistem());
     dataLama.setRole(karyawan.getRole());
     dataLama.setUsername(karyawan.getUsername());

@@ -51,12 +51,13 @@ public class AuthService {
 
         String token = jwtService.generateToken(
                 karyawan.getIdKaryawan(),
-                karyawan.getRole());
+                karyawan.getRole().name());
 
         loginLogService.catatLogin(karyawan);
 
         return new LoginResponse(true, "Login berhasil", token, karyawan.getIdKaryawan(), karyawan.getNamaKaryawan(),
-                karyawan.getRole());
+                karyawan.getRole().name());
+
     }
 
     public void logout(String idKaryawan) {
@@ -76,6 +77,6 @@ public class AuthService {
                 null,
                 karyawan.getIdKaryawan(),
                 karyawan.getNamaKaryawan(),
-                karyawan.getRole());
+                karyawan.getRole().name());
     }
 }

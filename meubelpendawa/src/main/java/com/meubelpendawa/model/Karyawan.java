@@ -1,8 +1,11 @@
 package com.meubelpendawa.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "karyawan")
@@ -13,14 +16,15 @@ public class Karyawan {
 
     private String namaKaryawan;
 
-    private String noHp;
-
-    private String alamat;
+    @Column(unique = true)
+    private String email;
 
     private Boolean aksesSistem;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
+    @Column(unique = true)
     private String username;
 
     private String password;
@@ -30,10 +34,10 @@ public class Karyawan {
     public Karyawan() {
     }
 
-    public Karyawan(String namaKaryawan, String noHp, String alamat, Boolean aksesSistem, String role, String username, String password, Boolean statusAktif) {
+    public Karyawan(String namaKaryawan, String email, Boolean aksesSistem, Role role, String username,
+            String password, Boolean statusAktif) {
         this.namaKaryawan = namaKaryawan;
-        this.noHp = noHp;
-        this.alamat = alamat;
+        this.email = email;
         this.aksesSistem = aksesSistem;
         this.role = role;
         this.username = username;
@@ -57,20 +61,12 @@ public class Karyawan {
         this.namaKaryawan = namaKaryawan;
     }
 
-    public String getNoHp() {
-        return noHp;
+    public String getEmail() {
+        return email;
     }
 
-    public void setNoHp(String noHp) {
-        this.noHp = noHp;
-    }
-
-    public String getAlamat() {
-        return alamat;
-    }
-
-    public void setAlamat(String alamat) {
-        this.alamat = alamat;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean getAksesSistem() {
@@ -81,11 +77,11 @@ public class Karyawan {
         this.aksesSistem = aksesSistem;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

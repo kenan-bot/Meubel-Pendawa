@@ -6,13 +6,16 @@ import App from "./App.jsx";
 import { ProdukProvider } from "./context/ProdukContext";
 import { KategoriProvider } from "./context/KategoriContext";
 import { MerekProvider } from "./context/MerekContext";
+import { KaryawanProvider } from "./context/KaryawanContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ProdukProvider>
       <KategoriProvider>
         <MerekProvider>
-          <App />
+          <KaryawanProvider>
+            <App />
+          </KaryawanProvider>
         </MerekProvider>
       </KategoriProvider>
     </ProdukProvider>
