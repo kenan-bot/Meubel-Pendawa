@@ -20,7 +20,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
   const { kategori } = useKategori();
   const { merek } = useMerek();
-  const { addProduk } = useProduk();
+  const { addProduk, updateProdukState } = useProduk();
 
   const [namaProduk, setNamaProduk] = useState("");
   const [stok, setStok] = useState("");
@@ -140,32 +140,42 @@ const ProductForm = ({ mode = "create", produk = null }) => {
           type: "success",
           message: "Produk berhasil ditambahkan",
         });
+
+        // reset form
+        setNamaProduk("");
+        setStok("");
+        setHargaDefault("");
+        setKategoriId("");
+        setMerekId("");
+        setDeskripsi("");
+        setGambar(null);
+        setGambarUrl("");
       } else {
         const dataUpdate = {
           ...data,
           idProduk: produk.idProduk,
         };
 
-        await updateProduk(produk.idProduk, dataUpdate);
+        const result = await updateProduk(dataUpdate);
+
+        updateProdukState(result);
 
         setToast({
           type: "success",
           message: "Produk berhasil diperbarui",
         });
       }
+    } catch (error) {
+      console.error("ERROR UPDATE/CREATE:", error);
 
-      setNamaProduk("");
-      setStok("");
-      setHargaDefault("");
-      setKategoriId("");
-      setMerekId("");
-      setDeskripsi("");
-      setGambar(null);
-      setGambarUrl("");
+      if (error.response) {
+        console.error("STATUS:", error.response.status);
+        console.error("DATA:", error.response.data);
+      }
 
       setToast({
         type: "error",
-        message: "Gagal menambahkan produk",
+        message: error.response?.data?.message || "Gagal menyimpan produk",
       });
     } finally {
       setLoading(false);

@@ -17,8 +17,8 @@ export const createProduk = async (data) => {
   return response.data;
 };
 
-export const updateProduk = async (id, data) => {
-  const response = await axiosClient.put(`/produk/${id}`, data);
+export const updateProduk = async (data) => {
+  const response = await axiosClient.put("/produk", data);
   return response.data;
 };
 

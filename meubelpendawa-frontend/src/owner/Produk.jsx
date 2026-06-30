@@ -105,7 +105,14 @@ export default function Produk() {
         }}
         title="Update Produk"
       >
-        <ProductForm mode="edit" produk={selectedProduk} />
+        <ProductForm
+          mode="edit"
+          produk={selectedProduk}
+          onSuccess={() => {
+            setOpenUpdateProduk(false);
+            setSelectedProduk(null);
+          }}
+        />
       </Modal>
     </>
   );

@@ -12,6 +12,16 @@ export function ProdukProvider({ children }) {
     loadProduk();
   }, []);
 
+  //load produk yg diupdate aja
+  const updateProdukState = (produkUpdate) => {
+    setProduk((prev) =>
+      prev.map((item) =>
+        item.idProduk === produkUpdate.idProduk ? produkUpdate : item,
+      ),
+    );
+  };
+
+  //load produk keseluruhan
   const loadProduk = async () => {
     try {
       const data = await getAllProduk();
@@ -60,6 +70,7 @@ export function ProdukProvider({ children }) {
 
         reloadProduk: loadProduk,
         addProduk,
+        updateProdukState,
       }}
     >
       {children}

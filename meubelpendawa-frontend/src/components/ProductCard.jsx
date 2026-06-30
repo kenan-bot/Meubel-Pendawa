@@ -114,12 +114,15 @@ const ProductCard = ({
 
                       <CardBody
                         className={`inline-flex items-center justify-center px-2 py-0 mb-1 text-white
-                      text-sm font-light rounded-md
-                      ${item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500"}`}
+                        text-sm font-light rounded-md
+                        ${item.stok === 0 ? "bg-red-500" : 
+                          item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500" }`}
                       >
-                        {item.stok > 5
-                          ? `Tersedia ${item.stok}`
-                          : `Tersisa ${item.stok}`}
+                        {item.stok === 0
+                          ? "Stok Habis"
+                          : item.stok > 5
+                            ? `Tersedia ${item.stok}`
+                            : `Tersisa ${item.stok}`}
                       </CardBody>
                     </CardHeader>
 
