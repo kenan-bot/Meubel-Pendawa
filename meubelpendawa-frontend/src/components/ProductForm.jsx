@@ -104,8 +104,14 @@ const ProductForm = ({ onSuccess }) => {
       setGambar(null);
       setGambarUrl("");
 
-      onSuccess?.();
-      setToast({ type: "success", message: "Produk berhasil ditambahkan" });
+      setToast({
+        type: "success",
+        message: "Produk berhasil ditambahkan",
+      });
+
+      setTimeout(() => {
+        onSuccess?.();
+      }, 1500);
     } catch (error) {
       console.error(error);
       setToast({ type: "error", message: "Gagal menambahkan produk" });
