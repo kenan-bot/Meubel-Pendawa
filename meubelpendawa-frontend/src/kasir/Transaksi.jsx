@@ -7,6 +7,8 @@ import { getAllKaryawan } from "../api/karyawanApi";
 import SearchBar from "../components/SearchBar";
 import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
+import DateTimeDisplay from "../components/DateTimeDisplay"; // [BARU] pengganti formatTanggalHeader + jamSekarang
+import RupiahInput from "../components/RupiahInput"; // [BARU] pengganti input number biasa (no spinner)
 
 import { GiShoppingBag } from "react-icons/gi";
 import { FaTrash, FaQrcode } from "react-icons/fa";
@@ -26,23 +28,7 @@ function formatTanggal(date) {
   return `${dd} - ${mm} - ${yyyy} : ${hh}:${mi}:${ss}`;
 }
 
-// format ala "Selasa, 30 Juni 2026 • Pukul 18.37.04"
-function formatTanggalHeader(date) {
-  const hari = date.toLocaleDateString("id-ID", { weekday: "long" });
-  const tanggal = date.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const jam = date
-    .toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-    .replace(/:/g, ".");
-  return `${hari}, ${tanggal} • Pukul ${jam}`;
-}
+// [DIHAPUS] function formatTanggalHeader(date) {...} -> digantikan oleh <DateTimeDisplay />
 
 function Transaksi() {
   const { produk, loading } = useProduk();
@@ -59,13 +45,7 @@ function Transaksi() {
   const isDelivery = metodePengiriman === "DELIVERY";
   const isCashless = metodePembayaran === "CASHLESS";
 
-  // ----- jam realtime untuk header kanan atas -----
-  const [jamSekarang, setJamSekarang] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setJamSekarang(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // [DIHAPUS] state jamSekarang & useEffect timer-nya, sudah ditangani di dalam <DateTimeDisplay />
 
   useEffect(() => {
     const loadDriver = async () => {
@@ -109,7 +89,7 @@ function Transaksi() {
 
   // ----- keranjang (lokal dulu, baru dikirim ke backend saat proses pesanan) -----
   const [keranjang, setKeranjang] = useState([]); // { produk, qty, hargaJual }
-  const [orderId] = useState(`#${Date.now().toString().slice(-7)}`);
+  // [DIHAPUS] const [orderId] = useState(`#${Date.now()...}`); -> tidak dipakai, label cukup "Order"
   const [waktu] = useState(new Date());
   const [jumlahBayar, setJumlahBayar] = useState("");
   const [editHargaId, setEditHargaId] = useState(null);
@@ -234,9 +214,8 @@ function Transaksi() {
               <h1 className="text-lg font-bold text-gray-800">Form Pemesan</h1>
               <p className="text-xs text-gray-400 mt-0.5">Halaman Form Pemesan</p>
             </div>
-            <p className="text-sm text-gray-500 whitespace-nowrap">
-              {formatTanggalHeader(jamSekarang)}
-            </p>
+            {/* [DIGANTI] sebelumnya: <p>{formatTanggalHeader(jamSekarang)}</p> */}
+            <DateTimeDisplay />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
@@ -418,7 +397,8 @@ function Transaksi() {
           </div>
 
           <p className="text-[11px] text-gray-400 mb-0.5">{formatTanggal(waktu)}</p>
-          <p className="text-orange-500 font-bold text-xs">Order: {orderId}</p>
+          {/* [DIGANTI] sebelumnya menampilkan orderId, sekarang cukup label "Order" saja */}
+          <p className="text-orange-500 font-bold text-xs">Order</p>
         </div>
 
         {/* daftar item -- INI yang discroll, dikecilin supaya lebih banyak item kelihatan */}
@@ -483,17 +463,22 @@ function Transaksi() {
                   </span>
                 </div>
 
+                {/* [DIGANTI] Atur Harga sebelumnya <input type="number"> (ada spinner),
+                    sekarang pakai RupiahInput (text input, auto-format Rp, tanpa spinner) */}
                 {editHargaId === item.produk.idProduk ? (
-                  <input
-                    type="number"
-                    autoFocus
-                    defaultValue={item.hargaJual}
-                    onBlur={(e) => {
-                      ubahHarga(item.produk.idProduk, e.target.value);
-                      setEditHargaId(null);
-                    }}
-                    className="w-full mt-1.5 px-1.5 py-1 text-[11px] border border-orange-300 rounded-md focus:outline-none"
-                  />
+                  <div className="mt-1.5 [&_label]:hidden [&_input]:text-[11px] [&_input]:py-1 [&_input]:px-1.5 [&_input]:border-orange-300">
+                    <RupiahInput
+                      value={item.hargaJual}
+                      onChange={(val) => ubahHarga(item.produk.idProduk, val)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEditHargaId(null)}
+                      className="mt-1 text-[10px] text-gray-400 underline"
+                    >
+                      Selesai
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => setEditHargaId(item.produk.idProduk)}
@@ -512,13 +497,14 @@ function Transaksi() {
           <div className="bg-orange-500 text-white rounded-lg p-3 space-y-1.5 text-xs">
             <div className="flex items-center justify-between">
               <span>Jumlah Bayar</span>
-              <input
-                type="number"
-                value={jumlahBayar}
-                onChange={(e) => setJumlahBayar(e.target.value)}
-                placeholder="Rp0"
-                className="w-24 text-right px-1.5 py-1 rounded text-orange-600 font-semibold text-xs focus:outline-none"
-              />
+              {/* [DIGANTI] sebelumnya <input type="number"> (ada spinner),
+                  sekarang pakai RupiahInput (text input, auto-format Rp, tanpa spinner) */}
+              <div className="w-28 [&_label]:hidden [&_input]:w-full [&_input]:text-right [&_input]:px-1.5 [&_input]:py-1 [&_input]:rounded [&_input]:text-orange-600 [&_input]:font-semibold [&_input]:text-xs [&_input]:border-0 [&_input]:focus:ring-0 [&_input]:focus:outline-none">
+                <RupiahInput
+                  value={jumlahBayar}
+                  onChange={(val) => setJumlahBayar(val)}
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between">

@@ -3,6 +3,7 @@ import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
 
 import SearchBar from "../components/SearchBar";
+import DateTimeDisplay from "../components/DateTimeDisplay"; // [BARU] pengganti formatTanggalHeader + jamSekarang
 
 import { FaUserCircle, FaMotorcycle, FaMapMarkerAlt, FaTruck, FaCheckCircle } from "react-icons/fa";
 
@@ -12,6 +13,8 @@ function formatRupiah(nominal) {
 }
 
 // format ala "17 - 05 - 2026 : 17:08:56" (samakan gaya dengan keranjang di Transaksi)
+// tetap dipakai untuk menampilkan tanggal transaksi (data historis), bukan jam berjalan,
+// jadi tidak diganti DateTimeDisplay (DateTimeDisplay selalu menampilkan waktu saat ini).
 function formatTanggal(date) {
   const dd = String(date.getDate()).padStart(2, "0");
   const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -22,41 +25,20 @@ function formatTanggal(date) {
   return `${dd} - ${mm} - ${yyyy} : ${hh}:${mi}:${ss}`;
 }
 
-// format ala "Selasa, 30 Juni 2026 • Pukul 18.37.04" (samakan dengan header Form Pemesan)
-function formatTanggalHeader(date) {
-  const hari = date.toLocaleDateString("id-ID", { weekday: "long" });
-  const tanggal = date.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const jam = date
-    .toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-    .replace(/:/g, ".");
-  return `${hari}, ${tanggal} • Pukul ${jam}`;
-}
+// [DIHAPUS] function formatTanggalHeader(date) {...} -> digantikan oleh <DateTimeDisplay />
 
 function StatusPengiriman() {
   const [transaksiList, setTransaksiList] = useState([]);
   const [detailList, setDetailList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [jamSekarang, setJamSekarang] = useState(new Date());
+  // [DIHAPUS] state jamSekarang & useEffect timer-nya, sudah ditangani di dalam <DateTimeDisplay />
   const [keyword, setKeyword] = useState("");
   const [tabStatus, setTabStatus] = useState("ON_PROCESS"); // ON_PROCESS | COMPLETED
 
   // status pengiriman per orderId (sementara disimpan lokal,
   // karena tabel transaksi belum punya kolom status pengiriman di backend)
   const [statusMap, setStatusMap] = useState({});
-
-  useEffect(() => {
-    const timer = setInterval(() => setJamSekarang(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -115,13 +97,10 @@ function StatusPengiriman() {
     });
   }, [transaksiList, statusMap, tabStatus, keyword]);
 
-  const tandaiSelesai = (orderId) => {
-    setStatusMap((prev) => ({ ...prev, [orderId]: "COMPLETED" }));
-  };
-
-  const tandaiProses = (orderId) => {
-    setStatusMap((prev) => ({ ...prev, [orderId]: "ON_PROCESS" }));
-  };
+  // [DIHAPUS] function tandaiSelesai(orderId) {...}
+  // [DIHAPUS] function tandaiProses(orderId) {...}
+  // Kasir hanya bisa MELIHAT status pengiriman, tidak bisa mengubahnya.
+  // Perubahan status (proses -> selesai) hanya dilakukan oleh driver/role lain di halaman lain.
 
   return (
     <div className="flex flex-col -m-8 p-4 bg-gray-50 h-[calc(100vh-2rem)] overflow-hidden text-sm">
@@ -135,9 +114,8 @@ function StatusPengiriman() {
                 Halaman untuk memantau status pengiriman
               </p>
             </div>
-            <p className="text-sm text-gray-500 whitespace-nowrap">
-              {formatTanggalHeader(jamSekarang)}
-            </p>
+            {/* [DIGANTI] sebelumnya: <p>{formatTanggalHeader(jamSekarang)}</p> */}
+            <DateTimeDisplay />
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -256,18 +234,16 @@ function StatusPengiriman() {
                       <span>{t.alamatPengiriman}</span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        isCompleted ? tandaiProses(t.orderId) : tandaiSelesai(t.orderId)
-                      }
-                      className={`mt-3 w-full flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-semibold text-white transition ${
-                        isCompleted ? "bg-[#5F04E8] hover:bg-[#4d03c0]" : "bg-orange-500 hover:bg-orange-600"
+                    {/* [DIGANTI] sebelumnya <button onClick={...tandaiSelesai/tandaiProses}>,
+                        sekarang hanya badge status (read-only), kasir tidak bisa update status pengiriman */}
+                    <div
+                      className={`mt-3 w-full flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-semibold text-white select-none cursor-default ${
+                        isCompleted ? "bg-[#5F04E8]" : "bg-orange-500"
                       }`}
                     >
                       {isCompleted ? <FaCheckCircle size={12} /> : <FaTruck size={12} />}
                       {isCompleted ? "Completed" : "On Process"}
-                    </button>
+                    </div>
                   </div>
                 );
               })}
