@@ -1,18 +1,25 @@
 import Sidebar from "../layout/Sidebar";
 import { ownerMenus } from "../role-menu/SidebarMenu";
 import { Outlet } from "react-router-dom";
-import Dashboard from "./Dashboard";
+import DateTimeDisplay from "../components/DateTimeDisplay";
 
 function OwnerLayout() {
   return (
     <div className="bg-gray-100 flex h-screen">
-
       <Sidebar menus={ownerMenus} />
 
-      <main className="flex-1 p-3 sm:p-4 md:p-8 overflow-y-auto">
-        <Outlet />
-      </main>
+      <main className="flex-1 overflow-y-auto">
+        
+        <div className="px-3 sm:px-4 md:px-8 pt-3 md:pt-5 flex">
+          <div className="ml-auto mr-10">
+            <DateTimeDisplay />
+          </div>
+        </div>
 
+        <div className="px-3 sm:px-4 md:px-8 pb-8">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 }

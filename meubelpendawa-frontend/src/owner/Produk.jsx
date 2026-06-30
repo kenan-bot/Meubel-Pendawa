@@ -5,7 +5,7 @@ import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
 
 export default function Produk() {
-  const { produk, loading } = useProduk();
+  const { filteredProduk, loading } = useProduk();
 
   const handleEdit = (item) => {
     console.log("Edit:", item);
@@ -42,7 +42,7 @@ export default function Produk() {
 
       <div className="mt-3">
         <ProductCard
-          produk={produk}
+          produk={filteredProduk}
           mode="owner"
           onEdit={handleEdit}
           onDelete={handleDelete}

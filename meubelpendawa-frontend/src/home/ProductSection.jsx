@@ -10,7 +10,7 @@ function ProductSection() {
   // ✅ TAMBAHAN BARU - state untuk pagination
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 12;
-  const { produk, loading } = useProduk();
+  const { filteredProduk, loading } = useProduk();
 
 
 
@@ -19,13 +19,13 @@ function ProductSection() {
       <div className="ml-8 flex items-center gap-4 mt-20 px-4 md:px-8 lg:px-12">
         <SearchBar />
         <FilterKategori  mode="home"/>
-        <FilterMerek />
+        <FilterMerek mode="home" />
       </div>
 
       {loading ? (
         <div className="text-center py-10 text-white">Memuat produk...</div>
       ) : (
-        <ProductCard produk={produk} mode="home" />
+        <ProductCard produk={filteredProduk} mode="home" />
       )}
 
       {/* ✅ BAGIAN INI DIUBAH - Pagination sekarang pakai props */}

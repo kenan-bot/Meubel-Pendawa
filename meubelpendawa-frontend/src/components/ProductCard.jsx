@@ -18,11 +18,44 @@ const ProductCard = ({ produk, mode = "home", onEdit, onDelete }) => {
   const isOwner = mode === "owner";
   const isCashier = mode === "cashier";
 
+  if (!produk || produk.length === 0) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="text-center">
+          <h3 className={`text-xl font-bold ${isHome ? "text-white" : "text-black"}`} >
+            Produk tidak ditemukan
+          </h3>
+
+          <p className={`text-sm mt-0 ${isHome ? "text-gray-200" : "text-gray-600"}`}>
+            Coba gunakan kata kunci atau filter lain
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={mode === "home" ? "min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-8" : "w-full"} >
-      <div className={mode === "home" ? "mt-0 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto" : "w-full"} >
-        <div className={ mode === "home" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" 
-        : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"} >
+    <div
+      className={
+        mode === "home"
+          ? "min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-8"
+          : "w-full"
+      }
+    >
+      <div
+        className={
+          mode === "home"
+            ? "mt-0 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto"
+            : "w-full"
+        }
+      >
+        <div
+          className={
+            mode === "home"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+              : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          }
+        >
           {produk.map((item, index) => (
             <motion.div
               key={item.idProduk}
