@@ -3,6 +3,7 @@ import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
 
 import SearchBar from "../components/SearchBar";
+import DateTimeDisplay from "../components/DateTimeDisplay"; // [BARU] pengganti formatTanggalHeader + jamSekarang
 
 import { FaUserCircle, FaPrint, FaMoneyBillWave, FaQrcode, FaShoppingBag, FaCar, FaMotorcycle } from "react-icons/fa";
 
@@ -12,6 +13,8 @@ function formatRupiah(nominal) {
 }
 
 // format ala "17 - 05 - 2026 : 17:08:56"
+// tetap dipakai untuk menampilkan tanggal transaksi (data historis), bukan jam berjalan,
+// jadi tidak diganti DateTimeDisplay (DateTimeDisplay selalu menampilkan waktu saat ini).
 function formatTanggal(date) {
   const dd = String(date.getDate()).padStart(2, "0");
   const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -22,23 +25,7 @@ function formatTanggal(date) {
   return `${dd} - ${mm} - ${yyyy} : ${hh}:${mi}:${ss}`;
 }
 
-// format ala "Selasa, 30 Juni 2026 • Pukul 18.37.04"
-function formatTanggalHeader(date) {
-  const hari = date.toLocaleDateString("id-ID", { weekday: "long" });
-  const tanggal = date.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const jam = date
-    .toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-    .replace(/:/g, ".");
-  return `${hari}, ${tanggal} • Pukul ${jam}`;
-}
+// [DIHAPUS] function formatTanggalHeader(date) {...} -> digantikan oleh <DateTimeDisplay />
 
 function isHariIni(tanggal) {
   if (!tanggal) return false;
@@ -56,13 +43,8 @@ function RiwayatHarian() {
   const [detailList, setDetailList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [jamSekarang, setJamSekarang] = useState(new Date());
+  // [DIHAPUS] state jamSekarang & useEffect timer-nya, sudah ditangani di dalam <DateTimeDisplay />
   const [keyword, setKeyword] = useState("");
-
-  useEffect(() => {
-    const timer = setInterval(() => setJamSekarang(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -104,10 +86,12 @@ function RiwayatHarian() {
     let cash = 0;
     let cashless = 0;
     transaksiHariIni.forEach((t) => {
+      // [DIGANTI] sebelumnya pakai t.jumlahBayar (uang yang diberikan pembeli),
+      // sekarang pakai t.totalPesanan (total transaksi sebenarnya / pemasukan riil)
       if (t.metodePembayaran?.toUpperCase() === "CASH") {
-        cash += Number(t.jumlahBayar || 0);
+        cash += Number(t.totalPesanan || 0);
       } else {
-        cashless += Number(t.jumlahBayar || 0);
+        cashless += Number(t.totalPesanan || 0);
       }
     });
     return {
@@ -139,9 +123,8 @@ function RiwayatHarian() {
                 Informasi direset setiap pukul 23.59
               </p>
             </div>
-            <p className="text-sm text-gray-500 whitespace-nowrap">
-              {formatTanggalHeader(jamSekarang)}
-            </p>
+            {/* [DIGANTI] sebelumnya: <p>{formatTanggalHeader(jamSekarang)}</p> */}
+            <DateTimeDisplay />
           </div>
 
           {/* ringkasan */}
