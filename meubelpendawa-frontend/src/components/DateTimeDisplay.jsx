@@ -25,7 +25,7 @@ const DateTimeDisplay = () => {
   });
 
   return (
-    <div className="font-medium text-black">
+    <div className="text-[9px] md:text-[16px] font-medium text-black whitespace-nowrap">
       {tanggal} • Pukul {jam}
     </div>
   );
