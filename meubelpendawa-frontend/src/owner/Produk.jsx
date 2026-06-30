@@ -3,9 +3,10 @@ import { useProduk } from "../context/ProdukContext";
 import SearchBar from "../components/SearchBar";
 import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
+import FormInput from "../components/FormInput";
 
 import Modal from "../components/Modal";
-// import ProductForm from "../components/ProductForm"; 
+import ProductForm from "../components/ProductForm"; 
 import { useState } from "react";
 
 import { FiPlus } from "react-icons/fi";
@@ -71,7 +72,7 @@ export default function Produk() {
         onClose={() => setOpenTambahProduk(false)}
         title="Tambah Produk"
       >
-        <div>Form tambah produk di sini</div>
+        <ProductForm onSuccess={() => setOpenTambahProduk(false)} />
       </Modal>
     </>
   );
