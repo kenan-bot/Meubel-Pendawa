@@ -35,21 +35,25 @@ function TransaksiContent() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 -m-8 p-4 bg-gray-50 h-[calc(100vh-2rem)] overflow-hidden text-sm">
-
       {/* ===== KIRI: FORM + PRODUK ===== */}
       <div className="flex-1 bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col min-h-0">
         <div className="p-4 lg:p-5 pb-0 flex-shrink-0">
-          <PageHeader title="Form Pemesan" subtitle="Halaman Form Pemesan">
-            <DateTimeDisplay />
-          </PageHeader>
+          <PageHeader
+            title="Form Pemesan"
+            subtitle="Halaman Form Pemesan"
+          ></PageHeader>
 
           <FormPemesan />
         </div>
 
         {/* Search & filter — khusus untuk cari produk di bawah ini */}
         <div className="relative z-30 flex flex-wrap items-center gap-2 px-4 lg:px-5 pt-2">
-          <SearchBar theme="orange" placeholder="Search furniture..." value={t.keyword}
-            onChange={(e) => t.setKeyword(e.target.value)} />
+          <SearchBar
+            theme="orange"
+            placeholder="Search furniture..."
+            value={t.keyword}
+            onChange={(e) => t.setKeyword(e.target.value)}
+          />
           <FilterKategori onSelect={t.setKategoriPick} />
           <FilterMerek onSelect={t.setMerekPick} />
         </div>
@@ -57,15 +61,28 @@ function TransaksiContent() {
         {/* Grid produk — klik untuk tambah ke keranjang */}
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 lg:px-5 pb-4 pt-2">
           {t.loading ? (
-            <div className="text-center py-8 text-gray-500">Memuat produk...</div>
+            <div className="text-center py-8 text-gray-500">
+              Memuat produk...
+            </div>
           ) : t.produkTersaring.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">Produk tidak ditemukan.</div>
+            <div className="text-center py-8 text-gray-400">
+              Produk tidak ditemukan.
+            </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
               {t.produkTersaring.map((item) => (
-                <Card key={item.idProduk} padding="none" hover={false} onClick={() => t.tambahKeKeranjang(item)}
-                  className="cursor-pointer text-[#5F04E8] overflow-hidden">
-                  <CardImage src={item.gambarUrl} alt={item.namaProduk} className="!h-20" />
+                <Card
+                  key={item.idProduk}
+                  padding="none"
+                  hover={false}
+                  onClick={() => t.tambahKeKeranjang(item)}
+                  className="cursor-pointer text-[#5F04E8] overflow-hidden"
+                >
+                  <CardImage
+                    src={item.gambarUrl}
+                    alt={item.namaProduk}
+                    className="!h-20"
+                  />
                   <div className="p-2">
                     <div className="flex flex-wrap gap-1 mb-1">
                       {item.merek && (
@@ -82,10 +99,16 @@ function TransaksiContent() {
                     <CardBody className="font-bold text-xs leading-tight truncate text-[#5F04E8]">
                       {item.namaProduk}
                     </CardBody>
-                    <span className={`inline-block px-1.5 py-0.5 my-1 text-[9px] font-semibold text-white rounded-md ${item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500"}`}>
-                      {item.stok > 5 ? `Tersedia ${item.stok}` : `Tersisa ${item.stok}`}
+                    <span
+                      className={`inline-block px-1.5 py-0.5 my-1 text-[9px] font-semibold text-white rounded-md ${item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500"}`}
+                    >
+                      {item.stok > 5
+                        ? `Tersedia ${item.stok}`
+                        : `Tersisa ${item.stok}`}
                     </span>
-                    <p className="text-xs font-semibold">{formatRupiah(item.hargaDefault)}</p>
+                    <p className="text-xs font-semibold">
+                      {formatRupiah(item.hargaDefault)}
+                    </p>
                   </div>
                 </Card>
               ))}
@@ -100,16 +123,20 @@ function TransaksiContent() {
 
         <div className="p-4 pb-3 flex-shrink-0">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-base font-bold text-orange-500">Keranjang Pesanan</h2>
+            <h2 className="text-base font-bold text-orange-500">
+              Keranjang Pesanan
+            </h2>
             <GiShoppingBag className="text-orange-500" size={20} />
           </div>
-          <p className="text-[11px] text-gray-400 mb-0.5">{formatTanggal(t.waktu)}</p>
+          <DateTimeDisplay className="text-[8px] md:text-[12px] text-gray-500" />
           <p className="text-orange-500 font-bold text-xs">Order</p>
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 space-y-2.5">
           {t.keranjang.length === 0 && (
-            <p className="text-xs text-gray-400 text-center py-8">Belum ada produk di keranjang.</p>
+            <p className="text-xs text-gray-400 text-center py-8">
+              Belum ada produk di keranjang.
+            </p>
           )}
           {t.keranjang.map((item) => (
             <KeranjangItem key={item.produk.idProduk} item={item} />

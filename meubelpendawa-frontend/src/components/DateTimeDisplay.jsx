@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const DateTimeDisplay = () => {
+const DateTimeDisplay = ({ className = "" }) => {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -25,7 +25,9 @@ const DateTimeDisplay = () => {
   });
 
   return (
-    <div className="text-[9px] md:text-[16px] font-medium text-black whitespace-nowrap">
+    <div
+      className={`text-[9px] md:text-[16px] font-medium text-black whitespace-nowrap ${className}`}
+    >
       {tanggal} • Pukul {jam}
     </div>
   );
