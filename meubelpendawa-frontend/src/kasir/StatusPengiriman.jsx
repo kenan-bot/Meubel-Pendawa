@@ -21,6 +21,10 @@ function StatusPengiriman() {
   const [keyword, setKeyword] = useState("");
   const [tabStatus, setTabStatus] = useState("ON_PROCESS"); // ON_PROCESS | COMPLETED
 
+  // filter tanggal -- hanya relevan & ditampilkan saat tab Completed aktif,
+  // supaya data yang sudah selesai (numpuk dari hari ke hari) bisa disaring per tanggal tertentu
+  const [tanggalFilter, setTanggalFilter] = useState("");
+
   // status pengiriman per orderId, dibaca langsung dari tabel `pengiriman` di database
   const [statusMap, setStatusMap] = useState({});
 
@@ -79,15 +83,30 @@ function StatusPengiriman() {
 
   const dataTersaring = useMemo(() => {
     const kw = keyword.toLowerCase();
+
+    // tanggal hanya dipakai kalau lagi di tab Completed (dan kalau memang dipilih)
+    const tanggalAktif = tabStatus === "COMPLETED" ? tanggalFilter : "";
+
     return transaksiList.filter((t) => {
       const status = statusMap[t.orderId] || "ON_PROCESS";
       const cocokStatus = status === tabStatus;
+
       const cocokKeyword =
         t.namaPemesan?.toLowerCase().includes(kw) ||
         t.orderId?.toLowerCase().includes(kw);
-      return cocokStatus && cocokKeyword;
+
+      let cocokTanggal = true;
+      if (tanggalAktif) {
+        // bandingkan tanggal lokal (yyyy-mm-dd) saja, tanpa jam
+        const tanggalTransaksi = t.tanggalTransaksi
+          ? new Date(t.tanggalTransaksi).toLocaleDateString("en-CA") // format yyyy-mm-dd
+          : null;
+        cocokTanggal = tanggalTransaksi === tanggalAktif;
+      }
+
+      return cocokStatus && cocokKeyword && cocokTanggal;
     });
-  }, [transaksiList, statusMap, tabStatus, keyword]);
+  }, [transaksiList, statusMap, tabStatus, keyword, tanggalFilter]);
 
   // Kasir hanya bisa MELIHAT status pengiriman, tidak bisa mengubahnya.
   // Perubahan status (proses -> selesai) hanya dilakukan oleh driver/role lain di halaman lain.
@@ -112,12 +131,18 @@ function StatusPengiriman() {
             <DateTimeDisplay />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
               {TAB_LIST.map((tab) => (
                 <button
                   key={tab.key}
-                  onClick={() => setTabStatus(tab.key)}
+                  onClick={() => {
+                    setTabStatus(tab.key);
+                    if (tab.key !== "COMPLETED") {
+                      // reset filter tanggal supaya tidak "nyangkut" saat balik ke On Process
+                      setTanggalFilter("");
+                    }
+                  }}
                   className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
                     tabStatus === tab.key ? tab.active : tab.idle
                   }`}
@@ -134,6 +159,38 @@ function StatusPengiriman() {
               onChange={(e) => setKeyword(e.target.value)}
             />
           </div>
+
+          {/* [BARU] filter tanggal -- hanya muncul di tab Completed,
+              karena data selesai akan terus numpuk dari hari ke hari */}
+          {tabStatus === "COMPLETED" && (
+            <div className="flex flex-wrap items-end gap-2 mb-4 p-2.5 rounded-lg bg-[#5F04E8]/5 border border-[#5F04E8]/10">
+              <div>
+                <label className="block mb-1 text-[10px] font-semibold text-gray-500">Tanggal selesai</label>
+                <input
+                  type="date"
+                  value={tanggalFilter}
+                  onChange={(e) => setTanggalFilter(e.target.value)}
+                  className="border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#5F04E8]"
+                />
+              </div>
+
+              <button
+                onClick={() => setTanggalFilter(new Date().toLocaleDateString("en-CA"))}
+                className="text-[11px] font-semibold px-2.5 py-1.5 rounded-md border border-[#5F04E8]/30 text-[#5F04E8] hover:bg-[#5F04E8]/10"
+              >
+                Hari ini
+              </button>
+
+              {tanggalFilter && (
+                <button
+                  onClick={() => setTanggalFilter("")}
+                  className="text-[11px] text-gray-400 underline mb-1.5"
+                >
+                  Tampilkan semua
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* grid kartu pengiriman -- INI yang discroll */}

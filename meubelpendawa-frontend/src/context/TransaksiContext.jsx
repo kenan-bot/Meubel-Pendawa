@@ -52,6 +52,12 @@ export function TransaksiProvider({ children }) {
 
   const tampilkanPesan = (text, type = "error") => { setPesan(text); setPesanType(type); };
 
+  useEffect(() => {
+    if (!pesan) return;
+    const timer = setTimeout(() => setPesan(""), 3000);
+    return () => clearTimeout(timer);
+  }, [pesan]);
+
   const tambahKeKeranjang = (item) => setKeranjang((prev) => {
     const ada = prev.find((c) => c.produk.idProduk === item.idProduk);
     if (ada) return prev.map((c) => c.produk.idProduk === item.idProduk ? { ...c, qty: c.qty + 1 } : c);
