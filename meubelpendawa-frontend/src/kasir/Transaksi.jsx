@@ -119,7 +119,7 @@ function TransaksiContent() {
             </h2>
             <GiShoppingBag className="text-orange-500" size={20} />
           </div>
-          <DateTimeDisplay className="text-[8px] md:text-[11px] text-gray-500" />
+          <DateTimeDisplay className="text-[8px] md:text-[10px] text-gray-500" />
           <p className="text-orange-500 font-bold text-xs">Order</p>
         </div>
 
