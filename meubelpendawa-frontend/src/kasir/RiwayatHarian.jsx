@@ -2,30 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
 
+import PageHeader from "../components/PageHeader";
 import SearchBar from "../components/SearchBar";
-import DateTimeDisplay from "../components/DateTimeDisplay"; // [BARU] pengganti formatTanggalHeader + jamSekarang
+import DateTimeDisplay from "../components/DateTimeDisplay";
+import Card from "../components/Card"; // [REUSE] kartu ringkasan pakai Card generic
+import TransaksiCard from "../components/TransaksiCard"; // [REUSE] kartu transaksi variant="riwayat"
 
-import { FaUserCircle, FaPrint, FaMoneyBillWave, FaQrcode, FaShoppingBag, FaCar, FaMotorcycle } from "react-icons/fa";
+import { FaMoneyBillWave, FaQrcode, FaShoppingBag } from "react-icons/fa";
 
 function formatRupiah(nominal) {
   if (!nominal && nominal !== 0) return "Rp 0";
   return "Rp" + Number(nominal).toLocaleString("id-ID");
 }
-
-// format ala "17 - 05 - 2026 : 17:08:56"
-// tetap dipakai untuk menampilkan tanggal transaksi (data historis), bukan jam berjalan,
-// jadi tidak diganti DateTimeDisplay (DateTimeDisplay selalu menampilkan waktu saat ini).
-function formatTanggal(date) {
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-  const hh = String(date.getHours()).padStart(2, "0");
-  const mi = String(date.getMinutes()).padStart(2, "0");
-  const ss = String(date.getSeconds()).padStart(2, "0");
-  return `${dd} - ${mm} - ${yyyy} : ${hh}:${mi}:${ss}`;
-}
-
-// [DIHAPUS] function formatTanggalHeader(date) {...} -> digantikan oleh <DateTimeDisplay />
 
 function isHariIni(tanggal) {
   if (!tanggal) return false;
@@ -38,12 +26,49 @@ function isHariIni(tanggal) {
   );
 }
 
+// ringkasan yang ditampilkan di atas (label, icon, value, style card)
+function buildRingkasanCards(ringkasan) {
+  return [
+    {
+      key: "cash",
+      icon: <FaMoneyBillWave className="text-orange-500" />,
+      label: "Pemasukan Cash",
+      value: formatRupiah(ringkasan.cash),
+      variant: "default",
+      valueClass: "text-[#5F04E8]",
+    },
+    {
+      key: "cashless",
+      icon: <FaQrcode className="text-orange-500" />,
+      label: "Pemasukan Cashless",
+      value: formatRupiah(ringkasan.cashless),
+      variant: "default",
+      valueClass: "text-[#5F04E8]",
+    },
+    {
+      key: "jumlah",
+      icon: <FaShoppingBag className="text-orange-500" />,
+      label: "Total Transaksi",
+      value: ringkasan.jumlahTransaksi,
+      variant: "default",
+      valueClass: "text-[#5F04E8]",
+    },
+    {
+      key: "total",
+      icon: null,
+      label: "Total Pemasukan",
+      value: formatRupiah(ringkasan.totalPemasukan),
+      variant: "orange",
+      valueClass: "text-white",
+      labelClass: "text-white",
+    },
+  ];
+}
+
 function RiwayatHarian() {
   const [transaksiList, setTransaksiList] = useState([]);
   const [detailList, setDetailList] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // [DIHAPUS] state jamSekarang & useEffect timer-nya, sudah ditangani di dalam <DateTimeDisplay />
   const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
@@ -86,8 +111,6 @@ function RiwayatHarian() {
     let cash = 0;
     let cashless = 0;
     transaksiHariIni.forEach((t) => {
-      // [DIGANTI] sebelumnya pakai t.jumlahBayar (uang yang diberikan pembeli),
-      // sekarang pakai t.totalPesanan (total transaksi sebenarnya / pemasukan riil)
       if (t.metodePembayaran?.toUpperCase() === "CASH") {
         cash += Number(t.totalPesanan || 0);
       } else {
@@ -102,6 +125,8 @@ function RiwayatHarian() {
     };
   }, [transaksiHariIni]);
 
+  const ringkasanCards = useMemo(() => buildRingkasanCards(ringkasan), [ringkasan]);
+
   const dataTersaring = useMemo(() => {
     const kw = keyword.toLowerCase();
     return transaksiHariIni.filter(
@@ -115,53 +140,38 @@ function RiwayatHarian() {
     <div className="flex flex-col -m-8 p-4 bg-gray-50 h-[calc(100vh-2rem)] overflow-hidden text-sm">
       <div className="bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0">
         {/* header (TIDAK ikut scroll) */}
-        <div className="p-4 lg:p-5 pb-0 flex-shrink-0">
-          <div className="flex items-start justify-between mb-3 flex-wrap gap-2">
-            <div>
-              <h1 className="text-lg font-bold text-gray-800">Riwayat Harian</h1>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Informasi direset setiap pukul 23.59
-              </p>
-            </div>
-            {/* [DIGANTI] sebelumnya: <p>{formatTanggalHeader(jamSekarang)}</p> */}
+        <div className="p-4 lg:p-5 pb-0 flex-shrink-0 relative">
+          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul */}
+          <div className="absolute top-4 right-4 lg:top-5 lg:right-5">
             <DateTimeDisplay />
           </div>
 
+          <PageHeader
+            title="Riwayat Harian"
+            subtitle="Informasi direset setiap pukul 23.59"
+          />
+
           {/* ringkasan */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 items-stretch">
-            <div className="rounded-xl border border-gray-100 shadow-sm p-3 flex flex-col justify-between">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-500">
-                <FaMoneyBillWave className="text-orange-500" /> Pemasukan Cash
-              </span>
-              <p className="text-lg font-bold text-[#5F04E8] mt-1">
-                {formatRupiah(ringkasan.cash)}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-100 shadow-sm p-3 flex flex-col justify-between">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-500">
-                <FaQrcode className="text-orange-500" /> Pemasukan Cashless
-              </span>
-              <p className="text-lg font-bold text-[#5F04E8] mt-1">
-                {formatRupiah(ringkasan.cashless)}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-100 shadow-sm p-3 flex flex-col justify-between">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-500">
-                <FaShoppingBag className="text-orange-500" /> Total Transaksi
-              </span>
-              <p className="text-lg font-bold text-[#5F04E8] mt-1">
-                {ringkasan.jumlahTransaksi}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-orange-500 text-white shadow-sm p-3 flex flex-col justify-between">
-              <span className="text-[11px] font-semibold">Total Pemasukan</span>
-              <p className="text-lg font-bold mt-1">
-                {formatRupiah(ringkasan.totalPemasukan)}
-              </p>
-            </div>
+            {ringkasanCards.map((c) => (
+              <Card
+                key={c.key}
+                variant={c.variant}
+                padding="small"
+                hover={false}
+                className="flex flex-col justify-between"
+              >
+                <span
+                  className={`flex items-center gap-1.5 text-[11px] font-semibold ${
+                    c.labelClass || "text-gray-500"
+                  }`}
+                >
+                  {c.icon}
+                  {c.label}
+                </span>
+                <p className={`text-lg font-bold mt-1 ${c.valueClass}`}>{c.value}</p>
+              </Card>
+            ))}
           </div>
 
           <div className="flex justify-end mb-3">
@@ -184,111 +194,14 @@ function RiwayatHarian() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {dataTersaring.map((t) => {
-                const items = itemsByOrder[t.orderId] || [];
-                const isDelivery = t.metodePengiriman?.toUpperCase() === "DELIVERY";
-                const isCash = t.metodePembayaran?.toUpperCase() === "CASH";
-
-                return (
-                  <div
-                    key={t.orderId}
-                    className="border border-gray-100 rounded-xl shadow-sm p-3.5 flex flex-col bg-white"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FaUserCircle className="text-[#5F04E8] flex-shrink-0" size={28} />
-                        <div className="min-w-0">
-                          <p className="font-bold text-sm text-[#5F04E8] truncate">
-                            {t.namaPemesan}
-                          </p>
-                          <p className="text-[11px] text-gray-400">{t.noWhatsapp}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button
-                          type="button"
-                          title="Cetak struk"
-                          className="text-gray-400 hover:text-[#5F04E8] transition"
-                          onClick={() => window.print()}
-                        >
-                          <FaPrint size={13} />
-                        </button>
-                        <span className="px-2 py-0.5 rounded-full bg-[#5F04E8]/10 text-[#5F04E8] text-[10px] font-bold whitespace-nowrap">
-                          #{t.orderId}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-2.5 flex-wrap gap-1.5">
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-600">
-                        {isDelivery ? <FaMotorcycle className="text-orange-500" /> : <FaCar className="text-orange-500" />}
-                        {isDelivery ? "Delivery" : "Pick Up"}
-                      </span>
-                      <span className="text-[11px] text-gray-400 whitespace-nowrap">
-                        {t.tanggalTransaksi
-                          ? formatTanggal(new Date(t.tanggalTransaksi))
-                          : "-"}
-                      </span>
-                    </div>
-
-                    <div className="mt-3">
-                      <div className="flex justify-between text-[11px] font-semibold text-gray-400 mb-1">
-                        <span>Items</span>
-                        <span className="flex gap-6">
-                          <span>Qty</span>
-                          <span>Harga</span>
-                        </span>
-                      </div>
-                      <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
-                        {items.map((d) => (
-                          <div
-                            key={d.idDetailTransaksi}
-                            className="flex justify-between text-xs text-gray-700"
-                          >
-                            <span className="truncate pr-2">{d.produk?.namaProduk}</span>
-                            <span className="flex gap-6 flex-shrink-0">
-                              <span className="w-4 text-center">{d.qty}</span>
-                              <span>{formatRupiah(d.hargaJual)}</span>
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-gray-100 text-xs">
-                      <span className="text-gray-500 font-medium">Metode Pembayaran</span>
-                      <span
-                        className={`font-semibold ${
-                          isCash ? "text-orange-500" : "text-[#5F04E8]"
-                        }`}
-                      >
-                        {isCash ? "Cash" : "Cashless"}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-1 text-xs">
-                      <span className="text-gray-500 font-medium">Total Bayar</span>
-                      <span className="text-gray-700 font-semibold">
-                        {formatRupiah(t.jumlahBayar)}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-1 text-xs">
-                      <span className="text-gray-500 font-medium">Kembalian</span>
-                      <span className="text-gray-700 font-semibold">
-                        {formatRupiah(t.kembalian)}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
-                      <span className="text-sm font-bold text-gray-700">Total</span>
-                      <span className="font-bold text-[#5F04E8] text-base">
-                        {formatRupiah(t.totalPesanan)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+              {dataTersaring.map((t) => (
+                <TransaksiCard
+                  key={t.orderId}
+                  transaksi={t}
+                  items={itemsByOrder[t.orderId] || []}
+                  variant="riwayat"
+                />
+              ))}
             </div>
           )}
         </div>
