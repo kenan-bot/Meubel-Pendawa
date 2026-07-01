@@ -8,6 +8,7 @@ import com.meubelpendawa.service.PengirimanService;
 
 @RestController
 @RequestMapping("/pengiriman")
+@CrossOrigin("*")   // <-- tambahkan baris ini
 public class PengirimanController {
 
     @Autowired
@@ -20,7 +21,7 @@ public class PengirimanController {
 
     @GetMapping("/driver/{idKaryawan}")
     public List<Pengiriman> getPengirimanDriver(@PathVariable String idKaryawan) {
-    return pengirimanService.getPengirimanByDriver(idKaryawan);
+        return pengirimanService.getPengirimanByDriver(idKaryawan);
     }
 
     @PostMapping
@@ -39,9 +40,7 @@ public class PengirimanController {
     }
 
     @PutMapping("/{idPengiriman}/status")
-    public Pengiriman updateStatus(@PathVariable String idPengiriman,@RequestParam String status) {
-    return pengirimanService.updateStatus(idPengiriman, status);
-}
-
-
+    public Pengiriman updateStatus(@PathVariable String idPengiriman, @RequestParam String status) {
+        return pengirimanService.updateStatus(idPengiriman, status);
+    }
 }

@@ -1,53 +1,46 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
+import { getAllPengiriman } from "../api/pengirimanApi";
 
+import PageHeader from "../components/PageHeader";
 import SearchBar from "../components/SearchBar";
-import DateTimeDisplay from "../components/DateTimeDisplay"; // [BARU] pengganti formatTanggalHeader + jamSekarang
+import DateTimeDisplay from "../components/DateTimeDisplay";
+import TransaksiCard from "../components/TransaksiCard"; // [REUSE] kartu sudah punya variant="pengiriman"
 
-import { FaUserCircle, FaMotorcycle, FaMapMarkerAlt, FaTruck, FaCheckCircle } from "react-icons/fa";
-
-function formatRupiah(nominal) {
-  if (!nominal && nominal !== 0) return "Rp 0";
-  return "Rp" + Number(nominal).toLocaleString("id-ID");
-}
-
-// format ala "17 - 05 - 2026 : 17:08:56" (samakan gaya dengan keranjang di Transaksi)
-// tetap dipakai untuk menampilkan tanggal transaksi (data historis), bukan jam berjalan,
-// jadi tidak diganti DateTimeDisplay (DateTimeDisplay selalu menampilkan waktu saat ini).
-function formatTanggal(date) {
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-  const hh = String(date.getHours()).padStart(2, "0");
-  const mi = String(date.getMinutes()).padStart(2, "0");
-  const ss = String(date.getSeconds()).padStart(2, "0");
-  return `${dd} - ${mm} - ${yyyy} : ${hh}:${mi}:${ss}`;
-}
-
-// [DIHAPUS] function formatTanggalHeader(date) {...} -> digantikan oleh <DateTimeDisplay />
+const TAB_LIST = [
+  { key: "ON_PROCESS", label: "On Process", active: "bg-orange-500 text-white", idle: "bg-white text-orange-500 border border-orange-300" },
+  { key: "COMPLETED", label: "Completed", active: "bg-[#5F04E8] text-white", idle: "bg-white text-[#5F04E8] border border-[#5F04E8]/40" },
+];
 
 function StatusPengiriman() {
   const [transaksiList, setTransaksiList] = useState([]);
   const [detailList, setDetailList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // [DIHAPUS] state jamSekarang & useEffect timer-nya, sudah ditangani di dalam <DateTimeDisplay />
   const [keyword, setKeyword] = useState("");
   const [tabStatus, setTabStatus] = useState("ON_PROCESS"); // ON_PROCESS | COMPLETED
 
-  // status pengiriman per orderId (sementara disimpan lokal,
-  // karena tabel transaksi belum punya kolom status pengiriman di backend)
+  // status pengiriman per orderId, dibaca langsung dari tabel `pengiriman` di database
   const [statusMap, setStatusMap] = useState({});
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [transaksiData, detailData] = await Promise.all([
+        const [transaksiRes, detailRes, pengirimanRes] = await Promise.allSettled([
           getAllTransaksi(),
           getAllDetailTransaksi(),
+          getAllPengiriman(),
         ]);
+
+        const transaksiData = transaksiRes.status === "fulfilled" ? transaksiRes.value : [];
+        const detailData = detailRes.status === "fulfilled" ? detailRes.value : [];
+        const pengirimanData = pengirimanRes.status === "fulfilled" ? pengirimanRes.value : [];
+
+        if (transaksiRes.status === "rejected") console.error("Gagal mengambil transaksi:", transaksiRes.reason);
+        if (detailRes.status === "rejected") console.error("Gagal mengambil detail transaksi:", detailRes.reason);
+        if (pengirimanRes.status === "rejected") console.error("Gagal mengambil status pengiriman:", pengirimanRes.reason);
 
         const dataDelivery = transaksiData.filter(
           (t) => t.metodePengiriman?.toUpperCase() === "DELIVERY"
@@ -56,13 +49,14 @@ function StatusPengiriman() {
         setTransaksiList(dataDelivery);
         setDetailList(detailData);
 
-        setStatusMap((prev) => {
-          const next = { ...prev };
-          dataDelivery.forEach((t) => {
-            if (!next[t.orderId]) next[t.orderId] = "ON_PROCESS";
-          });
-          return next;
+        // bangun peta status dari data pengiriman asli (bukan hardcode lagi)
+        const nextStatusMap = {};
+        pengirimanData.forEach((p) => {
+          const orderId = p.transaksi?.orderId;
+          if (!orderId) return;
+          nextStatusMap[orderId] = p.statusPengiriman || "ON_PROCESS";
         });
+        setStatusMap(nextStatusMap);
       } catch (error) {
         console.error("Gagal mengambil data status pengiriman:", error);
       } finally {
@@ -84,21 +78,17 @@ function StatusPengiriman() {
   }, [detailList]);
 
   const dataTersaring = useMemo(() => {
+    const kw = keyword.toLowerCase();
     return transaksiList.filter((t) => {
       const status = statusMap[t.orderId] || "ON_PROCESS";
       const cocokStatus = status === tabStatus;
-
-      const kw = keyword.toLowerCase();
       const cocokKeyword =
         t.namaPemesan?.toLowerCase().includes(kw) ||
         t.orderId?.toLowerCase().includes(kw);
-
       return cocokStatus && cocokKeyword;
     });
   }, [transaksiList, statusMap, tabStatus, keyword]);
 
-  // [DIHAPUS] function tandaiSelesai(orderId) {...}
-  // [DIHAPUS] function tandaiProses(orderId) {...}
   // Kasir hanya bisa MELIHAT status pengiriman, tidak bisa mengubahnya.
   // Perubahan status (proses -> selesai) hanya dilakukan oleh driver/role lain di halaman lain.
 
@@ -106,40 +96,35 @@ function StatusPengiriman() {
     <div className="flex flex-col -m-8 p-4 bg-gray-50 h-[calc(100vh-2rem)] overflow-hidden text-sm">
       <div className="bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0">
         {/* header (TIDAK ikut scroll) */}
-        <div className="p-4 lg:p-5 pb-0 flex-shrink-0">
-          <div className="flex items-start justify-between mb-3 flex-wrap gap-2">
-            <div>
-              <h1 className="text-lg font-bold text-gray-800">Lihat Status Pengiriman</h1>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Halaman untuk memantau status pengiriman
-              </p>
-            </div>
-            {/* [DIGANTI] sebelumnya: <p>{formatTanggalHeader(jamSekarang)}</p> */}
+        <div className="p-4 lg:p-5 pb-0 flex-shrink-0 relative">
+          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul -- hanya di layar lg+ */}
+          <div className="hidden lg:block absolute top-5 right-5">
+            <DateTimeDisplay />
+          </div>
+
+          <PageHeader
+            title="Lihat Status Pengiriman"
+            subtitle="Halaman untuk memantau status pengiriman"
+          />
+
+          {/* [RESPONSIVE] di layar kecil, tanggal/jam ditaruh di bawah judul (bukan absolute) supaya tidak numpuk */}
+          <div className="lg:hidden mb-4 -mt-4">
             <DateTimeDisplay />
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setTabStatus("ON_PROCESS")}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
-                  tabStatus === "ON_PROCESS"
-                    ? "bg-orange-500 text-white"
-                    : "bg-white text-orange-500 border border-orange-300"
-                }`}
-              >
-                On Process
-              </button>
-              <button
-                onClick={() => setTabStatus("COMPLETED")}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
-                  tabStatus === "COMPLETED"
-                    ? "bg-[#5F04E8] text-white"
-                    : "bg-white text-[#5F04E8] border border-[#5F04E8]/40"
-                }`}
-              >
-                Completed
-              </button>
+              {TAB_LIST.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setTabStatus(tab.key)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
+                    tabStatus === tab.key ? tab.active : tab.idle
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             <SearchBar
@@ -161,92 +146,15 @@ function StatusPengiriman() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {dataTersaring.map((t) => {
-                const items = itemsByOrder[t.orderId] || [];
-                const status = statusMap[t.orderId] || "ON_PROCESS";
-                const isCompleted = status === "COMPLETED";
-
-                return (
-                  <div
-                    key={t.orderId}
-                    className="border border-gray-100 rounded-xl shadow-sm p-3.5 flex flex-col bg-white"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FaUserCircle className="text-[#5F04E8] flex-shrink-0" size={28} />
-                        <div className="min-w-0">
-                          <p className="font-bold text-sm text-[#5F04E8] truncate">
-                            {t.namaPemesan}
-                          </p>
-                          <p className="text-[11px] text-gray-400">{t.noWhatsapp}</p>
-                        </div>
-                      </div>
-                      <span className="px-2 py-0.5 rounded-full bg-[#5F04E8]/10 text-[#5F04E8] text-[10px] font-bold whitespace-nowrap">
-                        #{t.orderId}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-2.5 px-2 py-1.5 rounded-md bg-gray-50 text-[11px] text-gray-500">
-                      <span className="flex items-center gap-1 truncate">
-                        <FaMotorcycle className="text-orange-500 flex-shrink-0" />
-                        {t.driver?.namaKaryawan || "-"}
-                      </span>
-                      <span className="whitespace-nowrap">
-                        {t.tanggalTransaksi
-                          ? formatTanggal(new Date(t.tanggalTransaksi))
-                          : "-"}
-                      </span>
-                    </div>
-
-                    <div className="mt-3">
-                      <div className="flex justify-between text-[11px] font-semibold text-gray-400 mb-1">
-                        <span>Items</span>
-                        <span className="flex gap-6">
-                          <span>Qty</span>
-                          <span>Harga</span>
-                        </span>
-                      </div>
-                      <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
-                        {items.map((d) => (
-                          <div
-                            key={d.idDetailTransaksi}
-                            className="flex justify-between text-xs text-gray-700"
-                          >
-                            <span className="truncate pr-2">{d.produk?.namaProduk}</span>
-                            <span className="flex gap-6 flex-shrink-0">
-                              <span className="w-4 text-center">{d.qty}</span>
-                              <span>{formatRupiah(d.hargaJual)}</span>
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-gray-100">
-                      <span className="text-xs font-semibold text-gray-500">Total</span>
-                      <span className="font-bold text-[#5F04E8] text-sm">
-                        {formatRupiah(t.totalPesanan)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-start gap-1.5 mt-2 px-2.5 py-2 rounded-md border border-gray-200 text-[11px] text-gray-500">
-                      <FaMapMarkerAlt className="text-orange-500 flex-shrink-0 mt-0.5" />
-                      <span>{t.alamatPengiriman}</span>
-                    </div>
-
-                    {/* [DIGANTI] sebelumnya <button onClick={...tandaiSelesai/tandaiProses}>,
-                        sekarang hanya badge status (read-only), kasir tidak bisa update status pengiriman */}
-                    <div
-                      className={`mt-3 w-full flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-semibold text-white select-none cursor-default ${
-                        isCompleted ? "bg-[#5F04E8]" : "bg-orange-500"
-                      }`}
-                    >
-                      {isCompleted ? <FaCheckCircle size={12} /> : <FaTruck size={12} />}
-                      {isCompleted ? "Completed" : "On Process"}
-                    </div>
-                  </div>
-                );
-              })}
+              {dataTersaring.map((t) => (
+                <TransaksiCard
+                  key={t.orderId}
+                  transaksi={t}
+                  items={itemsByOrder[t.orderId] || []}
+                  variant="pengiriman"
+                  statusPengiriman={statusMap[t.orderId] || "ON_PROCESS"}
+                />
+              ))}
             </div>
           )}
         </div>

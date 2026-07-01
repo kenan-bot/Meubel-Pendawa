@@ -35,16 +35,7 @@ public class IdGeneratorService {
         return String.format("LOG%03d", nomor);
     }
 
-    public String generateOrderId(String lastOrderId) {
-
-        String tanggal = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyy"));
-        String prefix = "ORD" + tanggal;
-
-        if (lastOrderId == null || !lastOrderId.startsWith(prefix)) {
-            return prefix + "1";
-        }
-
-        int nomorTerakhir = Integer.parseInt(lastOrderId.substring(prefix.length()));
-        return prefix + (nomorTerakhir + 1);
+    public String generateOrderId(String prefix, long jumlahHariIni) {
+        return prefix + String.format("%03d", jumlahHariIni + 1);
     }
 }

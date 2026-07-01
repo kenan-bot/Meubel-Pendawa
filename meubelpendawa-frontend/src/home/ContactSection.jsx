@@ -32,13 +32,18 @@ const ContactSection = () => {
                 <h3 className="text-[#5F04E8] text-xl font-bold mb-1">
                   Location
                 </h3>
-                <p className="text-[#FF6B00] text-sm leading-snug">
+                <a
+                  href="https://maps.app.goo.gl/xFbqHJosy2hZAFx87"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FF6B00] text-sm leading-snug hover:underline cursor-pointer"
+                >
                   Jl. Brigjend Sudiarto, Pandean, Lodoyong,
                   <br />
                   Kec. Ambarawa, Kabupaten Semarang,
                   <br />
                   Jawa Tengah 50611
-                </p>
+                </a>
               </div>
             </Card>
 
