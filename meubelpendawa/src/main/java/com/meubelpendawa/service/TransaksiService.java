@@ -1,5 +1,6 @@
 package com.meubelpendawa.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import com.meubelpendawa.model.Transaksi;
 import com.meubelpendawa.repository.TransaksiRepository;
 import com.meubelpendawa.model.Pengiriman;
 import com.meubelpendawa.repository.PengirimanRepository;
+import java.time.format.DateTimeFormatter;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TransaksiService {
@@ -25,23 +28,23 @@ public class TransaksiService {
         return transaksiRepository.findAll();
     }
 
+    @Transactional
     public Transaksi simpanTransaksi(Transaksi transaksi) {
 
-        String lastOrderId = transaksiRepository.findTopByOrderByOrderIdDesc()
-                .map(Transaksi::getOrderId)
-                .orElse(null);
+        String tanggal = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+        String prefix = "ORD" + tanggal;
+        long jumlahHariIni = transaksiRepository.countByOrderIdStartingWith(prefix);
 
-        transaksi.setOrderId(idGeneratorService.generateOrderId(lastOrderId));
+        transaksi.setOrderId(idGeneratorService.generateOrderId(prefix, jumlahHariIni));
         transaksi.setTanggalTransaksi(LocalDateTime.now());
 
         transaksi.setTotalPesanan(0.0);
         transaksi.setKembalian(0.0);
 
         Transaksi transaksiTersimpan = transaksiRepository.save(transaksi);
-        
-        
+
         if ("DELIVERY".equalsIgnoreCase(transaksi.getMetodePengiriman())) {
-            
+
             Pengiriman pengiriman = new Pengiriman();
             long nomorPengiriman = pengirimanRepository.count() + 1;
             pengiriman.setIdPengiriman(idGeneratorService.generatePengirimanId(nomorPengiriman));
@@ -50,7 +53,7 @@ public class TransaksiService {
             pengiriman.setStatusPengiriman("ON_PROCESS");
             pengirimanRepository.save(pengiriman);
         }
-        
+
         return transaksiTersimpan;
     }
 
@@ -71,5 +74,3 @@ public class TransaksiService {
         return transaksiRepository.findByNamaPemesanContainingIgnoreCaseOrOrderIdContainingIgnoreCase(keyword, keyword);
     }
 }
-
-

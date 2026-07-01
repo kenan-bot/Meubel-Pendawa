@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
+import { getAllPengiriman } from "../api/pengirimanApi";
 
 import PageHeader from "../components/PageHeader";
 import SearchBar from "../components/SearchBar";
@@ -20,17 +21,17 @@ function StatusPengiriman() {
   const [keyword, setKeyword] = useState("");
   const [tabStatus, setTabStatus] = useState("ON_PROCESS"); // ON_PROCESS | COMPLETED
 
-  // status pengiriman per orderId (sementara disimpan lokal,
-  // karena tabel transaksi belum punya kolom status pengiriman di backend)
+  // status pengiriman per orderId, dibaca langsung dari tabel `pengiriman` di database
   const [statusMap, setStatusMap] = useState({});
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [transaksiData, detailData] = await Promise.all([
+        const [transaksiData, detailData, pengirimanData] = await Promise.all([
           getAllTransaksi(),
           getAllDetailTransaksi(),
+          getAllPengiriman(),
         ]);
 
         const dataDelivery = transaksiData.filter(
@@ -40,13 +41,14 @@ function StatusPengiriman() {
         setTransaksiList(dataDelivery);
         setDetailList(detailData);
 
-        setStatusMap((prev) => {
-          const next = { ...prev };
-          dataDelivery.forEach((t) => {
-            if (!next[t.orderId]) next[t.orderId] = "ON_PROCESS";
-          });
-          return next;
+        // bangun peta status dari data pengiriman asli (bukan hardcode lagi)
+        const nextStatusMap = {};
+        pengirimanData.forEach((p) => {
+          const orderId = p.transaksi?.orderId;
+          if (!orderId) return;
+          nextStatusMap[orderId] = p.statusPengiriman || "ON_PROCESS";
         });
+        setStatusMap(nextStatusMap);
       } catch (error) {
         console.error("Gagal mengambil data status pengiriman:", error);
       } finally {
