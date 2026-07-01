@@ -22,17 +22,12 @@ export function TransaksiProvider({ children }) {
 
   useEffect(() => {
     getAllKaryawan()
-      .then((data) =>
-        setDriverList(data.filter((k) => k.role?.toUpperCase() === "DRIVER")),
-      )
+      .then((data) => setDriverList(data.filter((k) => k.role?.toUpperCase() === "DRIVER")))
       .catch((err) => console.error("Gagal mengambil daftar driver:", err));
   }, []);
 
   useEffect(() => {
-    if (!isDelivery) {
-      setAlamatPengiriman("");
-      setDriverId("");
-    }
+    if (!isDelivery) { setAlamatPengiriman(""); setDriverId(""); }
   }, [isDelivery]);
 
   // ----- filter produk -----
@@ -40,22 +35,12 @@ export function TransaksiProvider({ children }) {
   const [kategoriPick, setKategoriPick] = useState(null);
   const [merekPick, setMerekPick] = useState(null);
 
-  const produkTersaring = useMemo(
-    () =>
-      produk.filter((item) => {
-        const cocokKeyword = item.namaProduk
-          ?.toLowerCase()
-          .includes(keyword.toLowerCase());
-        const cocokKategori = kategoriPick
-          ? item.kategori?.idKategori === kategoriPick.idKategori
-          : true;
-        const cocokMerek = merekPick
-          ? item.merek?.idMerek === merekPick.idMerek
-          : true;
-        return cocokKeyword && cocokKategori && cocokMerek;
-      }),
-    [produk, keyword, kategoriPick, merekPick],
-  );
+  const produkTersaring = useMemo(() => produk.filter((item) => {
+    const cocokKeyword = item.namaProduk?.toLowerCase().includes(keyword.toLowerCase());
+    const cocokKategori = kategoriPick ? item.kategori?.idKategori === kategoriPick.idKategori : true;
+    const cocokMerek = merekPick ? item.merek?.idMerek === merekPick.idMerek : true;
+    return cocokKeyword && cocokKategori && cocokMerek;
+  }), [produk, keyword, kategoriPick, merekPick]);
 
   // ----- keranjang -----
   const [keranjang, setKeranjang] = useState([]);
@@ -65,164 +50,79 @@ export function TransaksiProvider({ children }) {
   const [pesan, setPesan] = useState("");
   const [pesanType, setPesanType] = useState("error");
 
-  const tampilkanPesan = (text, type = "error") => {
-    setPesan(text);
-    setPesanType(type);
-  };
+  const tampilkanPesan = (text, type = "error") => { setPesan(text); setPesanType(type); };
 
-  const tambahKeKeranjang = (item) =>
-    setKeranjang((prev) => {
-      const ada = prev.find((c) => c.produk.idProduk === item.idProduk);
-      if (ada)
-        return prev.map((c) =>
-          c.produk.idProduk === item.idProduk ? { ...c, qty: c.qty + 1 } : c,
-        );
-      return [...prev, { produk: item, qty: 1, hargaJual: item.hargaDefault }];
-    });
+  const tambahKeKeranjang = (item) => setKeranjang((prev) => {
+    const ada = prev.find((c) => c.produk.idProduk === item.idProduk);
+    if (ada) return prev.map((c) => c.produk.idProduk === item.idProduk ? { ...c, qty: c.qty + 1 } : c);
+    return [...prev, { produk: item, qty: 1, hargaJual: item.hargaDefault }];
+  });
 
-  const ubahQty = (idProduk, delta) =>
-    setKeranjang((prev) =>
-      prev.map((c) =>
-        c.produk.idProduk === idProduk
-          ? { ...c, qty: Math.max(1, c.qty + delta) }
-          : c,
-      ),
-    );
+  const ubahQty = (idProduk, delta) => setKeranjang((prev) =>
+    prev.map((c) => c.produk.idProduk === idProduk ? { ...c, qty: Math.max(1, c.qty + delta) } : c));
 
-  const hapusItem = (idProduk) =>
-    setKeranjang((prev) => prev.filter((c) => c.produk.idProduk !== idProduk));
+  const hapusItem = (idProduk) => setKeranjang((prev) => prev.filter((c) => c.produk.idProduk !== idProduk));
 
-  const ubahHarga = (idProduk, hargaBaru) => {
-    setKeranjang((prev) =>
-      prev.map((item) => {
-        if (item.produk.idProduk !== idProduk) return item;
+  const ubahHarga = (idProduk, harga) => setKeranjang((prev) =>
+    prev.map((c) => c.produk.idProduk === idProduk ? { ...c, hargaJual: Number(harga) || 0 } : c));
 
-        const hargaDefault = item.produk.hargaDisplay; // atau hargaProduk
-        const hargaMinimum = hargaDefault - hargaDefault * 0.1;
-
-        if (hargaBaru < hargaMinimum) {
-          alert(
-            `Harga tidak boleh kurang dari ${hargaMinimum.toLocaleString("id-ID")}`,
-          );
-          return item;
-        }
-
-        return {
-          ...item,
-          hargaJual: hargaBaru,
-        };
-      }),
-    );
-  };
-
-  const totalPesanan = keranjang.reduce(
-    (sum, c) => sum + c.qty * c.hargaJual,
-    0,
-  );
+  const totalPesanan = keranjang.reduce((sum, c) => sum + c.qty * c.hargaJual, 0);
   const kembalian = jumlahBayar ? Number(jumlahBayar) - totalPesanan : 0;
 
   const resetForm = () => {
-    setNamaPemesan("");
-    setNoWhatsapp("");
-    setAlamatPengiriman("");
-    setDriverId("");
-    setKeranjang([]);
-    setJumlahBayar("");
+    setNamaPemesan(""); setNoWhatsapp(""); setAlamatPengiriman("");
+    setDriverId(""); setKeranjang([]); setJumlahBayar("");
   };
 
   const prosesPesanan = async () => {
     setPesan("");
-    if (!namaPemesan || !noWhatsapp)
-      return tampilkanPesan("Nama dan No. Telp/WhatsApp wajib diisi.");
-    if (isDelivery && (!alamatPengiriman || !driverId))
-      return tampilkanPesan("Alamat & driver wajib diisi untuk Delivery.");
-    if (keranjang.length === 0)
-      return tampilkanPesan("Keranjang masih kosong.");
-    if (!jumlahBayar || Number(jumlahBayar) < totalPesanan)
-      return tampilkanPesan("Jumlah bayar belum mencukupi total pesanan.");
+    if (!namaPemesan || !noWhatsapp) return tampilkanPesan("Nama dan No. Telp/WhatsApp wajib diisi.");
+    if (isDelivery && (!alamatPengiriman || !driverId)) return tampilkanPesan("Alamat & driver wajib diisi untuk Delivery.");
+    if (keranjang.length === 0) return tampilkanPesan("Keranjang masih kosong.");
+    if (!jumlahBayar || Number(jumlahBayar) < totalPesanan) return tampilkanPesan("Jumlah bayar belum mencukupi total pesanan.");
 
     try {
       setSubmitting(true);
       const transaksiBaru = await createTransaksi({
-        namaPemesan,
-        noWhatsapp,
+        namaPemesan, noWhatsapp,
         alamatPengiriman: isDelivery ? alamatPengiriman : "-",
-        metodePengiriman,
-        metodePembayaran,
+        metodePengiriman, metodePembayaran,
         driver: isDelivery ? { idKaryawan: driverId } : null,
       });
       for (const item of keranjang) {
         await createDetailTransaksi({
-          qty: item.qty,
-          hargaJual: item.hargaJual,
+          qty: item.qty, hargaJual: item.hargaJual,
           produk: { idProduk: item.produk.idProduk },
           transaksi: { orderId: transaksiBaru.orderId },
         });
       }
       await prosesPembayaran(transaksiBaru.orderId, Number(jumlahBayar));
-      tampilkanPesan(
-        `Pesanan ${transaksiBaru.orderId} berhasil diproses.`,
-        "success",
-      );
+      tampilkanPesan(`Pesanan ${transaksiBaru.orderId} berhasil diproses.`, "success");
       resetForm();
     } catch (error) {
       console.error(error);
-      tampilkanPesan(
-        error?.response?.data?.message ||
-          "Gagal memproses pesanan. Coba periksa kembali data.",
-      );
+      tampilkanPesan(error?.response?.data?.message || "Gagal memproses pesanan. Coba periksa kembali data.");
     } finally {
       setSubmitting(false);
     }
   };
 
   const value = {
-    loading,
-    produkTersaring,
-    keyword,
-    setKeyword,
-    setKategoriPick,
-    setMerekPick,
-    namaPemesan,
-    setNamaPemesan,
-    noWhatsapp,
-    setNoWhatsapp,
-    metodePengiriman,
-    setMetodePengiriman,
-    metodePembayaran,
-    setMetodePembayaran,
-    alamatPengiriman,
-    setAlamatPengiriman,
-    driverId,
-    setDriverId,
-    driverList,
-    keranjang,
-    tambahKeKeranjang,
-    ubahQty,
-    hapusItem,
-    ubahHarga,
-    waktu,
-    jumlahBayar,
-    setJumlahBayar,
-    totalPesanan,
-    kembalian,
-    isCashless,
-    submitting,
-    pesan,
-    pesanType,
-    prosesPesanan,
+    loading, produkTersaring,
+    keyword, setKeyword, setKategoriPick, setMerekPick,
+    namaPemesan, setNamaPemesan, noWhatsapp, setNoWhatsapp,
+    metodePengiriman, setMetodePengiriman, metodePembayaran, setMetodePembayaran,
+    alamatPengiriman, setAlamatPengiriman, driverId, setDriverId, driverList,
+    keranjang, tambahKeKeranjang, ubahQty, hapusItem, ubahHarga, waktu,
+    jumlahBayar, setJumlahBayar, totalPesanan, kembalian, isCashless,
+    submitting, pesan, pesanType, prosesPesanan, tampilkanPesan,
   };
 
-  return (
-    <TransaksiContext.Provider value={value}>
-      {children}
-    </TransaksiContext.Provider>
-  );
+  return <TransaksiContext.Provider value={value}>{children}</TransaksiContext.Provider>;
 }
 
 export function useTransaksi() {
   const ctx = useContext(TransaksiContext);
-  if (!ctx)
-    throw new Error("useTransaksi harus dipakai di dalam <TransaksiProvider>");
+  if (!ctx) throw new Error("useTransaksi harus dipakai di dalam <TransaksiProvider>");
   return ctx;
 }

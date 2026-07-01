@@ -9,7 +9,7 @@ function formatRupiah(nominal) {
 }
 
 const KeranjangItem = ({ item }) => {
-  const { ubahQty, hapusItem, ubahHarga } = useTransaksi();
+  const { ubahQty, hapusItem, ubahHarga, tampilkanPesan } = useTransaksi();
   const [showInput, setShowInput] = useState(false);
   const [hargaInput, setHargaInput] = useState(item.hargaJual);
   const idProduk = item.produk.idProduk;
@@ -17,6 +17,20 @@ const KeranjangItem = ({ item }) => {
   useEffect(() => {
     setHargaInput(item.hargaJual);
   }, [item.hargaJual]);
+
+  const handleSelesai = () => {
+    const hargaDefault = Number(item.produk.hargaDefault);
+    const hargaMinimum = hargaDefault * 0.9;
+
+    if (Number(hargaInput) < hargaMinimum) {
+      tampilkanPesan(`Harga terlalu rendah! Minimal ${formatRupiah(hargaMinimum)}`, "error");
+      return;
+    }
+
+    ubahHarga(idProduk, Number(hargaInput));
+    tampilkanPesan("Harga berhasil diperbarui.", "success");
+    setShowInput(false);
+  };
 
   return (
     <div className="flex gap-2 items-start border-b border-gray-100 pb-2.5">
@@ -70,21 +84,7 @@ const KeranjangItem = ({ item }) => {
 
             <button
               type="button"
-              onClick={() => {
-                const hargaDefault = Number(item.produk.hargaDefault);
-                const hargaMinimum = hargaDefault * 0.9;
-
-                if (Number(hargaInput) < hargaMinimum) {
-                  alert(
-                    `Harga terlalu rendah!\n\nHarga minimal yang diperbolehkan adalah ${formatRupiah(hargaMinimum)}`,
-                  );
-                  return;
-                }
-
-                ubahHarga(idProduk, Number(hargaInput));
-
-                alert("Harga berhasil diperbarui.");
-              }}
+              onClick={handleSelesai}
               className="mt-1 text-[10px] text-gray-400 underline"
             >
               Selesai
