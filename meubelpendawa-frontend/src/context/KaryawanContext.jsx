@@ -11,6 +11,10 @@ export const KaryawanProvider = ({ children }) => {
     loadKaryawan();
   }, []);
 
+  const addKaryawan = (newKaryawan) => {
+    setKaryawan((prev) => [newKaryawan, ...prev]);
+  };
+
   const loadKaryawan = async () => {
     try {
       const data = await getAllKaryawan();
@@ -24,11 +28,15 @@ export const KaryawanProvider = ({ children }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredKaryawan = karyawan.filter((item) =>
-    item.namaKaryawan
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  const filteredKaryawan = karyawan.filter((item) => {
+    const keyword = searchTerm.toLowerCase();
+
+    return (
+      item.namaKaryawan?.toLowerCase().includes(keyword) ||
+      item.email?.toLowerCase().includes(keyword) ||
+      item.username?.toLowerCase().includes(keyword)
+    );
+  });
 
   return (
     <KaryawanContext.Provider
@@ -39,6 +47,7 @@ export const KaryawanProvider = ({ children }) => {
         searchTerm,
         setSearchTerm,
         reloadKaryawan: loadKaryawan,
+        addKaryawan,
       }}
     >
       {children}

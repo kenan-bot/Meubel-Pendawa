@@ -38,8 +38,8 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
               <div className="flex justify-center gap-2">
                 <button
                   onClick={() => onResetPassword?.(item)}
-                  className="p-2 rounded-lg bg-orange-50 text-orange-500
-                  hover:bg-[#E7DBFF] transition"
+                  className="p-2 rounded-lg text-orange-500
+                  hover:bg-orange-100 transition"
                 >
                   <FaKey />
                 </button>

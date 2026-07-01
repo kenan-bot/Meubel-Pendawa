@@ -5,6 +5,7 @@ const FormInput = ({
   type = "text",
   placeholder = "",
   required = false,
+  autoComplete = "off",
 }) => {
   return (
     <div className="w-full">
@@ -19,6 +20,7 @@ const FormInput = ({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
+        autoComplete={autoComplete}
         className="w-full border border-gray-300 rounded-md px-3 py-2
         focus:outline-none focus:ring-2 focus:ring-orange-500
         transition-all duration-200"

@@ -5,6 +5,8 @@ import { useKaryawan } from "../context/KaryawanContext";
 import SearchBar from "../components/SearchBar";
 import KaryawanCard from "../components/KaryawanCard";
 import { FiPlus } from "react-icons/fi";
+import KaryawanForm from "../components/KaryawanForm";
+import Modal from "../components/Modal";
 
 function Karyawan() {
   const [openModal, setOpenModal] = useState(false);
@@ -26,16 +28,18 @@ function Karyawan() {
 
       {/* Search + Button */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
-        <SearchBar theme="orange" />
-
-        <button
+        <SearchBar
           theme="orange"
           placeholder="Cari karyawan..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <button
+          onClick={() => setOpenModal(true)}
           className="md:ml-auto flex items-center gap-1.5 bg-orange-500 text-white text-sm font-medium
-                      px-3 py-1.5 rounded-md hover:bg-orange-600 hover:scale-[1.02]
-                      transition-all duration-300 ease-out"
+          px-3 py-1.5 rounded-md hover:bg-orange-600 hover:scale-[1.02]
+          transition-all duration-300 ease-out"
         >
           <FiPlus size={18} />
           Tambah Karyawan
@@ -61,6 +65,14 @@ function Karyawan() {
       ) : (
         <KaryawanCard karyawan={filteredKaryawan} />
       )}
+
+      <Modal
+        isOpen={openModal}
+        onClose={() => setOpenModal(false)}
+        title="Tambah Karyawan"
+      >
+        <KaryawanForm />
+      </Modal>
     </div>
   );
 }

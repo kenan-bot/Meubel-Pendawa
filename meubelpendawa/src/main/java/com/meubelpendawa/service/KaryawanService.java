@@ -25,8 +25,7 @@ public class KaryawanService {
         return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.#_-])[A-Za-z\\d@$!%*?&.#_-]{12,}$");
     }
 
-    private final BCryptPasswordEncoder passwordEncoder =
-        new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public List<Karyawan> getAllKaryawan() {
         return karyawanRepository.findAll();
@@ -36,95 +35,102 @@ public class KaryawanService {
 
         long nomor = karyawanRepository.count() + 1;
         karyawan.setIdKaryawan(idGeneratorService.generateKaryawanId(nomor));
-        
+
         if (karyawan.getAksesSistem()) {
             if (karyawanRepository.existsByUsername(karyawan.getUsername())) {
                 throw new RuntimeException("Username sudah digunakan");
             }
 
-        if (!isValidUsername(karyawan.getUsername())) {
-            throw new RuntimeException("Username minimal 8 karakter dan harus mengandung huruf serta angka");
+            if (!isValidUsername(karyawan.getUsername())) {
+                throw new RuntimeException("Username minimal 8 karakter dan harus mengandung huruf serta angka");
+            }
+
+            if (!isValidPassword(karyawan.getPassword())) {
+                throw new RuntimeException(
+                        "Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
+            }
+
+            if (karyawanRepository.existsByEmail(karyawan.getEmail())) {
+                throw new RuntimeException("Email sudah digunakan");
+            }
+
+            karyawan.setPassword(passwordEncoder.encode(karyawan.getPassword()));
+        } else {
+            karyawan.setRole(null);
+            karyawan.setUsername(null);
+            karyawan.setPassword(null);
         }
-        
-        if (!isValidPassword(karyawan.getPassword())) {
-            throw new RuntimeException("Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
-        }
-
-        karyawan.setPassword(passwordEncoder.encode(karyawan.getPassword()));
-    } else {
-        karyawan.setRole(null);
-        karyawan.setUsername(null);
-        karyawan.setPassword(null);
-    }
-    return karyawanRepository.save(karyawan);
+        return karyawanRepository.save(karyawan);
 
     }
-
 
     public Karyawan updateKaryawan(Karyawan karyawan) {
-        
+
         Karyawan dataLama = karyawanRepository.findById(karyawan.getIdKaryawan())
-        .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
+                .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
 
-    if (karyawan.getAksesSistem()) {
+        if (karyawan.getAksesSistem()) {
 
-        if (!isValidUsername(karyawan.getUsername())) {throw new RuntimeException(
-            "Username minimal 8 karakter dan harus mengandung huruf serta angka");
-        }
-
-        Optional<Karyawan> usernameLama = karyawanRepository.findByUsername(karyawan.getUsername());
-
-        if (usernameLama.isPresent() && !usernameLama.get().getIdKaryawan()
-            .equals(karyawan.getIdKaryawan())) {throw new RuntimeException(
-        "Username sudah digunakan");
-        } 
-        
-        if (!dataLama.getAksesSistem()) {
-
-            if (karyawan.getPassword() == null || karyawan.getPassword().isBlank()) {
-                throw new RuntimeException("Password wajib diisi saat mengaktifkan akses sistem");
+            if (!isValidUsername(karyawan.getUsername())) {
+                throw new RuntimeException(
+                        "Username minimal 8 karakter dan harus mengandung huruf serta angka");
             }
-        }
 
-        if (karyawan.getPassword() != null && !karyawan.getPassword().isBlank()) {
+            Optional<Karyawan> usernameLama = karyawanRepository.findByUsername(karyawan.getUsername());
 
-            if (!isValidPassword(karyawan.getPassword())) {throw new RuntimeException(
-                "Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
+            if (usernameLama.isPresent() && !usernameLama.get().getIdKaryawan()
+                    .equals(karyawan.getIdKaryawan())) {
+                throw new RuntimeException(
+                        "Username sudah digunakan");
             }
-            
-            dataLama.setPassword(passwordEncoder.encode(karyawan.getPassword()));
+
+            if (!dataLama.getAksesSistem()) {
+
+                if (karyawan.getPassword() == null || karyawan.getPassword().isBlank()) {
+                    throw new RuntimeException("Password wajib diisi saat mengaktifkan akses sistem");
+                }
+            }
+
+            if (karyawan.getPassword() != null && !karyawan.getPassword().isBlank()) {
+
+                if (!isValidPassword(karyawan.getPassword())) {
+                    throw new RuntimeException(
+                            "Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
+                }
+
+                dataLama.setPassword(passwordEncoder.encode(karyawan.getPassword()));
+            }
+
+        } else {
+            dataLama.setRole(null);
+            dataLama.setUsername(null);
+            dataLama.setPassword(null);
         }
 
-    } else {
-        dataLama.setRole(null);
-        dataLama.setUsername(null);
-        dataLama.setPassword(null);
+        dataLama.setNamaKaryawan(karyawan.getNamaKaryawan());
+        dataLama.setEmail(karyawan.getEmail());
+        dataLama.setAksesSistem(karyawan.getAksesSistem());
+        dataLama.setRole(karyawan.getRole());
+        dataLama.setUsername(karyawan.getUsername());
+        dataLama.setStatusAktif(karyawan.getStatusAktif());
+
+        return karyawanRepository.save(dataLama);
+
     }
-
-    dataLama.setNamaKaryawan(karyawan.getNamaKaryawan());
-    dataLama.setEmail(karyawan.getEmail());
-    dataLama.setAksesSistem(karyawan.getAksesSistem());
-    dataLama.setRole(karyawan.getRole());
-    dataLama.setUsername(karyawan.getUsername());
-    dataLama.setStatusAktif(karyawan.getStatusAktif());
-
-    return karyawanRepository.save(dataLama);
-
-    }   
 
     public Karyawan resetPassword(String idKaryawan, String passwordBaru) {
-        
+
         Karyawan karyawan = karyawanRepository.findById(idKaryawan)
-        .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
-        
-        if (!isValidPassword(passwordBaru)) {throw new RuntimeException(
-            "Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
+                .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
+
+        if (!isValidPassword(passwordBaru)) {
+            throw new RuntimeException(
+                    "Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
         }
-        
-        karyawan.setPassword(passwordEncoder.encode(passwordBaru));  
+
+        karyawan.setPassword(passwordEncoder.encode(passwordBaru));
         return karyawanRepository.save(karyawan);
     }
-
 
     public void hapusKaryawan(String idKaryawan) {
         karyawanRepository.deleteById(idKaryawan);

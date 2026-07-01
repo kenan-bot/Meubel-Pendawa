@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AnimatedSection from "../components/AnimatedSection";
 import axios from "axios";
+import Toast from "../components/Toast";
 
 export default function FormLogin() {
   const navigate = useNavigate();
@@ -9,11 +11,23 @@ export default function FormLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (!toast) return;
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    try {setLoading(true);
+    try {
+      setLoading(true);
 
       const response = await axios.post("http://localhost:8080/auth/login", {
         username,
@@ -22,7 +36,11 @@ export default function FormLogin() {
 
       const data = response.data;
 
-      if (!data.success) {alert(data.message);
+      if (!data.success) {
+        setToast({
+          type: "error",
+          message: data.message,
+        });
         return;
       }
 
@@ -31,19 +49,21 @@ export default function FormLogin() {
       localStorage.setItem("idKaryawan", data.idKaryawan);
       localStorage.setItem("namaKaryawan", data.namaKaryawan);
 
-      if (data.role === "OWNER") {navigate("/owner");
-      } else if (data.role === "CASHIER_SALES") {navigate("/kasir");
-
-      } else if (data.role === "DRIVER") {navigate("/driver");
-
+      if (data.role === "OWNER") {
+        navigate("/owner");
+      } else if (data.role === "CASHIER_SALES") {
+        navigate("/kasir");
+      } else if (data.role === "DRIVER") {
+        navigate("/driver");
       }
     } catch (error) {
-      if (error.response) {alert(error.response.data.message);
-      }
-      else {alert("Tidak dapat terhubung ke server");
-      }
-    }
-    finally {setLoading(false);
+      setToast({
+        type: "error",
+        message:
+          error.response?.data?.message || "Tidak dapat terhubung ke server",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -278,7 +298,14 @@ export default function FormLogin() {
             </AnimatedSection>
           </form>
         </div>
+        {toast && (
+      <Toast
+        type={toast.type}
+        message={toast.message}
+      />
+    )}
       </div>
     </div>
   );
+  
 }

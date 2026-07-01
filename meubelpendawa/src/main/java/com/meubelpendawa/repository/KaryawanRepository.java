@@ -9,4 +9,5 @@ public interface KaryawanRepository extends JpaRepository<Karyawan, String> {
     Optional<Karyawan> findByUsername(String username);
     List<Karyawan> findByNamaKaryawanContainingIgnoreCase(String namaKaryawan);
     boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

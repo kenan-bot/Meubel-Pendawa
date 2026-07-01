@@ -13,3 +13,8 @@ export const searchKaryawan = async (keyword) => {
   });
   return response.data;
 };
+
+export const createKaryawan = async (data) => {
+  const response = await axiosClient.post(BASE_URL, data);
+  return response.data;
+};
