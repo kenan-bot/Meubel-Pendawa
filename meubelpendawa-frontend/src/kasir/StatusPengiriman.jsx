@@ -28,11 +28,19 @@ function StatusPengiriman() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [transaksiData, detailData, pengirimanData] = await Promise.all([
+        const [transaksiRes, detailRes, pengirimanRes] = await Promise.allSettled([
           getAllTransaksi(),
           getAllDetailTransaksi(),
           getAllPengiriman(),
         ]);
+
+        const transaksiData = transaksiRes.status === "fulfilled" ? transaksiRes.value : [];
+        const detailData = detailRes.status === "fulfilled" ? detailRes.value : [];
+        const pengirimanData = pengirimanRes.status === "fulfilled" ? pengirimanRes.value : [];
+
+        if (transaksiRes.status === "rejected") console.error("Gagal mengambil transaksi:", transaksiRes.reason);
+        if (detailRes.status === "rejected") console.error("Gagal mengambil detail transaksi:", detailRes.reason);
+        if (pengirimanRes.status === "rejected") console.error("Gagal mengambil status pengiriman:", pengirimanRes.reason);
 
         const dataDelivery = transaksiData.filter(
           (t) => t.metodePengiriman?.toUpperCase() === "DELIVERY"
@@ -89,8 +97,8 @@ function StatusPengiriman() {
       <div className="bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0">
         {/* header (TIDAK ikut scroll) */}
         <div className="p-4 lg:p-5 pb-0 flex-shrink-0 relative">
-          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul */}
-          <div className="absolute top-4 right-4 lg:top-5 lg:right-5">
+          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul -- hanya di layar lg+ */}
+          <div className="hidden lg:block absolute top-5 right-5">
             <DateTimeDisplay />
           </div>
 
@@ -98,6 +106,11 @@ function StatusPengiriman() {
             title="Lihat Status Pengiriman"
             subtitle="Halaman untuk memantau status pengiriman"
           />
+
+          {/* [RESPONSIVE] di layar kecil, tanggal/jam ditaruh di bawah judul (bukan absolute) supaya tidak numpuk */}
+          <div className="lg:hidden mb-4 -mt-4">
+            <DateTimeDisplay />
+          </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">

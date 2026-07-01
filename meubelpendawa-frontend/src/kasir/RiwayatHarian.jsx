@@ -141,8 +141,8 @@ function RiwayatHarian() {
       <div className="bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0">
         {/* header (TIDAK ikut scroll) */}
         <div className="p-4 lg:p-5 pb-0 flex-shrink-0 relative">
-          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul */}
-          <div className="absolute top-4 right-4 lg:top-5 lg:right-5">
+          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul -- hanya di layar lg+ */}
+          <div className="hidden lg:block absolute top-5 right-5">
             <DateTimeDisplay />
           </div>
 
@@ -150,6 +150,11 @@ function RiwayatHarian() {
             title="Riwayat Harian"
             subtitle="Informasi direset setiap pukul 23.59"
           />
+
+          {/* [RESPONSIVE] di layar kecil, tanggal/jam ditaruh di bawah judul (bukan absolute) supaya tidak numpuk */}
+          <div className="lg:hidden mb-4 -mt-4">
+            <DateTimeDisplay />
+          </div>
 
           {/* ringkasan */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 items-stretch">
