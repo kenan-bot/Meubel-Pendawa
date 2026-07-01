@@ -22,8 +22,9 @@ function StatusPengiriman() {
   const [tabStatus, setTabStatus] = useState("ON_PROCESS"); // ON_PROCESS | COMPLETED
 
   // filter tanggal -- hanya relevan & ditampilkan saat tab Completed aktif,
-  // supaya data yang sudah selesai (numpuk dari hari ke hari) bisa disaring per tanggal tertentu
-  const [tanggalFilter, setTanggalFilter] = useState("");
+  // supaya data yang sudah selesai (numpuk dari hari ke hari) bisa disaring per tanggal tertentu.
+  // Default: tanggal hari ini (sysdate), bukan "tampilkan semua", biar tidak numpuk pas pertama buka.
+  const [tanggalFilter, setTanggalFilter] = useState(() => new Date().toLocaleDateString("en-CA"));
 
   // status pengiriman per orderId, dibaca langsung dari tabel `pengiriman` di database
   const [statusMap, setStatusMap] = useState({});
@@ -160,7 +161,7 @@ function StatusPengiriman() {
             />
           </div>
 
-          {/* [BARU] filter tanggal -- hanya muncul di tab Completed,
+          {/* [BARU] filter tanggal -- hanya muncul di tab Completed, default hari ini (sysdate),
               karena data selesai akan terus numpuk dari hari ke hari */}
           {tabStatus === "COMPLETED" && (
             <div className="flex flex-wrap items-end gap-2 mb-4 p-2.5 rounded-lg bg-[#5F04E8]/5 border border-[#5F04E8]/10">
@@ -173,22 +174,6 @@ function StatusPengiriman() {
                   className="border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#5F04E8]"
                 />
               </div>
-
-              <button
-                onClick={() => setTanggalFilter(new Date().toLocaleDateString("en-CA"))}
-                className="text-[11px] font-semibold px-2.5 py-1.5 rounded-md border border-[#5F04E8]/30 text-[#5F04E8] hover:bg-[#5F04E8]/10"
-              >
-                Hari ini
-              </button>
-
-              {tanggalFilter && (
-                <button
-                  onClick={() => setTanggalFilter("")}
-                  className="text-[11px] text-gray-400 underline mb-1.5"
-                >
-                  Tampilkan semua
-                </button>
-              )}
             </div>
           )}
         </div>

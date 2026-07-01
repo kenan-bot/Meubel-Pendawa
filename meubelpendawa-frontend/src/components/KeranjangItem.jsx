@@ -29,7 +29,7 @@ const KeranjangItem = ({ item }) => {
 
     ubahHarga(idProduk, Number(hargaInput));
     tampilkanPesan("Harga berhasil diperbarui.", "success");
-    setShowInput(false);
+    // form tetap terbuka — tidak setShowInput(false)
   };
 
   return (
@@ -55,9 +55,12 @@ const KeranjangItem = ({ item }) => {
             <FaTrash size={11} />
           </button>
         </div>
+
+        {/* Baris qty: menampilkan hargaJual — berubah setelah atur harga */}
         <p className="text-[10px] text-gray-400">
           Qty: {item.qty} x {formatRupiah(item.hargaJual)}
         </p>
+
         <div className="flex items-center justify-between mt-1">
           <div className="flex items-center gap-1.5">
             <button
@@ -74,14 +77,16 @@ const KeranjangItem = ({ item }) => {
               +
             </button>
           </div>
+
+          {/* Harga bold ungu: selalu pakai hargaDefault, tidak pernah berubah */}
           <span className="font-bold text-[#5F04E8] text-xs">
-            {formatRupiah(item.qty * item.hargaJual)}
+            {formatRupiah(item.qty * Number(item.produk.hargaDefault))}
           </span>
         </div>
+
         {showInput ? (
           <div className="mt-1.5 [&_label]:hidden [&_input]:text-[11px] [&_input]:py-1 [&_input]:px-1.5 [&_input]:border-orange-300">
             <RupiahInput value={hargaInput} onChange={setHargaInput} />
-
             <button
               type="button"
               onClick={handleSelesai}
