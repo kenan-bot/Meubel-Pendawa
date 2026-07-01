@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 import com.meubelpendawa.dto.LoginRequest;
 import com.meubelpendawa.dto.LoginResponse;
 import com.meubelpendawa.model.Karyawan;
+import com.meubelpendawa.model.OtpResetPassword;
 import com.meubelpendawa.repository.KaryawanRepository;
+import com.meubelpendawa.repository.OtpResetPasswordRepository;
 import com.meubelpendawa.security.JwtService;
 import com.meubelpendawa.service.LoginLogService;
+import com.meubelpendawa.model.OtpResetPassword;
 
 @Service
 public class AuthService {
@@ -22,6 +25,12 @@ public class AuthService {
 
     @Autowired
     private LoginLogService loginLogService;
+
+    @Autowired
+    private KaryawanService karyawanService;
+
+    @Autowired
+    private OtpResetPasswordRepository otpRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -79,4 +88,32 @@ public class AuthService {
                 karyawan.getNamaKaryawan(),
                 karyawan.getRole().name());
     }
+
+    public void resetPassword(
+            String email,
+            String passwordBaru) {
+
+        OtpResetPassword otp = otpRepository
+                .findTopByEmailOrderByExpiredAtDesc(email)
+                .orElseThrow(() -> new RuntimeException("OTP tidak ditemukan"));
+
+        if (!otp.getVerified()) {
+            throw new RuntimeException(
+                    "OTP belum diverifikasi");
+        }
+
+        Karyawan karyawan = karyawanRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
+
+        karyawanService.resetPassword(
+                karyawan.getIdKaryawan(),
+                passwordBaru);
+
+        otp.setUsed(true);
+        otp.setVerified(false);
+
+        otpRepository.save(otp);
+    }
+
 }

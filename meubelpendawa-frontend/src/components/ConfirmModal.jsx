@@ -7,14 +7,27 @@ const ConfirmModal = ({
   confirmText = "Ya",
   cancelText = "Batal",
   onConfirm,
-  onCancel,
+  onClose,
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/40 flex items-center justify-center">
-
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-5">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center
+      bg-black/40 backdrop-blur-sm p-3"
+    >
+      <div
+        className="animate-modal-show bg-white rounded-xl shadow-xl
+        w-[95%] sm:w-[90%] max-w-md p-5"
+      >
+        <div className="flex justify-end">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500"
+          >
+            ✕
+          </button>
+        </div>
 
         <div className="flex justify-center mb-3">
           <div className="bg-red-100 p-3 rounded-full">
@@ -34,9 +47,8 @@ const ConfirmModal = ({
         </p>
 
         <div className="flex justify-center gap-3 mt-6">
-
           <button
-            onClick={onCancel}
+            onClick={onClose}
             className="
               px-4 py-2 rounded-md
               border border-gray-300
@@ -60,11 +72,8 @@ const ConfirmModal = ({
           >
             {confirmText}
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 };

@@ -90,6 +90,7 @@ export default function Produk() {
       </div>
 
       <Modal
+        maxWidth="max-w-3xl"
         isOpen={openTambahProduk}
         onClose={() => setOpenTambahProduk(false)}
         title="Tambah Produk"

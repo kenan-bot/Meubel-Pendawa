@@ -28,15 +28,30 @@ export const KaryawanProvider = ({ children }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredKaryawan = karyawan.filter((item) => {
-    const keyword = searchTerm.toLowerCase();
+  const filteredKaryawan = karyawan
+    .filter((item) => {
+      if (!item.statusAktif && item.tanggalNonaktif) {
+        const waktuNonaktif = new Date(item.tanggalNonaktif);
+        const sekarang = new Date();
 
-    return (
-      item.namaKaryawan?.toLowerCase().includes(keyword) ||
-      item.email?.toLowerCase().includes(keyword) ||
-      item.username?.toLowerCase().includes(keyword)
-    );
-  });
+        const selisihJam = (sekarang - waktuNonaktif) / (1000 * 60 * 60);
+
+        if (selisihJam >= 24) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .filter((item) => {
+      const keyword = searchTerm.toLowerCase();
+
+      return (
+        item.namaKaryawan?.toLowerCase().includes(keyword) ||
+        item.email?.toLowerCase().includes(keyword) ||
+        item.username?.toLowerCase().includes(keyword)
+      );
+    });
 
   const updateStatusState = (karyawanUpdate) => {
     setKaryawan((prev) =>

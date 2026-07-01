@@ -1,15 +1,20 @@
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  maxWidth = "max-w-md",
+}) => {
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center
-    bg-black/40 backdrop-blur-sm p-3"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-3"
     >
       <div
-        className="animate-modal-show bg-white rounded-xl shadow-xl
-        w-[95%] sm:w-[90%] md:w-full max-w-3xl
-        p-4 md:p-5 max-h-[90vh] overflow-y-auto"
+        className={`animate-modal-show bg-white rounded-xl shadow-xl
+        w-[95%] ${maxWidth}
+        p-4 md:p-5 max-h-[90vh] overflow-y-auto`}
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-bold text-xl">{title}</h2>

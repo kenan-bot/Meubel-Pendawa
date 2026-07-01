@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.meubelpendawa.model.Karyawan;
 import com.meubelpendawa.repository.KaryawanRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.time.LocalDateTime;
 
 @Service
 public class KaryawanService {
@@ -146,6 +147,12 @@ public class KaryawanService {
                 .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
 
         karyawan.setStatusAktif(statusAktif);
+        
+        if (!statusAktif) {
+            karyawan.setTanggalNonaktif(LocalDateTime.now());
+        } else {
+            karyawan.setTanggalNonaktif(null);
+        }
 
         return karyawanRepository.save(karyawan);
     }

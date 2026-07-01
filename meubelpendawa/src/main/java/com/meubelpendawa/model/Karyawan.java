@@ -1,5 +1,7 @@
 package com.meubelpendawa.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -31,11 +33,13 @@ public class Karyawan {
 
     private Boolean statusAktif;
 
+    private LocalDateTime tanggalNonaktif;
+
     public Karyawan() {
     }
 
     public Karyawan(String namaKaryawan, String email, Boolean aksesSistem, Role role, String username,
-            String password, Boolean statusAktif) {
+            String password, Boolean statusAktif, LocalDateTime tanggalNonaktif) {
         this.namaKaryawan = namaKaryawan;
         this.email = email;
         this.aksesSistem = aksesSistem;
@@ -43,6 +47,7 @@ public class Karyawan {
         this.username = username;
         this.password = password;
         this.statusAktif = statusAktif;
+        this.tanggalNonaktif = tanggalNonaktif;
     }
 
     public String getIdKaryawan() {
@@ -107,6 +112,14 @@ public class Karyawan {
 
     public void setStatusAktif(Boolean statusAktif) {
         this.statusAktif = statusAktif;
+    }
+
+    public LocalDateTime getTanggalNonaktif() {
+        return tanggalNonaktif;
+    }
+
+    public void setTanggalNonaktif(LocalDateTime tanggalNonaktif) {
+        this.tanggalNonaktif = tanggalNonaktif;
     }
 
 }

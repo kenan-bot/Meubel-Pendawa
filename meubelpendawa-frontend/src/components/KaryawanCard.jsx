@@ -13,10 +13,14 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
 
   const handleToggle = async (item) => {
     try {
+      console.log("TOGGLE:", item.idKaryawan);
+
       const result = await updateStatusKaryawan(
         item.idKaryawan,
         !item.statusAktif,
       );
+
+      console.log("RESULT:", result);
 
       updateStatusState(result);
     } catch (error) {
@@ -24,134 +28,149 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
     }
   };
 
+  const handleConfirm = async () => {
+    console.log("KONFIRM DIKLIK");
+    console.log(selectedKaryawan);
+
+    await handleToggle(selectedKaryawan);
+
+    setShowConfirm(false);
+    setSelectedKaryawan(null);
+  };
+
   const handleSwitchClick = (item) => {
-    // jika sedang aktif dan ingin dinonaktifkan
     if (item.statusAktif) {
       setSelectedKaryawan(item);
       setShowConfirm(true);
       return;
     }
 
-    // jika sedang nonaktif dan ingin diaktifkan
     handleToggle(item);
   };
 
   return (
-    <div className="space-y-3">
-      {karyawan.map((item, index) => (
-        <AnimatedSection key={item.idKaryawan} delay={index * 0.05}>
-          <>
-            {/* =========== DESKTOP ======= */}
-            <div
-              className="hidden lg:grid grid-cols-[230px_170px_315px_160px_105px_80px]
+    <>
+      <div className="space-y-3">
+        {karyawan.map((item, index) => (
+          <AnimatedSection key={item.idKaryawan} delay={index * 0.05}>
+            <>
+              {/* =========== DESKTOP ======= */}
+              <div
+                className="hidden lg:grid grid-cols-[230px_170px_315px_160px_105px_80px]
                 items-center bg-white rounded-2xl px-5 py-4 transition-all duration-300
                 hover:scale-[1.02] hover:shadow-lg"
-            >
-              <div className="font-semibold">{item.namaKaryawan}</div>
-              <div>{item.role ?? "-"}</div>
-              <div className="truncate">{item.email}</div>
-              <div>{item.username ?? "-"}</div>
+              >
+                <div className="font-semibold">{item.namaKaryawan}</div>
+                <div>{item.role ?? "-"}</div>
+                <div className="truncate">{item.email}</div>
+                <div>{item.username ?? "-"}</div>
 
-              <div>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold
+                <div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold
                   ${
                     item.statusAktif
                       ? "bg-green-100 text-green-700"
                       : "bg-red-100 text-red-600"
                   }`}
-                >
-                  {item.statusAktif ? "Aktif" : "Nonaktif"}
-                </span>
-              </div>
+                  >
+                    {item.statusAktif ? "Aktif" : "Nonaktif"}
+                  </span>
+                </div>
 
-              <div className="flex justify-center gap-2">
-                <button
-                  onClick={() => onResetPassword?.(item)}
-                  className="p-2 rounded-lg text-orange-500
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => onResetPassword?.(item)}
+                    className="p-2 rounded-lg text-orange-500
                   hover:bg-orange-100 transition"
-                >
-                  <FaKey />
-                </button>
+                  >
+                    <FaKey />
+                  </button>
 
                   <StatusToggle
                     checked={item.statusAktif}
                     onChange={() => handleSwitchClick(item)}
                   />
-              </div>
-            </div>
-
-
-
-            {/* =========== MOBILE ========== */}
-            <div className="lg:hidden bg-white rounded-2xl shadow-sm p-4 space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs text-gray-500">Nama Karyawan</p>
-                  <p className="font-semibold">{item.namaKaryawan}</p>
                 </div>
+              </div>
 
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold
+              {/* =========== MOBILE ========== */}
+              <div className="lg:hidden bg-white rounded-2xl shadow-sm p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs text-gray-500">Nama Karyawan</p>
+                    <p className="font-semibold">{item.namaKaryawan}</p>
+                  </div>
+
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold
                     ${
                       item.statusAktif
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-600"
                     }`}
-                >
-                  {item.statusAktif ? "Aktif" : "Nonaktif"}
-                </span>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-500">Email</p>
-                <p>{item.email}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs text-gray-500">Role</p>
-                  <p>{item.role ?? "-"}</p>
+                  >
+                    {item.statusAktif ? "Aktif" : "Nonaktif"}
+                  </span>
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-500">Username</p>
-                  <p>{item.username ?? "-"}</p>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <p>{item.email}</p>
                 </div>
-              </div>
 
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={() => onResetPassword?.(item)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#F3EDFF]
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Role</p>
+                    <p>{item.role ?? "-"}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500">Username</p>
+                    <p>{item.username ?? "-"}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => onResetPassword?.(item)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#F3EDFF]
                   text-[#5F04E8] rounded-lg py-2 font-medium"
-                >
-                  <FaKey />
-                  Reset
-                </button>
+                  >
+                    <FaKey />
+                    Reset
+                  </button>
 
-                <StatusToggle
-                  checked={item.statusAktif}
-                  onChange={() => handleSwitchClick(item)}
-                />
-                {item.statusAktif ? "Nonaktifkan" : "Aktifkan"}
+                  <div className="flex-1 flex items-center justify-center gap-2">
+                    <StatusToggle
+                      checked={item.statusAktif}
+                      onChange={() => handleSwitchClick(item)}
+                    />
+
+                    <span className="font-medium">
+                      {item.statusAktif ? "Nonaktifkan" : "Aktifkan"}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </>
-        </AnimatedSection>
-      ))}
-    </div>
+            </>
+          </AnimatedSection>
+        ))}
+      </div>
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Nonaktifkan Karyawan"
+        message={`Karyawan "${selectedKaryawan?.namaKaryawan}" akan dinonaktifkan dan disembunyikan 
+        dari daftar setelah 24 jam.`}
+        onConfirm={handleConfirm}
+        onClose={() => {
+          setShowConfirm(false);
+          setSelectedKaryawan(null);
+        }}
+      />
+    </>
   );
-  <ConfirmModal
-    isOpen={showConfirm}
-    title="Nonaktifkan Karyawan"
-    message={`Yakin ingin menonaktifkan ${selectedKaryawan?.namaKaryawan}?`}
-    onConfirm={() => {
-      handleToggle(selectedKaryawan);
-      setShowConfirm(false);
-    }}
-    onClose={() => setShowConfirm(false)}
-  />;
 };
 
 export default KaryawanCard;
