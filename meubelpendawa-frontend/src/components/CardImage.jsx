@@ -2,7 +2,7 @@ import React from "react";
 
 const CardImage = ({ src, alt = "Card Image", className = "" }) => {
   return (
-    <div className={`w-full h-48 overflow-hidden rounded-t-lg`}>
+    <div className={`w-full h-48 overflow-hidden rounded-t-lg ${className}`}>
       {src ? (
         <img
           src={src}
