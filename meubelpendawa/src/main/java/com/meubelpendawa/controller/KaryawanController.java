@@ -7,7 +7,6 @@ import com.meubelpendawa.model.Karyawan;
 import com.meubelpendawa.service.KaryawanService;
 import com.meubelpendawa.dto.ResetPasswordRequest;
 
-
 @RestController
 @RequestMapping("/karyawan")
 @CrossOrigin("*")
@@ -39,6 +38,11 @@ public class KaryawanController {
     @PutMapping("/{idKaryawan}/reset-password")
     public Karyawan resetPassword(@PathVariable String idKaryawan, @RequestBody ResetPasswordRequest request) {
         return karyawanService.resetPassword(idKaryawan, request.getPasswordBaru());
+    }
+
+    @PatchMapping("/{id}/status")
+    public Karyawan updateStatus(@PathVariable String id, @RequestParam Boolean statusAktif) {
+        return karyawanService.updateStatus(id, statusAktif);
     }
 
     @DeleteMapping("/{id}")

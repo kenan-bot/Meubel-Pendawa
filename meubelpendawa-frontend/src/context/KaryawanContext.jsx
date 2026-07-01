@@ -38,6 +38,14 @@ export const KaryawanProvider = ({ children }) => {
     );
   });
 
+  const updateStatusState = (karyawanUpdate) => {
+    setKaryawan((prev) =>
+      prev.map((item) =>
+        item.idKaryawan === karyawanUpdate.idKaryawan ? karyawanUpdate : item,
+      ),
+    );
+  };
+
   return (
     <KaryawanContext.Provider
       value={{
@@ -48,6 +56,7 @@ export const KaryawanProvider = ({ children }) => {
         setSearchTerm,
         reloadKaryawan: loadKaryawan,
         addKaryawan,
+        updateStatusState,
       }}
     >
       {children}

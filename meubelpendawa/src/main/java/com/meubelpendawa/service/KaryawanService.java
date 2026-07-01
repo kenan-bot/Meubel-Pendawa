@@ -140,4 +140,13 @@ public class KaryawanService {
         return karyawanRepository.findByNamaKaryawanContainingIgnoreCase(keyword);
     }
 
+    public Karyawan updateStatus(String id, Boolean statusAktif) {
+
+        Karyawan karyawan = karyawanRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
+
+        karyawan.setStatusAktif(statusAktif);
+
+        return karyawanRepository.save(karyawan);
+    }
 }

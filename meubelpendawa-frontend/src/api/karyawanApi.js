@@ -18,3 +18,20 @@ export const createKaryawan = async (data) => {
   const response = await axiosClient.post(BASE_URL, data);
   return response.data;
 };
+
+export const updateStatusKaryawan = async (
+  idKaryawan,
+  statusAktif
+) => {
+  const response = await axiosClient.patch(
+    `/karyawan/${idKaryawan}/status`,
+    null,
+    {
+      params: {
+        statusAktif,
+      },
+    }
+  );
+
+  return response.data;
+};
