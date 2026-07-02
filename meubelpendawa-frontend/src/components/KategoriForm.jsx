@@ -6,7 +6,7 @@ import Toast from "./Toast";
 import { createKategori } from "../api/kategoriApi";
 import { useKategori } from "../context/KategoriContext";
 
-export default function KategoriForm() {
+export default function KategoriForm({ onSuccess, onError }) {
   const [namaKategori, setNamaKategori] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -15,24 +15,12 @@ export default function KategoriForm() {
 
   const { addKategori } = useKategori();
 
-  useEffect(() => {
-    if (!toast) return;
-
-    const timer = setTimeout(() => {
-      setToast(null);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [toast]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!namaKategori.trim()) {
-      setToast({
-        type: "warning",
-        message: "Nama kategori wajib diisi",
-      });
+      onError?.("Nama kategori wajib diisi");
       return;
     }
 
@@ -46,15 +34,9 @@ export default function KategoriForm() {
       setNamaKategori("");
       addKategori(result);
 
-      setToast({
-        type: "success",
-        message: "Kategori berhasil ditambahkan",
-      });
+      onSuccess?.();
     } catch (error) {
-      setToast({
-        type: "error",
-        message: "Gagal menambah kategori",
-      });
+      onError?.("Gagal menambah kategori");
     } finally {
       setLoading(false);
     }
@@ -74,16 +56,16 @@ export default function KategoriForm() {
             type="submit"
             disabled={loading}
             className={`px-4 py-2 rounded-md text-white transition-all duration-200
-                ${loading
+                ${
+                  loading
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105 active:scale-95"}`}
+                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105 active:scale-95"
+                }`}
           >
             {loading ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </form>
-
-      {toast && <Toast type={toast.type} message={toast.message} />}
     </>
   );
 }

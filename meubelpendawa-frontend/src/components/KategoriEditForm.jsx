@@ -6,18 +6,19 @@ import Toast from "./Toast";
 import { updateKategori } from "../api/kategoriApi";
 import { useKategori } from "../context/KategoriContext";
 
-const KategoriEditForm = ({ kategori, onClose }) => {
+export default function KategoriEditForm({ kategori, onError }) {
   const [namaKategori, setNamaKategori] = useState("");
 
   const [loading, setLoading] = useState(false);
+
   const [toast, setToast] = useState(null);
 
   const { updateKategoriState } = useKategori();
 
   useEffect(() => {
-    if (kategori) {
-      setNamaKategori(kategori.namaKategori || "");
-    }
+    if (!kategori) return;
+
+    setNamaKategori(kategori.namaKategori || "");
   }, [kategori]);
 
   useEffect(() => {
@@ -38,17 +39,18 @@ const KategoriEditForm = ({ kategori, onClose }) => {
         type: "warning",
         message: "Nama kategori wajib diisi",
       });
-
       return;
     }
 
     try {
       setLoading(true);
 
-      const result = await updateKategori({
+      const dataUpdate = {
         ...kategori,
-        namaKategori,
-      });
+        namaKategori: namaKategori.trim(),
+      };
+
+      const result = await updateKategori(dataUpdate);
 
       updateKategoriState(result);
 
@@ -58,14 +60,14 @@ const KategoriEditForm = ({ kategori, onClose }) => {
       });
 
       setTimeout(() => {
-        onClose();
-      }, 600);
+        onSuccess?.();
+      }, 800);
     } catch (error) {
       console.error(error);
 
       setToast({
         type: "error",
-        message: error.response?.data?.message || "Gagal memperbarui kategori",
+        message: "Gagal memperbarui kategori",
       });
     } finally {
       setLoading(false);
@@ -79,7 +81,6 @@ const KategoriEditForm = ({ kategori, onClose }) => {
           label="Nama Kategori"
           value={namaKategori}
           onChange={(e) => setNamaKategori(e.target.value)}
-          placeholder="Masukkan nama kategori"
         />
 
         <div className="flex justify-end">
@@ -87,8 +88,11 @@ const KategoriEditForm = ({ kategori, onClose }) => {
             type="submit"
             disabled={loading}
             className={`
-              px-5 py-2 rounded-md text-white
+              px-4 py-2
+              rounded-md
+              text-white
               transition-all duration-200
+
               ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
@@ -101,9 +105,6 @@ const KategoriEditForm = ({ kategori, onClose }) => {
         </div>
       </form>
 
-      {toast && <Toast type={toast.type} message={toast.message} />}
     </>
   );
-};
-
-export default KategoriEditForm;
+}

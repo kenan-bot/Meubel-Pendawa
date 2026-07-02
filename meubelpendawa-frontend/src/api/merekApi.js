@@ -13,11 +13,7 @@ export const createMerek = async (data) => {
 };
 
 export const updateMerek = async (data) => {
-  const response = await axios.put(
-    BASE_URL,
-    data
-  );
-
+  const response = await axios.put(BASE_URL, data);
   return response.data;
 };
 

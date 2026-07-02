@@ -6,7 +6,7 @@ import Toast from "./Toast";
 import { createMerek } from "../api/merekApi";
 import { useMerek } from "../context/MerekContext";
 
-export default function MerekForm() {
+export default function MerekForm({ onSuccess, onError }) {
   const [namaMerek, setNamaMerek] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -15,15 +15,6 @@ export default function MerekForm() {
 
   const { addMerek } = useMerek();
 
-  useEffect(() => {
-    if (!toast) return;
-
-    const timer = setTimeout(() => {
-      setToast(null);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [toast]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,6 +41,10 @@ export default function MerekForm() {
         type: "success",
         message: "Merek berhasil ditambahkan",
       });
+
+      setTimeout(() => {
+        onSuccess?.();
+      }, 800);
     } catch (error) {
       setToast({
         type: "error",
@@ -74,16 +69,17 @@ export default function MerekForm() {
             type="submit"
             disabled={loading}
             className={`px-4 py-2 rounded-md text-white transition-all duration-200
-                ${loading
+                ${
+                  loading
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105 active:scale-95"}`}
+                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105 active:scale-95"
+                }`}
           >
             {loading ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </form>
 
-      {toast && <Toast type={toast.type} message={toast.message} />}
     </>
   );
 }

@@ -12,6 +12,8 @@ export const KategoriProvider = ({ children }) => {
   }, []);
 
   const loadKategori = async () => {
+    setLoading(true);
+
     try {
       const data = await getAllKategori();
       setKategori(data);

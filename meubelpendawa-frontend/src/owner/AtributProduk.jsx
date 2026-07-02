@@ -25,9 +25,9 @@ export default function AtributProduk() {
 
   const { merek, loading: merekLoading } = useMerek();
 
-  const [toast, setToast] = useState(null);
-
   const [openTambahKategori, setOpenTambahKategori] = useState(false);
+
+  const [toast, setToast] = useState(null);
 
   const [openTambahMerek, setOpenTambahMerek] = useState(false);
 
@@ -134,12 +134,12 @@ export default function AtributProduk() {
                   font-medium
                   px-3 py-1.5
                   rounded-md
-                  hover:bg-orange-600
-                  transition-all duration-300
+                  hover:bg-orange-600 hover:scale-[1.02]
+                  transition-all duration-300 ease-out
                 "
               >
                 <FiPlus size={18} />
-                Tambah
+                Tambah Kategori
               </button>
             </div>
 
@@ -173,12 +173,12 @@ export default function AtributProduk() {
                   font-medium
                   px-3 py-1.5
                   rounded-md
-                  hover:bg-orange-600
-                  transition-all duration-300
+                  hover:bg-orange-600 hover:scale-[1.02]
+                  transition-all duration-300 ease-out
                 "
               >
                 <FiPlus size={18} />
-                Tambah
+                Tambah Merek
               </button>
             </div>
 
@@ -205,7 +205,22 @@ export default function AtributProduk() {
         onClose={() => setOpenTambahKategori(false)}
         title="Tambah Kategori"
       >
-        <KategoriForm />
+        <KategoriForm
+          onSuccess={() => {
+            setOpenTambahKategori(false);
+
+            setToast({
+              type: "success",
+              message: "Kategori berhasil ditambahkan",
+            });
+          }}
+          onError={(message) =>
+            setToast({
+              type: "error",
+              message,
+            })
+          }
+        />
       </Modal>
 
       {/* TAMBAH MEREK */}
@@ -214,7 +229,11 @@ export default function AtributProduk() {
         onClose={() => setOpenTambahMerek(false)}
         title="Tambah Merek"
       >
-        <MerekForm />
+        <MerekForm
+          onSuccess={() => {
+            setOpenTambahMerek(false);
+          }}
+        />
       </Modal>
 
       {/* EDIT KATEGORI */}
@@ -228,7 +247,7 @@ export default function AtributProduk() {
       >
         <KategoriEditForm
           kategori={selectedKategori}
-          onClose={() => {
+          onSuccess={() => {
             setOpenEditKategori(false);
             setSelectedKategori(null);
           }}
@@ -246,7 +265,7 @@ export default function AtributProduk() {
       >
         <MerekEditForm
           merek={selectedMerek}
-          onClose={() => {
+          onSuccess={() => {
             setOpenEditMerek(false);
             setSelectedMerek(null);
           }}
@@ -286,7 +305,6 @@ export default function AtributProduk() {
           setSelectedMerek(null);
         }}
       />
-
       {toast && <Toast type={toast.type} message={toast.message} />}
     </>
   );

@@ -12,6 +12,8 @@ export const MerekProvider = ({ children }) => {
   }, []);
 
   const loadMerek = async () => {
+    setLoading(true);
+
     try {
       const data = await getAllMerek();
       setMerek(data);

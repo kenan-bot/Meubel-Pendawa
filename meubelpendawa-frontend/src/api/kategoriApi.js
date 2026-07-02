@@ -13,11 +13,7 @@ export const createKategori = async (data) => {
 };
 
 export const updateKategori = async (data) => {
-  const response = await axios.put(
-    BASE_URL,
-    data
-  );
-
+  const response = await axios.put(BASE_URL, data);
   return response.data;
 };
 
