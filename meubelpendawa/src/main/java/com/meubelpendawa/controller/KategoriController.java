@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.meubelpendawa.model.Kategori;
 import com.meubelpendawa.service.KategoriService;
-
+import com.meubelpendawa.repository.ProdukRepository;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/kategori")
@@ -15,9 +16,28 @@ public class KategoriController {
     @Autowired
     private KategoriService kategoriService;
 
+    @Autowired
+    private ProdukRepository produkRepository;
+
     @GetMapping
     public List<Kategori> getAllKategori() {
         return kategoriService.getAllKategori();
+    }
+
+    @GetMapping("/{idKategori}/is-used")
+    public Map<String, Boolean> isUsed(
+            @PathVariable String idKategori) {
+
+        return Map.of(
+                "used",
+                produkRepository.existsByKategori_IdKategori(idKategori));
+    }
+
+    @GetMapping("/{idKategori}/usage-count")
+    public Long getUsageCount(
+            @PathVariable String idKategori) {
+
+        return produkRepository.countByKategori_IdKategori(idKategori);
     }
 
     @PostMapping

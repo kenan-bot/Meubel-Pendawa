@@ -8,25 +8,40 @@ export const KategoriProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadKategori = async () => {
-      try {
-        const data = await getAllKategori();
-        setKategori(data);
-      } catch (error) {
-        console.error("Gagal mengambil kategori:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadKategori();
   }, []);
+
+  const loadKategori = async () => {
+    try {
+      const data = await getAllKategori();
+      setKategori(data);
+    } catch (error) {
+      console.error("Gagal mengambil kategori:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addKategori = (kategoriBaru) => {
+    setKategori((prev) => [...prev, kategoriBaru]);
+  };
+
+  const updateKategoriState = (kategoriUpdate) => {
+    setKategori((prev) =>
+      prev.map((item) =>
+        item.idKategori === kategoriUpdate.idKategori ? kategoriUpdate : item,
+      ),
+    );
+  };
 
   return (
     <KategoriContext.Provider
       value={{
         kategori,
         loading,
+        reloadKategori: loadKategori,
+        addKategori,
+        updateKategoriState,
       }}
     >
       {children}
@@ -34,7 +49,6 @@ export const KategoriProvider = ({ children }) => {
   );
 };
 
-// Custom Hook
 export const useKategori = () => {
   return useContext(KategoriContext);
 };

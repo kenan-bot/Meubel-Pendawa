@@ -8,4 +8,6 @@ public interface ProdukRepository extends JpaRepository<Produk, String> {
     List<Produk> findByNamaProdukContainingIgnoreCase(String keyword);
     List<Produk> findByKategori_IdKategori(String idKategori);
     List<Produk> findByMerek_IdMerek(String idMerek);
+    boolean existsByKategori_IdKategori(String idKategori);
+    Long countByKategori_IdKategori(String idKategori);
 }

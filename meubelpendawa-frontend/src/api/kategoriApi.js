@@ -12,11 +12,31 @@ export const createKategori = async (data) => {
   return response.data;
 };
 
-export const updateKategori = async (id, data) => {
-  const response = await axios.put(`${BASE_URL}/${id}`, data);
+export const updateKategori = async (data) => {
+  const response = await axios.put(
+    BASE_URL,
+    data
+  );
+
   return response.data;
 };
 
-export const deleteKategori = async (id) => {
-  await axios.delete(`${BASE_URL}/${id}`);
+export const isKategoriUsed = async (
+  idKategori
+) => {
+  const response = await axios.get(
+    `${BASE_URL}/${idKategori}/is-used`
+  );
+
+  return response.data;
+};
+
+export const getKategoriUsageCount = async (
+  idKategori
+) => {
+  const response = await axios.get(
+    `${BASE_URL}/${idKategori}/usage-count`
+  );
+
+  return response.data;
 };

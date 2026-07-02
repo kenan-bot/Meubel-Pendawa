@@ -25,7 +25,7 @@ export const ownerMenus = [
   },
   {
     icon: <MdCategory size={30} />,
-    label: "Kategori",
+    label: "Atribut Produk",
     path: "/owner/kategori",
   },
   {
