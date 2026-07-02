@@ -63,7 +63,9 @@ const ProductCard = ({
           className={
             mode === "home"
               ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-              : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              : isCashier
+                ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3"
+                : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           }
         >
           {produk.map((item, index) => (
@@ -86,37 +88,46 @@ const ProductCard = ({
                   {" "}
                   {item.gambarUrl && (
                     <div className="mb-0">
-                      <CardImage src={item.gambarUrl} alt={item.namaProduk} />
+                      <CardImage
+                        src={item.gambarUrl}
+                        alt={item.namaProduk}
+                        className={isCashier ? "!h-24" : ""}
+                      />
                     </div>
                   )}
-                  <div className="p-4">
-                    <CardHeader>
+                  <div className={isCashier ? "p-2.5" : "p-4"}>
+                    <CardHeader className={isCashier ? "!mb-1.5" : ""}>
                       {item.merek && (
                         <span
-                          className="inline-block px-3 py-1 border border-[#5F04E8] 
-                      text-[#5F04E8] text-xs font-semibold rounded-full"
+                          className={`inline-block border border-[#5F04E8] text-[#5F04E8] font-semibold rounded-full ${
+                            isCashier ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs"
+                          }`}
                         >
                           {item.merek?.namaMerek}
                         </span>
                       )}
                       {item.kategori && (
                         <span
-                          className="inline-block px-3 py-1 border border-orange-500 text-orange-500
-                        text-xs font-semibold rounded-full ml-2"
+                          className={`inline-block border border-orange-500 text-orange-500 font-semibold rounded-full ml-2 ${
+                            isCashier ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs"
+                          }`}
                         >
                           {item.kategori.namaKategori}
                         </span>
                       )}
 
-                      <CardTitle className="text-[#5F04E8] leading-tight mt-1">
+                      <CardTitle
+                        className={`text-[#5F04E8] leading-tight mt-1 truncate ${
+                          isCashier ? "!text-xs" : ""
+                        }`}
+                      >
                         {item.namaProduk}
                       </CardTitle>
 
                       <CardBody
-                        className={`inline-flex items-center justify-center px-2 py-0 mb-1 text-white
-                        text-sm font-light rounded-md
-                        ${item.stok === 0 ? "bg-red-500" : 
-                          item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500" }`}
+                        className={`inline-flex items-center justify-center text-white rounded-md ${
+                          isCashier ? "!text-[10px] !px-1.5 !py-0.5" : "px-2 py-0 mb-1 text-sm font-light"
+                        } ${item.stok === 0 ? "bg-red-500" : item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500"}`}
                       >
                         {item.stok === 0
                           ? "Stok Habis"
@@ -126,19 +137,27 @@ const ProductCard = ({
                       </CardBody>
                     </CardHeader>
 
-                    {item.deskripsi ? (
-                      <CardBody className="text-[#5F04E8] text-sm leading-tight mt-0">
-                        {item.deskripsi}
-                      </CardBody>
-                    ) : (
-                      <CardBody className="text-[#5F04E8] leading-none italic">
-                        Tidak ada deskripsi untuk produk ini
-                      </CardBody>
-                    )}
+                    {/* [BARU] deskripsi disembunyikan khusus di mode cashier -- kartu jadi lebih ringkas,
+                        fokus ke info yang dibutuhkan kasir saja (nama, stok, harga). Mode home/owner
+                        tetap menampilkan deskripsi seperti semula. */}
+                    {!isCashier &&
+                      (item.deskripsi ? (
+                        <CardBody className="text-[#5F04E8] text-sm leading-tight mt-0">
+                          {item.deskripsi}
+                        </CardBody>
+                      ) : (
+                        <CardBody className="text-[#5F04E8] leading-none italic">
+                          Tidak ada deskripsi untuk produk ini
+                        </CardBody>
+                      ))}
 
-                    <CardFooter className="border-gray-300">
+                    <CardFooter
+                      className={`border-gray-300 ${isCashier ? "!mt-1.5 !pt-1.5" : ""}`}
+                    >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#5F04E8] text-lg">
+                        <span
+                          className={`font-bold text-[#5F04E8] ${isCashier ? "text-sm" : "text-lg"}`}
+                        >
                           {formatRupiah(item.hargaDefault)}
                         </span>
 
@@ -178,11 +197,6 @@ const ProductCard = ({
                         </div>
                       )}
 
-                      {isCashier && (
-                        <button className="w-full mt-3 bg-orange-500 text-white py-2 rounded-md">
-                          + Keranjang
-                        </button>
-                      )}
                     </CardFooter>
                   </div>
                 </Card>
