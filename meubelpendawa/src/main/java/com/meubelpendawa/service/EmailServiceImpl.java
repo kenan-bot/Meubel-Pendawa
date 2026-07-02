@@ -1,21 +1,21 @@
 package com.meubelpendawa.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import jakarta.mail.internet.MimeMessage;
 
-import com.resend.Resend;
-import com.resend.services.emails.model.CreateEmailOptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private final Resend resend;
+    @Autowired
+    private JavaMailSender mailSender;
 
-    public EmailServiceImpl(
-            @Value("${resend.api.key}") String apiKey) {
-
-        this.resend = new Resend(apiKey);
-    }
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
     @Override
     public void sendEmail(
@@ -25,20 +25,26 @@ public class EmailServiceImpl implements EmailService {
 
         try {
 
-            CreateEmailOptions params = CreateEmailOptions.builder()
-                    .from("onboarding@resend.dev")
-                    .to(to)
-                    .subject(subject)
-                    .html(htmlContent)
-                    .build();
+            MimeMessage message = mailSender.createMimeMessage();
 
-            resend.emails().send(params);
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setSubject(subject);
+
+            // true = HTML
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
 
         } catch (Exception e) {
+
             throw new RuntimeException(
                     "Gagal mengirim email ke " + to,
                     e);
+
         }
     }
-    
 }

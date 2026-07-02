@@ -23,6 +23,8 @@ function Karyawan() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [selectedKaryawan, setSelectedKaryawan] = useState(null);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [sendOtpError, setSendOtpError] = useState("");
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -41,30 +43,32 @@ function Karyawan() {
         type: "warning",
         message: "Karyawan ini tidak mempunyai akses sistem.",
       });
-
       return;
     }
+
+    // Modal langsung muncul
+    setSelectedKaryawan(item);
+    setShowOtpModal(true);
+
+    setSendingOtp(true);
+    setSendOtpError("");
 
     try {
       await requestOtp(item.email);
 
-      setSelectedKaryawan(item);
-      setShowOtpModal(true);
-
       setToast({
         type: "success",
-        message: "Kode OTP berhasil dikirim.",
+        message: "Kode OTP berhasil dikirim",
       });
     } catch (error) {
-      console.error(error);
-
-      console.log("Status:", error.response?.status);
-      console.log("Data:", error.response?.data);
+      setSendOtpError("Gagal mengirim kode OTP.");
 
       setToast({
         type: "error",
-        message: "Gagal mengirim kode OTP.",
+        message: "Gagal mengirim kode OTP",
       });
+    } finally {
+      setSendingOtp(false);
     }
   };
 
@@ -73,7 +77,6 @@ function Karyawan() {
       setOtpLoading(true);
       if (!selectedKaryawan) return;
 
-      await verifyOtp(selectedKaryawan.email, otp);
       await verifyOtp(selectedKaryawan.email, otp);
       setOtpVerified(true);
 
@@ -225,6 +228,8 @@ function Karyawan() {
           }}
           onVerify={handleVerifyOtp}
           loading={otpLoading}
+          sendingOtp={sendingOtp}
+          sendError={sendOtpError}
           otpVerified={otpVerified}
           countdown={countdown}
         />

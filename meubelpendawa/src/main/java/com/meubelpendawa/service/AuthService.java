@@ -1,5 +1,6 @@
 package com.meubelpendawa.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,7 +13,6 @@ import com.meubelpendawa.repository.KaryawanRepository;
 import com.meubelpendawa.repository.OtpResetPasswordRepository;
 import com.meubelpendawa.security.JwtService;
 import com.meubelpendawa.service.LoginLogService;
-import com.meubelpendawa.model.OtpResetPassword;
 
 @Service
 public class AuthService {
@@ -94,12 +94,20 @@ public class AuthService {
             String passwordBaru) {
 
         OtpResetPassword otp = otpRepository
-                .findTopByEmailOrderByExpiredAtDesc(email)
+                .findTopByEmailAndUsedFalseOrderByExpiredAtDesc(email)
                 .orElseThrow(() -> new RuntimeException("OTP tidak ditemukan"));
 
         if (!otp.getVerified()) {
             throw new RuntimeException(
                     "OTP belum diverifikasi");
+        }
+
+        if (passwordBaru == null || passwordBaru.isBlank()) {
+            throw new RuntimeException("Password baru wajib diisi");
+        }
+
+        if (otp.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP sudah kadaluarsa");
         }
 
         Karyawan karyawan = karyawanRepository
