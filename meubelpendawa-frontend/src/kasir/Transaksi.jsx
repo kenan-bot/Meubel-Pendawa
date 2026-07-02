@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { TransaksiProvider, useTransaksi } from "../context/TransaksiContext";
 
 import SearchBar from "../components/SearchBar";
@@ -8,20 +9,36 @@ import DateTimeDisplay from "../components/DateTimeDisplay";
 import FormPemesan from "../components/FormPemesan";
 import KeranjangItem from "../components/KeranjangItem";
 import RingkasanBayar from "../components/RingkasanBayar";
-import Card from "../components/Card";
-import CardImage from "../components/CardImage";
-import CardBody from "../components/CardBody";
+import ProductCard from "../components/ProductCard";
 import Toast from "../components/Toast";
 
 import { GiShoppingBag } from "react-icons/gi";
-
-function formatRupiah(nominal) {
-  if (!nominal && nominal !== 0) return "Rp 0";
-  return "Rp" + Number(nominal).toLocaleString("id-ID");
-}
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 function TransaksiContent() {
   const t = useTransaksi();
+
+  // [BARU] Form Pemesan bisa dibuka/tutup -- default TERTUTUP supaya grid produk
+  // langsung dominan begitu halaman dibuka. Data yang sudah diisi tetap tersimpan
+  // di context walau form disembunyikan (tidak hilang saat toggle).
+  const [formTerbuka, setFormTerbuka] = useState(false);
+  const isDelivery = t.metodePengiriman === "DELIVERY";
+
+  const ringkasanPemesan = [
+    t.namaPemesan,
+    t.noWhatsapp,
+    isDelivery ? "Delivery" : "Pickup",
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  // kalau proses pesanan gagal (misal Nama/No.WA/Alamat belum diisi) sementara form ditutup,
+  // buka lagi otomatis supaya kasir bisa langsung lihat kolom yang perlu dilengkapi
+  useEffect(() => {
+    if (t.pesan && t.pesanType === "error" && !formTerbuka) {
+      setFormTerbuka(true);
+    }
+  }, [t.pesan, t.pesanType]);
 
   return (
     // [RESPONSIVE] mobile: kolom tunggal, halaman scroll normal (natural height).
@@ -30,12 +47,28 @@ function TransaksiContent() {
       {/* ===== KIRI: FORM + PRODUK ===== */}
       <div className="flex-1 bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col lg:min-h-0">
         <div className="p-4 lg:p-5 pb-0 flex-shrink-0">
-          <PageHeader title="Form Pemesan" subtitle="Halaman Form Pemesan" />
-          <FormPemesan />
+          <PageHeader title="Form Pemesan" subtitle="Halaman Form Pemesan">
+            <button
+              type="button"
+              onClick={() => setFormTerbuka((v) => !v)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-[#5F04E8] px-3 py-1.5 rounded-full border border-[#5F04E8]/30 hover:bg-[#5F04E8]/5 transition flex-shrink-0"
+            >
+              {formTerbuka ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
+              {formTerbuka ? "Sembunyikan Form" : "Tampilkan Form"}
+            </button>
+
+            {!formTerbuka && (
+              <span className="text-xs text-gray-400 truncate">
+                {ringkasanPemesan || "Data pemesan belum diisi"}
+              </span>
+            )}
+          </PageHeader>
+
+          {formTerbuka && <FormPemesan />}
         </div>
 
         {/* Search & filter — khusus untuk cari produk di bawah ini */}
-        <div className="relative z-30 flex flex-wrap items-center gap-2 px-4 lg:px-5 pt-2">
+        <div className="relative z-30 flex flex-wrap items-center gap-2 px-4 lg:px-5 pt-2 pb-5">
           <SearchBar
             theme="orange"
             placeholder="Search furniture..."
@@ -53,55 +86,12 @@ function TransaksiContent() {
             <div className="text-center py-8 text-gray-500">
               Memuat produk...
             </div>
-          ) : t.produkTersaring.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
-              Produk tidak ditemukan.
-            </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
-              {t.produkTersaring.map((item) => (
-                <Card
-                  key={item.idProduk}
-                  padding="none"
-                  hover={false}
-                  onClick={() => t.tambahKeKeranjang(item)}
-                  className="cursor-pointer text-[#5F04E8] overflow-hidden"
-                >
-                  <CardImage
-                    src={item.gambarUrl}
-                    alt={item.namaProduk}
-                    className="!h-20"
-                  />
-                  <div className="p-2">
-                    <div className="flex flex-wrap gap-1 mb-1">
-                      {item.merek && (
-                        <span className="inline-block px-1.5 py-0.5 border border-[#5F04E8] text-[#5F04E8] text-[9px] font-semibold rounded-full">
-                          {item.merek.namaMerek}
-                        </span>
-                      )}
-                      {item.kategori && (
-                        <span className="inline-block px-1.5 py-0.5 border border-orange-500 text-orange-500 text-[9px] font-semibold rounded-full">
-                          {item.kategori.namaKategori}
-                        </span>
-                      )}
-                    </div>
-                    <CardBody className="font-bold text-xs leading-tight truncate text-[#5F04E8]">
-                      {item.namaProduk}
-                    </CardBody>
-                    <span
-                      className={`inline-block px-1.5 py-0.5 my-1 text-[9px] font-semibold text-white rounded-md ${item.stok > 5 ? "bg-[#5F04E8]" : "bg-orange-500"}`}
-                    >
-                      {item.stok > 5
-                        ? `Tersedia ${item.stok}`
-                        : `Tersisa ${item.stok}`}
-                    </span>
-                    <p className="text-xs font-semibold">
-                      {formatRupiah(item.hargaDefault)}
-                    </p>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            <ProductCard
+              produk={t.produkTersaring}
+              mode="cashier"
+              onCardClick={(item) => t.tambahKeKeranjang(item)}
+            />
           )}
         </div>
       </div>
@@ -119,7 +109,7 @@ function TransaksiContent() {
             </h2>
             <GiShoppingBag className="text-orange-500" size={20} />
           </div>
-          <DateTimeDisplay className="text-[8px] md:text-[10px] text-gray-500" />
+          <DateTimeDisplay className="text-[8px] md:text-[12px] text-gray-500" />
           <p className="text-orange-500 font-bold text-xs">Order</p>
         </div>
 
