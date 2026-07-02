@@ -7,6 +7,7 @@ import Karyawan from "../owner/Karyawan";
 import AtributProduk from "../owner/AtributProduk";
 import StatusPengiriman from "../owner/StatusPengiriman";
 import LaporanPenjualan from "../owner/LaporanPenjualan";
+import RiwayatLogin from "../owner/RiwayatLogin";
 
 function OwnerRoutes() {
   return (
@@ -20,6 +21,7 @@ function OwnerRoutes() {
         <Route path="kategori" element={<AtributProduk />} />
         <Route path="statuspengiriman" element={<StatusPengiriman />} />
         <Route path="laporanpenjualan" element={<LaporanPenjualan />} />
+        <Route path="riwayatlogin" element={<RiwayatLogin />} />
       </Route>
     </Routes>
   );

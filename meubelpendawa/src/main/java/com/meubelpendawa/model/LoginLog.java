@@ -24,18 +24,22 @@ public class LoginLog {
 
     private Boolean loginDiluarJamOperasional;
 
+    private Boolean logoutDiluarJamOperasional;
+
     public LoginLog() {
     }
 
     public LoginLog(Karyawan karyawan,
                     LocalDateTime loginAt,
                     LocalDateTime logoutAt,
-                    Boolean loginDiluarJamOperasional) {
+                    Boolean loginDiluarJamOperasional,
+                    Boolean logoutDiluarJamOperasional) {
 
         this.karyawan = karyawan;
         this.loginAt = loginAt;
         this.logoutAt = logoutAt;
         this.loginDiluarJamOperasional = loginDiluarJamOperasional;
+        this.logoutDiluarJamOperasional = logoutDiluarJamOperasional;
     }
 
     public String getIdLog() {
@@ -76,5 +80,13 @@ public class LoginLog {
 
     public void setLoginDiluarJamOperasional(Boolean loginDiluarJamOperasional) {
         this.loginDiluarJamOperasional = loginDiluarJamOperasional;
+    }
+
+    public Boolean getLogoutDiluarJamOperasional() {
+        return logoutDiluarJamOperasional;
+    }
+
+    public void setLogoutDiluarJamOperasional(Boolean logoutDiluarJamOperasional) {
+        this.logoutDiluarJamOperasional = logoutDiluarJamOperasional;
     }
 }

@@ -7,6 +7,7 @@ import { ProdukProvider } from "./context/ProdukContext";
 import { KategoriProvider } from "./context/KategoriContext";
 import { MerekProvider } from "./context/MerekContext";
 import { KaryawanProvider } from "./context/KaryawanContext";
+import { LoginLogProvider } from "./context/LoginLogContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -14,7 +15,9 @@ createRoot(document.getElementById("root")).render(
       <KategoriProvider>
         <MerekProvider>
           <KaryawanProvider>
-            <App />
+            <LoginLogProvider>
+              <App />
+            </LoginLogProvider>
           </KaryawanProvider>
         </MerekProvider>
       </KategoriProvider>

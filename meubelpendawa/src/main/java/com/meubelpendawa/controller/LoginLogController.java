@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.meubelpendawa.dto.LoginLogResponse;
 import com.meubelpendawa.model.LoginLog;
 import com.meubelpendawa.service.LoginLogService;
 
@@ -17,12 +18,12 @@ public class LoginLogController {
     private LoginLogService loginLogService;
 
     @GetMapping
-    public List<LoginLog> getAllLog() {
+    public List<LoginLogResponse> getAllLog() {
         return loginLogService.getAllLog();
     }
 
     @GetMapping("/karyawan/{idKaryawan}")
-    public List<LoginLog> getLogByKaryawan(
+    public List<LoginLogResponse> getLogByKaryawan(
             @PathVariable String idKaryawan) {
 
         return loginLogService.getLogByKaryawan(idKaryawan);
