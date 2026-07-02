@@ -11,9 +11,15 @@ import KeranjangItem from "../components/KeranjangItem";
 import RingkasanBayar from "../components/RingkasanBayar";
 import ProductCard from "../components/ProductCard";
 import Toast from "../components/Toast";
+import ConfirmModal from "../components/ConfirmModal";
 
 import { GiShoppingBag } from "react-icons/gi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+
+function formatRupiah(nominal) {
+  if (!nominal && nominal !== 0) return "Rp 0";
+  return "Rp" + Number(nominal).toLocaleString("id-ID");
+}
 
 function TransaksiContent() {
   const t = useTransaksi();
@@ -22,6 +28,11 @@ function TransaksiContent() {
   // langsung dominan begitu halaman dibuka. Data yang sudah diisi tetap tersimpan
   // di context walau form disembunyikan (tidak hilang saat toggle).
   const [formTerbuka, setFormTerbuka] = useState(false);
+
+  // [BARU] Konfirmasi sebelum proses pesanan -- mencegah salah klik / salah total
+  // saat kasir menekan tombol "Proses Pesanan" di RingkasanBayar.
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const isDelivery = t.metodePengiriman === "DELIVERY";
 
   const ringkasanPemesan = [
@@ -39,6 +50,11 @@ function TransaksiContent() {
       setFormTerbuka(true);
     }
   }, [t.pesan, t.pesanType]);
+
+  const handleConfirmProses = () => {
+    setShowConfirm(false);
+    t.prosesPesanan();
+  };
 
   return (
     // [RESPONSIVE] mobile: kolom tunggal, halaman scroll normal (natural height).
@@ -125,9 +141,20 @@ function TransaksiContent() {
         </div>
 
         <div className="flex-shrink-0 p-4 pt-3 sticky bottom-0 lg:static bg-white rounded-b-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.04)] lg:shadow-none">
-          <RingkasanBayar />
+          <RingkasanBayar onRequestProses={() => setShowConfirm(true)} />
         </div>
       </div>
+
+      {/* Konfirmasi sebelum transaksi benar-benar diproses */}
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Konfirmasi Pesanan"
+        message={`Proses pesanan senilai ${formatRupiah(t.totalPesanan)}?`}
+        confirmText="Proses"
+        cancelText="Batal"
+        onConfirm={handleConfirmProses}
+        onClose={() => setShowConfirm(false)}
+      />
     </div>
   );
 }

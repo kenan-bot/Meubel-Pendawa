@@ -7,10 +7,10 @@ function formatRupiah(nominal) {
   return "Rp" + Number(nominal).toLocaleString("id-ID");
 }
 
-const RingkasanBayar = () => {
+const RingkasanBayar = ({ onRequestProses }) => {
   const {
     jumlahBayar, setJumlahBayar, kembalian, totalPesanan,
-    isCashless, submitting, prosesPesanan,
+    isCashless, submitting,
   } = useTransaksi();
 
   return (
@@ -35,7 +35,7 @@ const RingkasanBayar = () => {
             <FaQrcode size={11} /> QR
           </button>
         )}
-        <button type="button" disabled={submitting} onClick={prosesPesanan}
+        <button type="button" disabled={submitting} onClick={onRequestProses}
           className="flex-1 py-1.5 bg-gray-800 hover:bg-gray-900 transition rounded-md text-[11px] font-semibold disabled:opacity-50">
           {submitting ? "Memproses..." : "Proses Pesanan"}
         </button>
