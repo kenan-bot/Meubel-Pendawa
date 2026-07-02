@@ -1,26 +1,31 @@
 import { useState, useEffect } from "react";
 
 import FormInput from "./FormInput";
-import Toast from "./Toast";
 
 import { createKategori } from "../api/kategoriApi";
 import { useKategori } from "../context/KategoriContext";
 
 export default function KategoriForm({ onSuccess, onError }) {
   const [namaKategori, setNamaKategori] = useState("");
-
   const [loading, setLoading] = useState(false);
-
-  const [toast, setToast] = useState(null);
-
-  const { addKategori } = useKategori();
-
+  const { kategori, addKategori } = useKategori();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!namaKategori.trim()) {
       onError?.("Nama kategori wajib diisi");
+      return;
+    }
+
+    const namaBaru = namaKategori.trim().toLowerCase();
+
+    const sudahAda = kategori.some(
+      (item) => item.namaKategori.trim().toLowerCase() === namaBaru,
+    );
+
+    if (sudahAda) {
+      onError?.("Kategori sudah ada");
       return;
     }
 

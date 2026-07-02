@@ -20,7 +20,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
   const { kategori } = useKategori();
   const { merek } = useMerek();
-  const { addProduk, updateProdukState } = useProduk();
+  const { produk: produkList, addProduk, updateProdukState } = useProduk();
 
   const [namaProduk, setNamaProduk] = useState("");
   const [stok, setStok] = useState("");
@@ -36,6 +36,9 @@ const ProductForm = ({ mode = "create", produk = null }) => {
   const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  const normalizeNamaProduk = (nama) =>
+    nama.toLowerCase().trim().replace(/\s+/g, " ").split(" ").sort().join(" ");
 
   useEffect(() => {
     if (mode !== "edit" || !produk) return;
@@ -142,11 +145,37 @@ const ProductForm = ({ mode = "create", produk = null }) => {
       return;
     }
 
+    // VALIDASI DUPLIKAT NAMA PRODUK
+    const namaBaru = normalizeNamaProduk(namaProduk);
+
+    const sudahAda = produkList.some((item) => {
+      const namaExisting =
+        item.namaProdukNormalized ?? normalizeNamaProduk(item.namaProduk);
+
+      if (mode === "edit") {
+        return (
+          item.idProduk !== produk?.idProduk &&
+          namaExisting === namaBaru &&
+          item.merek?.idMerek === merekId
+        );
+      }
+
+      return namaExisting === namaBaru && item.merek?.idMerek === merekId;
+    });
+
+    if (sudahAda) {
+      setToast({
+        type: "warning",
+        message: "Nama produk sudah ada",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
       const data = {
-        namaProduk,
+        namaProduk: namaProduk.trim(),
         stok: Number(stok || 0),
         hargaDefault: Number(hargaDefault || 0),
         deskripsi,
@@ -171,7 +200,6 @@ const ProductForm = ({ mode = "create", produk = null }) => {
           message: "Produk berhasil ditambahkan",
         });
 
-        // reset form
         setNamaProduk("");
         setStok("");
         setHargaDefault("");
@@ -187,7 +215,6 @@ const ProductForm = ({ mode = "create", produk = null }) => {
           idProduk: produk.idProduk,
         };
 
-        console.log("DATA UPDATE:", dataUpdate);
         const result = await updateProduk(dataUpdate);
 
         updateProdukState(result);
@@ -198,12 +225,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
         });
       }
     } catch (error) {
-      console.error("ERROR UPDATE/CREATE:", error);
-
-      if (error.response) {
-        console.error("STATUS:", error.response.status);
-        console.error("DATA:", error.response.data);
-      }
+      console.error(error);
 
       setToast({
         type: "error",

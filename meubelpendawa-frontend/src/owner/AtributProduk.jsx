@@ -232,7 +232,18 @@ export default function AtributProduk() {
         <MerekForm
           onSuccess={() => {
             setOpenTambahMerek(false);
+
+            setToast({
+              type: "success",
+              message: "Merek berhasil ditambahkan",
+            });
           }}
+          onError={(message) =>
+            setToast({
+              type: "error",
+              message,
+            })
+          }
         />
       </Modal>
 
@@ -247,9 +258,20 @@ export default function AtributProduk() {
       >
         <KategoriEditForm
           kategori={selectedKategori}
-          onSuccess={() => {
+          onSuccess={(message) => {
+            setToast({
+              type: "success",
+              message,
+            });
+
             setOpenEditKategori(false);
             setSelectedKategori(null);
+          }}
+          onError={(message) => {
+            setToast({
+              type: "error",
+              message,
+            });
           }}
         />
       </Modal>
@@ -265,9 +287,20 @@ export default function AtributProduk() {
       >
         <MerekEditForm
           merek={selectedMerek}
-          onSuccess={() => {
+          onSuccess={(message) => {
+            setToast({
+              type: "success",
+              message,
+            });
+
             setOpenEditMerek(false);
             setSelectedMerek(null);
+          }}
+          onError={(message) => {
+            setToast({
+              type: "error",
+              message,
+            });
           }}
         />
       </Modal>
@@ -276,7 +309,8 @@ export default function AtributProduk() {
       <ConfirmModal
         isOpen={openKategoriConfirm}
         title="Kategori sedang digunakan"
-        message="Kategori ini sedang digunakan oleh produk. Jika nama kategori diubah maka seluruh produk yang menggunakan kategori tersebut akan ikut berubah. Yakin ingin melanjutkan?"
+        message="Kategori ini sedang digunakan oleh produk. Jika nama kategori diubah,
+        semua produk yang menggunakan kategori ini akan ikut berubah. Yakin ingin melanjutkan?"
         confirmText="Lanjutkan"
         cancelText="Batal"
         onConfirm={() => {
@@ -293,7 +327,8 @@ export default function AtributProduk() {
       <ConfirmModal
         isOpen={openMerekConfirm}
         title="Merek sedang digunakan"
-        message="Merek ini sedang digunakan oleh produk. Jika nama merek diubah maka seluruh produk yang menggunakan merek tersebut akan ikut berubah. Yakin ingin melanjutkan?"
+        message="Merek ini sedang digunakan oleh produk. Jika nama kategori diubah,
+        semua produk yang menggunakan kategori ini akan ikut berubah. Yakin ingin melanjutkan?"
         confirmText="Lanjutkan"
         cancelText="Batal"
         onConfirm={() => {
