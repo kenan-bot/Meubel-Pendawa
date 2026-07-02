@@ -27,7 +27,7 @@ public class ProdukService {
         if (produk.getStok() < 0) {
             throw new RuntimeException("Stok tidak boleh negatif");
         }
-        
+
         if (produk.getHargaDefault() <= 0) {
             throw new RuntimeException("Harga harus lebih dari 0");
         }
@@ -40,11 +40,13 @@ public class ProdukService {
     }
 
     public Produk updateProduk(Produk produk) {
+        System.out.println("ID = " + produk.getIdProduk());
+        System.out.println("GAMBAR = " + produk.getGambarUrl());
 
         if (produk.getStok() < 0) {
             throw new RuntimeException("Stok tidak boleh negatif");
         }
-        
+
         if (produk.getHargaDefault() <= 0) {
             throw new RuntimeException("Harga harus lebih dari 0");
         }
@@ -52,7 +54,7 @@ public class ProdukService {
         if (produk.getNamaProduk() == null || produk.getNamaProduk().isBlank()) {
             throw new RuntimeException("Nama produk wajib diisi");
         }
-        
+
         return produkRepository.save(produk);
     }
 

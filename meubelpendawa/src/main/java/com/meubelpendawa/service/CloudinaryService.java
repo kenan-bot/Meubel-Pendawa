@@ -15,10 +15,27 @@ public class CloudinaryService {
 
     public String uploadFile(MultipartFile file) throws IOException {
 
+        String contentType = file.getContentType();
+
+        if (contentType == null ||
+                (!contentType.equals("image/jpeg")
+                        && !contentType.equals("image/png")
+                        && !contentType.equals("image/webp"))) {
+
+            throw new RuntimeException(
+                    "Format file harus JPG, PNG, atau WEBP");
+        }
+
+        long maxSize = 5 * 1024 * 1024; // 5 MB
+
+        if (file.getSize() > maxSize) {
+            throw new RuntimeException(
+                    "Ukuran file maksimal 5 MB");
+        }
+
         Map uploadResult = cloudinary.uploader().upload(
-            file.getBytes(),
-            Map.of()
-        );
+                file.getBytes(),
+                Map.of());
 
         return uploadResult.get("secure_url").toString();
     }

@@ -33,7 +33,9 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
   const [gambar, setGambar] = useState(null);
   const [gambarUrl, setGambarUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     if (mode !== "edit" || !produk) return;
@@ -47,6 +49,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
     setMerekId(produk.merek?.idMerek || "");
 
     setGambarUrl(produk.gambarUrl || "");
+    setPreviewUrl("");
   }, [produk, mode]);
 
   useEffect(() => {
@@ -63,17 +66,44 @@ const ProductForm = ({ mode = "create", produk = null }) => {
     const file = e.target.files[0];
 
     if (!file) return;
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+    if (!allowedTypes.includes(file.type)) {
+      setToast({
+        type: "warning",
+        message: "Format gambar harus JPG, PNG, atau WEBP",
+      });
+      return;
+    }
+
+    const MAX_SIZE = 5 * 1024 * 1024;
+
+    if (file.size > MAX_SIZE) {
+      setToast({
+        type: "warning",
+        message: "Ukuran gambar maksimal 5 MB",
+      });
+      return;
+    }
+
+    // preview langsung
     setGambar(file);
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
+
+    setUploadingImage(true);
 
     try {
-      const url = await uploadGambar(file);
-      setGambarUrl(url);
+      const uploadedUrl = await uploadGambar(file);
+
+      setGambarUrl(uploadedUrl);
     } catch (error) {
       setToast({
         type: "error",
         message: "Upload gambar gagal",
       });
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -150,12 +180,14 @@ const ProductForm = ({ mode = "create", produk = null }) => {
         setDeskripsi("");
         setGambar(null);
         setGambarUrl("");
+        setPreviewUrl("");
       } else {
         const dataUpdate = {
           ...data,
           idProduk: produk.idProduk,
         };
 
+        console.log("DATA UPDATE:", dataUpdate);
         const result = await updateProduk(dataUpdate);
 
         updateProdukState(result);
@@ -192,17 +224,11 @@ const ProductForm = ({ mode = "create", produk = null }) => {
             <div className="w-full">
               <div
                 className="w-full h-52 border-2 border-dashed border-gray-300
-              rounded-xl flex items-center justify-center overflow-hidden"
+                rounded-xl flex items-center justify-center overflow-hidden"
               >
-                {gambar ? (
+                {previewUrl || gambarUrl ? (
                   <img
-                    src={URL.createObjectURL(gambar)}
-                    alt="Preview"
-                    className="w-full h-full object-contain"
-                  />
-                ) : gambarUrl ? (
-                  <img
-                    src={gambarUrl}
+                    src={previewUrl || gambarUrl}
                     alt="Preview"
                     className="w-full h-full object-contain"
                   />
@@ -213,7 +239,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
               <input
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp,.svg"
+                accept=".jpg,.jpeg,.png,.webp"
                 className="mt-2 text-sm w-full"
                 onChange={handleImageChange}
               />
@@ -316,15 +342,23 @@ const ProductForm = ({ mode = "create", produk = null }) => {
             <div className="flex justify-end pt-3">
               <button
                 type="submit"
-                disabled={loading}
-                className="bg-orange-500 text-white px-5 py-2 rounded-md
-              hover:bg-orange-600 hover:scale-105 active:scale-95 transition-all duration-20"
+                disabled={loading || uploadingImage}
+                className={`
+                px-5 py-2 rounded-md text-white
+                transition-all duration-200
+                ${
+                  loading || uploadingImage
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105 active:scale-95"
+                }`}
               >
-                {loading
-                  ? "Menyimpan..."
-                  : mode === "edit"
-                    ? "Update"
-                    : "Simpan"}
+                {uploadingImage
+                  ? "Mengunggah gambar..."
+                  : loading
+                    ? "Menyimpan..."
+                    : mode === "edit"
+                      ? "Update"
+                      : "Simpan"}
               </button>
             </div>
           </div>
