@@ -9,27 +9,31 @@ function formatRupiah(nominal) {
 }
 
 const KeranjangItem = ({ item }) => {
-  const { ubahQty, hapusItem, ubahHarga, tampilkanPesan } = useTransaksi();
+  const { ubahQty, hapusItem, ubahHarga } = useTransaksi();
   const [showInput, setShowInput] = useState(false);
   const [hargaInput, setHargaInput] = useState(item.hargaJual);
   const idProduk = item.produk.idProduk;
+
+  const hargaDefault = Number(item.produk.hargaDefault);
+  const hargaMinimum = hargaDefault * 0.9;
+  const dibawahMinimum = Number(hargaInput) < hargaMinimum;
 
   useEffect(() => {
     setHargaInput(item.hargaJual);
   }, [item.hargaJual]);
 
-  const handleSelesai = () => {
-    const hargaDefault = Number(item.produk.hargaDefault);
-    const hargaMinimum = hargaDefault * 0.9;
+  // [BARU] update langsung tiap kali diketik -- tidak perlu Enter / tombol Selesai lagi.
+  // "Qty: x harga" (yang baca item.hargaJual dari context) otomatis ikut berubah live,
+  // TAPI hanya kalau nilainya valid (>= harga minimum 90% dari harga default).
+  // Kalau di bawah minimum, nilai lokal tetap tampil di input (biar user lihat apa yang diketik),
+  // namun belum diterapkan ke keranjang sampai nilainya valid lagi -- tanpa alert/toast yang mengganggu ketikan.
+  const handleChangeHarga = (nilaiBaru) => {
+    setHargaInput(nilaiBaru);
 
-    if (Number(hargaInput) < hargaMinimum) {
-      tampilkanPesan(`Harga terlalu rendah! Minimal ${formatRupiah(hargaMinimum)}`, "error");
-      return;
+    const angka = Number(nilaiBaru);
+    if (nilaiBaru !== "" && angka >= hargaMinimum) {
+      ubahHarga(idProduk, angka);
     }
-
-    ubahHarga(idProduk, Number(hargaInput));
-    tampilkanPesan("Harga berhasil diperbarui.", "success");
-    // form tetap terbuka — tidak setShowInput(false)
   };
 
   return (
@@ -56,7 +60,7 @@ const KeranjangItem = ({ item }) => {
           </button>
         </div>
 
-        {/* Baris qty: menampilkan hargaJual — berubah setelah atur harga */}
+        {/* Baris qty: menampilkan hargaJual -- otomatis berubah live saat harga diatur */}
         <p className="text-[10px] text-gray-400">
           Qty: {item.qty} x {formatRupiah(item.hargaJual)}
         </p>
@@ -80,19 +84,26 @@ const KeranjangItem = ({ item }) => {
 
           {/* Harga bold ungu: selalu pakai hargaDefault, tidak pernah berubah */}
           <span className="font-bold text-[#5F04E8] text-xs">
-            {formatRupiah(item.qty * Number(item.produk.hargaDefault))}
+            {formatRupiah(item.qty * hargaDefault)}
           </span>
         </div>
 
         {showInput ? (
           <div className="mt-1.5 [&_label]:hidden [&_input]:text-[11px] [&_input]:py-1 [&_input]:px-1.5 [&_input]:border-orange-300">
-            <RupiahInput value={hargaInput} onChange={setHargaInput} />
+            <RupiahInput value={hargaInput} onChange={handleChangeHarga} />
+
+            {dibawahMinimum && (
+              <p className="mt-1 text-[10px] text-red-500">
+                Harga minimal {formatRupiah(hargaMinimum)}
+              </p>
+            )}
+
             <button
               type="button"
-              onClick={handleSelesai}
+              onClick={() => setShowInput(false)}
               className="mt-1 text-[10px] text-gray-400 underline"
             >
-              Selesai
+              Tutup
             </button>
           </div>
         ) : (
