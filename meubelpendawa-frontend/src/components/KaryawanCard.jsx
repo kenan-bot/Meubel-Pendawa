@@ -52,7 +52,7 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
     <>
       <div className="space-y-3">
         {karyawan.map((item, index) => (
-          <AnimatedSection key={item.idKaryawan} delay={index * 0.05}>
+          <AnimatedSection key={item.idKaryawan} delay={Math.min(index * 0.04, 0.3)}>
             <>
               {/* =========== DESKTOP ======= */}
               <div
@@ -60,7 +60,13 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
                 items-center bg-white rounded-2xl px-5 py-4 transition-all duration-300
                 hover:scale-[1.02] hover:shadow-lg"
               >
-                <div className="font-semibold">{item.namaKaryawan}</div>
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    {item.namaKaryawan}
+                  </p>
+
+                  <p className="text-xs text-gray-400">{item.idKaryawan}</p>
+                </div>
                 <div>{item.role ?? "-"}</div>
                 <div className="truncate">{item.email}</div>
                 <div>{item.username ?? "-"}</div>
@@ -99,7 +105,12 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-xs text-gray-500">Nama Karyawan</p>
-                    <p className="font-semibold">{item.namaKaryawan}</p>
+
+                    <p className="font-semibold text-gray-800">
+                      {item.namaKaryawan}
+                    </p>
+
+                    <p className="text-xs text-gray-400">{item.idKaryawan}</p>
                   </div>
 
                   <span

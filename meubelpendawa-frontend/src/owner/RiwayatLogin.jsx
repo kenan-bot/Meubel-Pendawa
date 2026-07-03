@@ -1,10 +1,21 @@
 import { useLoginLog } from "../context/LoginLogContext";
 import SearchBar from "../components/SearchBar";
 import LoginLogCard from "../components/LoginLogCard";
+import DateRangePicker from "../components/DateRangePicker";
 
 function RiwayatLogin() {
-  const { filteredLoginLogs, loading, searchTerm, setSearchTerm } =
-    useLoginLog();
+  const {
+    filteredLoginLogs,
+    loading,
+    searchTerm,
+    setSearchTerm,
+
+    startDate,
+    setStartDate,
+
+    endDate,
+    setEndDate,
+  } = useLoginLog();
 
   return (
     <div className="px-3 py-5 md:p-5">
@@ -17,13 +28,25 @@ function RiwayatLogin() {
         </p>
       </div>
 
-      {/* Search */}
-      <div className="mb-5">
-        <SearchBar
-          theme="orange"
-          placeholder="Cari nama karyawan..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+      <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <div className="w-full lg:max-w-sm">
+          <SearchBar
+            theme="orange"
+            placeholder="Cari nama karyawan..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <DateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onReset={() => {
+            setStartDate("");
+            setEndDate("");
+          }}
         />
       </div>
 
@@ -33,15 +56,16 @@ function RiwayatLogin() {
         <>
           {/* Header Desktop */}
           <div
-            className="hidden lg:grid grid-cols-[240px_120px_190px_190px_170px_120px] items-center
-            border border-orange-500 text-orange-500 rounded-2xl px-5 py-4 font-semibold mb-4"
+            className="hidden lg:grid grid-cols-[2fr_1fr_1.6fr_1.6fr_1.2fr_1.4fr_1fr] items-center
+            border border-orange-500 text-orange-500 rounded-2xl px-8 py-4 font-semibold mb-4"
           >
             <div>Nama Karyawan</div>
-            <div>Role</div>
+            <div className="justify-self-center">Role</div>
             <div>Login</div>
             <div>Logout</div>
             <div>Durasi</div>
-            <div>Status</div>
+            <div className="justify-self-center">Jam Kerja</div>
+            <div className="justify-self-end">Status</div>
           </div>
 
           {/* Card */}

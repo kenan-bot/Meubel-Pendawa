@@ -5,11 +5,14 @@ const LoginLogContext = createContext();
 
 export const LoginLogProvider = ({ children }) => {
   const [loginLogs, setLoginLogs] = useState([]);
-  const [filteredLoginLogs, setFilteredLoginLogs] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter tanggal
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const fetchLoginLog = async () => {
     try {
@@ -18,7 +21,6 @@ export const LoginLogProvider = ({ children }) => {
       const data = await getAllLoginLog();
 
       setLoginLogs(data);
-      setFilteredLoginLogs(data);
     } catch (error) {
       console.error("Gagal mengambil data login log", error);
     } finally {
@@ -26,28 +28,42 @@ export const LoginLogProvider = ({ children }) => {
     }
   };
 
+  // Filter nama + tanggal
+  const filteredLoginLogs = loginLogs.filter((item) => {
+    const cocokNama = item.namaKaryawan
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const tanggalLogin = item.loginAt.substring(0, 10);
+
+    const cocokTanggal =
+      (!startDate || tanggalLogin >= startDate) &&
+      (!endDate || tanggalLogin <= endDate);
+
+    return cocokNama && cocokTanggal;
+  });
+
   useEffect(() => {
     fetchLoginLog();
   }, []);
-
-  useEffect(() => {
-    const keyword = searchTerm.toLowerCase();
-
-    const hasil = loginLogs.filter((item) =>
-      item.namaKaryawan.toLowerCase().includes(keyword)
-    );
-
-    setFilteredLoginLogs(hasil);
-  }, [searchTerm, loginLogs]);
 
   return (
     <LoginLogContext.Provider
       value={{
         loginLogs,
         filteredLoginLogs,
+
         loading,
+
         searchTerm,
         setSearchTerm,
+
+        startDate,
+        setStartDate,
+
+        endDate,
+        setEndDate,
+
         fetchLoginLog,
       }}
     >
