@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { FaPlus } from "react-icons/fa6";
 
 import { requestOtp, verifyOtp, resetPassword } from "../api/authApi";
 import { useKaryawan } from "../context/KaryawanContext";
@@ -11,6 +10,8 @@ import Modal from "../components/Modal";
 import ResetOtpForm from "../components/ResetOtpForm";
 import ResetPasswordForm from "../components/ResetPasswordForm";
 import Toast from "../components/Toast";
+import usePagination from "../hooks/usePagination";
+import Pagination from "../components/Pagination";
 
 function Karyawan() {
   const [openModal, setOpenModal] = useState(false);
@@ -139,6 +140,15 @@ function Karyawan() {
     }
   };
 
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(filteredKaryawan, 10);
+
   return (
     <div className="px-3 py-5 md:p-5">
       {/* Judul */}
@@ -190,10 +200,17 @@ function Karyawan() {
         <div className="p-6">Memuat data karyawan...</div>
       ) : (
         <KaryawanCard
-          karyawan={filteredKaryawan}
+          karyawan={paginatedData}
           onResetPassword={handleResetPassword}
         />
       )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={goToPage}
+        onNext={nextPage}
+        onPrev={prevPage}
+      />
 
       {/* modal tambah karyawan */}
       <Modal
