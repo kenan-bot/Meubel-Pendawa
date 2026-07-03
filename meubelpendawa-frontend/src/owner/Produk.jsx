@@ -34,6 +34,15 @@ export default function Produk() {
     console.log("Hapus:", idProduk);
   };
 
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(filteredProduk, 12);
+
   if (loading) {
     return <div className="p-6">Memuat produk...</div>;
   }
@@ -83,10 +92,18 @@ export default function Produk() {
 
         <div className="mt-3">
           <ProductCard
-            produk={filteredProduk}
+            produk={paginatedData}
             mode="owner"
             onEdit={handleEdit}
             onDelete={handleDelete}
+          />
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={goToPage}
+            onNext={nextPage}
+            onPrev={prevPage}
           />
         </div>
       </div>

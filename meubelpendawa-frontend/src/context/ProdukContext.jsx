@@ -52,14 +52,6 @@ export function ProdukProvider({ children }) {
     return kategoriMatch && merekMatch && searchMatch;
   });
 
-  const {
-    paginatedData,
-    currentPage,
-    totalPages,
-    nextPage,
-    prevPage,
-    goToPage,
-  } = usePagination(filteredProduk, 12);
 
   return (
     <ProdukContext.Provider

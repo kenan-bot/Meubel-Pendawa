@@ -7,7 +7,7 @@ function HeroSection() {
   return (
     <section
     id="home"
-    className="max-w-7xl mx-auto py-16 px-6">
+    className="max-w-7xl mx-auto py-16 px-6 overflow-hidden">
 
       <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
 
