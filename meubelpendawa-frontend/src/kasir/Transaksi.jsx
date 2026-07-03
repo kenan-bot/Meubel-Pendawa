@@ -13,6 +13,8 @@ import ProductCard from "../components/ProductCard";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
 import QrisPaymentModal from "../components/QrisPaymentModal";
+import usePagination from "../hooks/usePagination";
+import Pagination from "../components/Pagination";
 
 import { GiShoppingBag } from "react-icons/gi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -24,6 +26,15 @@ function formatRupiah(nominal) {
 
 function TransaksiContent() {
   const t = useTransaksi();
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage,
+    resetPage,
+  } = usePagination(t.produkTersaring, 12);
 
   // [BARU] Form Pemesan bisa dibuka/tutup -- default TERTUTUP supaya grid produk
   // langsung dominan begitu halaman dibuka. Data yang sudah diisi tetap tersimpan
@@ -70,7 +81,11 @@ function TransaksiContent() {
               onClick={() => setFormTerbuka((v) => !v)}
               className="flex items-center gap-1.5 text-xs font-semibold text-[#5F04E8] px-3 py-1.5 rounded-full border border-[#5F04E8]/30 hover:bg-[#5F04E8]/5 transition flex-shrink-0"
             >
-              {formTerbuka ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
+              {formTerbuka ? (
+                <FaChevronUp size={10} />
+              ) : (
+                <FaChevronDown size={10} />
+              )}
               {formTerbuka ? "Sembunyikan Form" : "Tampilkan Form"}
             </button>
 
@@ -105,11 +120,18 @@ function TransaksiContent() {
             </div>
           ) : (
             <ProductCard
-              produk={t.produkTersaring}
+              produk={paginatedData}
               mode="cashier"
               onCardClick={(item) => t.tambahKeKeranjang(item)}
             />
           )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={goToPage}
+            onNext={nextPage}
+            onPrev={prevPage}
+          />
         </div>
       </div>
 
