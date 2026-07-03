@@ -60,8 +60,8 @@ function RiwayatLogin() {
             border border-orange-500 text-orange-500 rounded-2xl px-8 py-4 font-semibold mb-4"
           >
             <div>Nama Karyawan</div>
-            <div className="justify-self-center">Role</div>
-            <div>Login</div>
+            <div className="justify-self-start -ml-6">Role</div>
+            <div className="pl-6">Login</div>
             <div>Logout</div>
             <div>Durasi</div>
             <div className="justify-self-center">Jam Kerja</div>
