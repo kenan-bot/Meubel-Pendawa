@@ -98,6 +98,25 @@
 			<artifactId>resend-java</artifactId>
 			<version>3.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.midtrans</groupId>
+			<artifactId>java-library</artifactId>
+			<version>3.2.2</version>
+		</dependency>
+
+		<!-- FIX: com.midtrans:java-library dan com.resend:resend-java sama-sama bawa okhttp3
+		     versi transitif yang beda, bentrok (NoSuchMethodError saat Platform.log dipanggil).
+		     Deklarasi langsung ini memaksa satu versi konsisten dipakai semua library. -->
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>logging-interceptor</artifactId>
+			<version>4.12.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
