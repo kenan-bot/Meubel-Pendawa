@@ -64,7 +64,7 @@ export default function Sidebar({ menus }) {
                 }) => `${isActive ? "bg-orange-700" : "hover:bg-orange-700"} 
               rounded-md duration-300 block`}
               >
-                <li className="px-2 md:px-3 py-2 my-2 cursor-pointer flex gap-1 md:gap-2 items-center relative group">
+                <li className="px-2 md:px-3 py-2 my-1 cursor-pointer flex gap-1 md:gap-2 items-center relative group">
                   <div>{item.icon}</div>
 
                   <p className={`overflow-hidden whitespace-nowrap duration-300 text-[10px] sm:text-xs md:text-base ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0"}`}

@@ -57,12 +57,12 @@ const ContactSection = () => {
                   WhatsApp
                 </h3>
                 <a
-                  href="https://wa.me/6283681912"
+                  href="https://wa.me/628883901498"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#FF6B00] font-semibold text-base hover:underline"
                 >
-                  0836 – 8191 – 192
+                  0888 – 3901 – 498
                 </a>
               </div>
             </Card>

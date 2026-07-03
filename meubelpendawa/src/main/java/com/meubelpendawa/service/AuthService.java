@@ -62,6 +62,11 @@ public class AuthService {
                 karyawan.getIdKaryawan(),
                 karyawan.getRole().name());
 
+        // Tutup sesi lama jika masih aktif
+        loginLogService.autoLogoutIfStillActive(
+                karyawan.getIdKaryawan());
+
+        // Buat sesi login baru
         loginLogService.catatLogin(karyawan);
 
         return new LoginResponse(true, "Login berhasil", token, karyawan.getIdKaryawan(), karyawan.getNamaKaryawan(),

@@ -2,6 +2,20 @@ import { useLoginLog } from "../context/LoginLogContext";
 import SearchBar from "../components/SearchBar";
 import LoginLogCard from "../components/LoginLogCard";
 import DateRangePicker from "../components/DateRangePicker";
+import { useState } from "react";
+import DropDownFilter from "../components/DropDownFilter";
+import usePagination from "../hooks/usePagination";
+import Pagination from "../components/Pagination";
+
+const statusOptions = [
+  { value: "Aktif", label: "Aktif" },
+  { value: "Logout", label: "Logout" },
+];
+
+const jamKerjaOptions = [
+  { value: false, label: "Jam Kerja" },
+  { value: true, label: "Diluar Jam Kerja" },
+];
 
 function RiwayatLogin() {
   const {
@@ -15,7 +29,22 @@ function RiwayatLogin() {
 
     endDate,
     setEndDate,
+
+    statusFilter,
+    setStatusFilter,
+
+    jamKerjaFilter,
+    setJamKerjaFilter,
   } = useLoginLog();
+
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(filteredLoginLogs, 10);
 
   return (
     <div className="px-3 py-5 md:p-5">
@@ -28,16 +57,32 @@ function RiwayatLogin() {
         </p>
       </div>
 
-      <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-        <div className="w-full lg:max-w-sm">
+      <div className="mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+        {/* KIRI */}
+        <div className="flex flex-wrap items-center gap-3 w-full">
           <SearchBar
             theme="orange"
             placeholder="Cari nama karyawan..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+
+          <DropDownFilter
+            title="Status"
+            items={statusOptions}
+            value={statusFilter}
+            onSelect={setStatusFilter}
+          />
+
+          <DropDownFilter
+            title="Jam Kerja"
+            items={jamKerjaOptions}
+            value={jamKerjaFilter}
+            onSelect={setJamKerjaFilter}
+          />
         </div>
 
+        {/* KANAN */}
         <DateRangePicker
           startDate={startDate}
           endDate={endDate}
@@ -69,9 +114,14 @@ function RiwayatLogin() {
           </div>
 
           {/* Card */}
-          <LoginLogCard loginLogs={filteredLoginLogs} />
-
-          {/* Pagination nanti di sini */}
+          <LoginLogCard loginLogs={paginatedData} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onNext={nextPage}
+            onPrev={prevPage}
+            onPageChange={goToPage}
+          />
         </>
       )}
     </div>

@@ -53,6 +53,19 @@ public class LoginLogService {
         return loginLogRepository.save(log);
     }
 
+    public void autoLogoutIfStillActive(String idKaryawan) {
+
+        loginLogRepository
+                .findTopByKaryawan_IdKaryawanAndLogoutAtIsNullOrderByLoginAtDesc(idKaryawan)
+                .ifPresent(log -> {
+
+                    log.setLogoutAt(LocalDateTime.now());
+
+                    loginLogRepository.save(log);
+
+                });
+    }
+
     public List<LoginLogResponse> getAllLog() {
 
         return loginLogRepository.findAllByOrderByLoginAtDesc()

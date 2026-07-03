@@ -52,43 +52,51 @@ const KaryawanCard = ({ karyawan = [], onResetPassword, onToggleStatus }) => {
     <>
       <div className="space-y-3">
         {karyawan.map((item, index) => (
-          <AnimatedSection key={item.idKaryawan} delay={Math.min(index * 0.04, 0.3)}>
+          <AnimatedSection
+            key={item.idKaryawan}
+            delay={Math.min(index * 0.04, 0.3)}
+          >
             <>
               {/* =========== DESKTOP ======= */}
               <div
-                className="hidden lg:grid grid-cols-[230px_170px_315px_160px_105px_80px]
-                items-center bg-white rounded-2xl px-5 py-4 transition-all duration-300
-                hover:scale-[1.02] hover:shadow-lg"
+                className="hidden lg:grid grid-cols-[3fr_2.7fr_2.8fr_2fr_1.5fr_0.8fr] items-center
+                bg-white rounded-2xl px-5 py-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
               >
-                <div>
+                {/* Nama */}
+                <div className="justify-self-start">
                   <p className="font-semibold text-gray-800">
                     {item.namaKaryawan}
                   </p>
-
                   <p className="text-xs text-gray-400">{item.idKaryawan}</p>
                 </div>
-                <div>{item.role ?? "-"}</div>
-                <div className="truncate">{item.email}</div>
-                <div>{item.username ?? "-"}</div>
 
-                <div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold
-                  ${
-                    item.statusAktif
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-600"
-                  }`}
+                {/* Role */}
+                <div>{item.role ?? "-"}</div>
+
+                {/* Email */}
+                <div className="justify-self-start min-w-0 w-full">
+                  <span className="truncate block">{item.email}</span>
+                </div>
+
+                {/* Username */}
+                <div className="justify-self-start">{item.username ?? "-"}</div>
+
+                {/* Status */}
+                <div className="justify-self-start">
+                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold
+                  ${item.statusAktif
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-600"}`}
                   >
                     {item.statusAktif ? "Aktif" : "Nonaktif"}
                   </span>
                 </div>
 
-                <div className="flex justify-center gap-2">
+                {/* Tindakan */}
+                <div className="justify-self-center flex items-center gap-2">
                   <button
                     onClick={() => onResetPassword?.(item)}
-                    className="p-2 rounded-lg text-orange-500
-                  hover:bg-orange-100 transition"
+                    className="p-2 rounded-lg text-orange-500 hover:bg-orange-100 transition"
                   >
                     <FaKey />
                   </button>

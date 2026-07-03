@@ -5,14 +5,20 @@ const LoginLogContext = createContext();
 
 export const LoginLogProvider = ({ children }) => {
   const [loginLogs, setLoginLogs] = useState([]);
-
   const [loading, setLoading] = useState(false);
 
+  // Search
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filter tanggal
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Filter status
+  const [statusFilter, setStatusFilter] = useState(null);
+
+  // Filter jam kerja
+  const [jamKerjaFilter, setJamKerjaFilter] = useState(null);
 
   const fetchLoginLog = async () => {
     try {
@@ -28,19 +34,29 @@ export const LoginLogProvider = ({ children }) => {
     }
   };
 
-  // Filter nama + tanggal
   const filteredLoginLogs = loginLogs.filter((item) => {
+    // Search
     const cocokNama = item.namaKaryawan
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
+    //Tanggal
     const tanggalLogin = item.loginAt.substring(0, 10);
 
     const cocokTanggal =
       (!startDate || tanggalLogin >= startDate) &&
       (!endDate || tanggalLogin <= endDate);
 
-    return cocokNama && cocokTanggal;
+    // Status
+    const cocokStatus = !statusFilter || item.status === statusFilter.value;
+
+    // Jam Kerja
+    const cocokJamKerja =
+      jamKerjaFilter === null ||
+      jamKerjaFilter === undefined ||
+      item.loginDiluarJamOperasional === jamKerjaFilter.value;
+
+    return cocokNama && cocokTanggal && cocokStatus && cocokJamKerja;
   });
 
   useEffect(() => {
@@ -63,6 +79,12 @@ export const LoginLogProvider = ({ children }) => {
 
         endDate,
         setEndDate,
+
+        statusFilter,
+        setStatusFilter,
+
+        jamKerjaFilter,
+        setJamKerjaFilter,
 
         fetchLoginLog,
       }}

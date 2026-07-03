@@ -28,15 +28,11 @@ const ProductCard = ({
     return (
       <div className="flex justify-center items-center py-20">
         <div className="text-center">
-          <h3
-            className={`text-xl font-bold ${isHome ? "text-white" : "text-black"}`}
-          >
+          <h3 className={`text-xl font-bold ${isHome ? "text-white" : "text-black"}`}>
             Produk tidak ditemukan
           </h3>
 
-          <p
-            className={`text-sm mt-0 ${isHome ? "text-gray-200" : "text-gray-600"}`}
-          >
+          <p className={`text-sm mt-0 ${isHome ? "text-gray-200" : "text-gray-600"}`}>
             Coba gunakan kata kunci atau filter lain
           </p>
         </div>

@@ -4,6 +4,8 @@ import SearchBar from "../components/SearchBar";
 import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
 import FormInput from "../components/FormInput";
+import usePagination from "../hooks/usePagination";
+import Pagination from "../components/Pagination";
 
 import Modal from "../components/Modal";
 import ProductForm from "../components/ProductForm";

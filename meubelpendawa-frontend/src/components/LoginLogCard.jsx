@@ -15,20 +15,8 @@ function LoginLogCard({ loginLogs }) {
       {loginLogs.map((log, index) => (
         <AnimatedSection key={log.idLog} delay={Math.min(index * 0.04, 0.3)}>
           <div
-            className="
-          bg-white
-          border
-          border-gray-200
-          rounded-2xl
-          shadow-sm
-          hover:shadow-md
-          transition-all
-          duration-300
-          mb-4
-          px-5
-          py-4
-          hover:scale-[1.02]
-        "
+            className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md
+            transition-all duration-300 mb-4 px-5 py-4 hover:scale-[1.02]"
           >
             {/* ================= Desktop ================= */}
             <div className="hidden lg:grid grid-cols-[2fr_1fr_1.6fr_1.6fr_1.2fr_1.4fr_1fr] items-center">
@@ -105,16 +93,8 @@ function LoginLogCard({ loginLogs }) {
                 </div>
 
                 <span
-                  className="
-                bg-orange-100
-                text-orange-600
-                px-3
-                py-1
-                rounded-full
-                text-xs
-                font-semibold
-                h-fit
-              "
+                  className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs
+                  font-semibold h-fit"
                 >
                   {log.role}
                 </span>

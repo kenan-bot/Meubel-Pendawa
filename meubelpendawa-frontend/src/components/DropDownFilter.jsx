@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 
-const DropdownFilter = ({
+const DropDownFilter = ({
   title = "Pilih",
   items = [],
   value = null,
@@ -39,7 +39,7 @@ const DropdownFilter = ({
         {/* Dropdown */}
         <div
           className={`absolute top-[105%] w-40 z-50 rounded-md shadow-lg
-          transition-all duration-300 ease-in-out overflow-hidden overflow-y-auto
+          transition-all duration-700 ease-in-out overflow-hidden overflow-y-auto
           ${isOrange ? "bg-orange-500" : "bg-white"}
           ${isOpen ? "max-h-56 opacity-100" : "max-h-0 opacity-0"}`}
         >
@@ -85,4 +85,4 @@ const DropdownFilter = ({
   );
 };
 
-export default DropdownFilter;
+export default DropDownFilter;

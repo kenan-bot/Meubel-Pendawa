@@ -8,7 +8,8 @@ function OwnerLayout() {
     <div className="bg-gray-100 flex h-screen">
       <Sidebar menus={ownerMenus} />
 
-      <main className="flex-1 overflow-y-auto">
+      <main id="page-content"
+      className="flex-1 overflow-y-auto">
 
         <div className="px-3 sm:px-4 md:px-8 pt-3 md:pt-5 flex">
           <div className="ml-auto mr-5">

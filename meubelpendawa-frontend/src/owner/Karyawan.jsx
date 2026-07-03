@@ -174,7 +174,7 @@ function Karyawan() {
 
       {/* Header */}
       <div
-        className="hidden lg:grid grid-cols-[230px_170px_315px_160px_105px_80px] items-center
+        className="hidden lg:grid grid-cols-[3fr_2.7fr_2.8fr_2.1fr_1.9fr_0.8fr] items-center
         border border-orange-500 text-orange-500 rounded-2xl px-5 py-4 font-semibold mb-4"
       >
         <div>Nama Karyawan</div>
