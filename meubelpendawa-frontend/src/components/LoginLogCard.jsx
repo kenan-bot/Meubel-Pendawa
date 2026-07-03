@@ -31,18 +31,15 @@ function LoginLogCard({ loginLogs }) {
         "
           >
             {/* ================= Desktop ================= */}
-            <div className="hidden lg:grid grid-cols-[2fr_1fr_1.8fr_1.8fr_1.3fr_1.4fr_1fr] items-center">
+            <div className="hidden lg:grid grid-cols-[2fr_1fr_1.6fr_1.6fr_1.2fr_1.4fr_1fr] items-center">
               {/* Nama */}
               <div className="min-w-0">
                 <p className="font-semibold truncate">{log.namaKaryawan}</p>
-                <p className="text-xs text-gray-400 truncate">
-                  {" "}
-                  {log.idKaryawan}
-                </p>
+                <p className="text-xs text-gray-400 truncate">{" "}{log.idKaryawan}</p>
               </div>
 
               {/* Role */}
-              <div className="flex items-center">
+              <div className="flex items-center -ml-6">
                 <span
                   className="inline-flex whitespace-nowrap bg-orange-100 text-orange-600 px-3 py-1 rounded-full
                   text-xs font-semibold">{" "}{log.role}
@@ -50,33 +47,30 @@ function LoginLogCard({ loginLogs }) {
               </div>
 
               {/* Login */}
-              <div className="min-w-0">
+              <div className="min-w-0 pl-6">
                 <p className="text-sm whitespace-nowrap">
                   {formatDateTime(log.loginAt)}
                 </p>
               </div>
 
               {/* Logout */}
-              <div className="min-w-0">
+              <div className="min-w-0 pl-10">
                 <p className="text-sm whitespace-nowrap">
                   {formatDateTime(log.logoutAt)}
                 </p>
               </div>
 
               {/* Durasi */}
-              <div className="min-w-0">
-                <p className="font-normal leading-5">{log.durasi}</p>
+              <div className="min-w-0 pl-14">
+                <p className="font-normal text-sm leading-none">{log.durasi}</p>
               </div>
 
               {/* Jam Kerja */}
-              <div>
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold
-                ${
-                  log.loginDiluarJamOperasional
+              <div className="justify-self-center pl-12">
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold
+                ${log.loginDiluarJamOperasional
                     ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
-                }`}
+                    : "bg-green-100 text-green-700"}`}
                 >
                   {log.loginDiluarJamOperasional
                     ? "Diluar Jam Kerja"
@@ -85,7 +79,7 @@ function LoginLogCard({ loginLogs }) {
               </div>
 
               {/* Status */}
-              <div>
+              <div className="justify-self-end">
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-xs font-semibold
                 ${

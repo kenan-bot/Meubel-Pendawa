@@ -59,12 +59,12 @@ function RiwayatLogin() {
             className="hidden lg:grid grid-cols-[2fr_1fr_1.6fr_1.6fr_1.2fr_1.4fr_1fr] items-center
             border border-orange-500 text-orange-500 rounded-2xl px-8 py-4 font-semibold mb-4"
           >
-            <div>Nama Karyawan</div>
+            <div className="-ml-4">Nama Karyawan</div>
             <div className="justify-self-start -ml-6">Role</div>
             <div className="pl-6">Login</div>
-            <div>Logout</div>
-            <div>Durasi</div>
-            <div className="justify-self-center">Jam Kerja</div>
+            <div className="pl-10">Logout</div>
+            <div className="pl-14">Durasi</div>
+            <div className="justify-self-center pl-12">Jam Kerja</div>
             <div className="justify-self-end">Status</div>
           </div>
 
