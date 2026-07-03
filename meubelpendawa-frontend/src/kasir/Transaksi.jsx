@@ -12,6 +12,7 @@ import RingkasanBayar from "../components/RingkasanBayar";
 import ProductCard from "../components/ProductCard";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
+import QrisPaymentModal from "../components/QrisPaymentModal";
 
 import { GiShoppingBag } from "react-icons/gi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -154,6 +155,15 @@ function TransaksiContent() {
         cancelText="Batal"
         onConfirm={handleConfirmProses}
         onClose={() => setShowConfirm(false)}
+      />
+
+      {/* Loading/error singkat saat menyiapkan Snap Token -- popup pembayaran aslinya
+          langsung diambil alih oleh window.snap.pay() begitu token didapat. */}
+      <QrisPaymentModal
+        isOpen={t.showQrisModal}
+        status={t.qrisStatus}
+        message={t.qrisMessage}
+        onClose={t.closeQrisModal}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { useProduk } from "./ProdukContext";
 import { createTransaksi, prosesPembayaran } from "../api/transaksiApi";
 import { createDetailTransaksi } from "../api/detailTransaksiApi";
 import { getAllKaryawan } from "../api/karyawanApi";
+import { buatSnapToken, loadMidtransScript, cekStatusPembayaran } from "../api/midtransApi";
 
 const TransaksiContext = createContext(null);
 
@@ -50,6 +51,12 @@ export function TransaksiProvider({ children }) {
   const [pesan, setPesan] = useState("");
   const [pesanType, setPesanType] = useState("error");
 
+  // ----- pembayaran QRIS (Midtrans) -----
+  const [showQrisModal, setShowQrisModal] = useState(false);
+  const [qrisStatus, setQrisStatus] = useState("loading"); // "loading" | "error"
+  const [qrisMessage, setQrisMessage] = useState("");
+  const closeQrisModal = () => setShowQrisModal(false);
+
   const tampilkanPesan = (text, type = "error") => { setPesan(text); setPesanType(type); };
 
   useEffect(() => {
@@ -85,7 +92,11 @@ export function TransaksiProvider({ children }) {
     if (!namaPemesan || !noWhatsapp) return tampilkanPesan("Nama dan No. Telp/WhatsApp wajib diisi.");
     if (isDelivery && (!alamatPengiriman || !driverId)) return tampilkanPesan("Alamat & driver wajib diisi untuk Delivery.");
     if (keranjang.length === 0) return tampilkanPesan("Keranjang masih kosong.");
-    if (!jumlahBayar || Number(jumlahBayar) < totalPesanan) return tampilkanPesan("Jumlah bayar belum mencukupi total pesanan.");
+    // Untuk CASHLESS, nominal yang dibayar mengikuti gross_amount di Midtrans (persis totalPesanan),
+    // jadi input "Jumlah Bayar" manual tidak wajib divalidasi seperti alur CASH.
+    if (!isCashless && (!jumlahBayar || Number(jumlahBayar) < totalPesanan)) {
+      return tampilkanPesan("Jumlah bayar belum mencukupi total pesanan.");
+    }
 
     try {
       setSubmitting(true);
@@ -102,14 +113,60 @@ export function TransaksiProvider({ children }) {
           transaksi: { orderId: transaksiBaru.orderId },
         });
       }
-      await prosesPembayaran(transaksiBaru.orderId, Number(jumlahBayar));
-      tampilkanPesan(`Pesanan ${transaksiBaru.orderId} berhasil diproses.`, "success");
+
+      if (isCashless) {
+        // Order & detail sudah tersimpan; sisanya (buka Snap, tunggu bayar) ditangani terpisah.
+        // Kalau gagal siapkan Snap Token, JANGAN resetForm -- biarkan kasir retry tanpa input ulang.
+        const berhasilSiapkanQris = await bayarViaMidtrans(transaksiBaru.orderId);
+        if (!berhasilSiapkanQris) return;
+      } else {
+        await prosesPembayaran(transaksiBaru.orderId, Number(jumlahBayar));
+        tampilkanPesan(`Pesanan ${transaksiBaru.orderId} berhasil diproses.`, "success");
+      }
       resetForm();
     } catch (error) {
       console.error(error);
       tampilkanPesan(error?.response?.data?.message || "Gagal memproses pesanan. Coba periksa kembali data.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Ambil Snap Token dari backend lalu buka popup pembayaran Midtrans.
+  // Status akhir (SUCCESS/FAILED) sebenarnya diputuskan lewat webhook backend (langkah 6),
+  // callback di sini cuma untuk feedback cepat ke kasir di layar.
+  const bayarViaMidtrans = async (orderId) => {
+    setQrisStatus("loading");
+    setQrisMessage("Menyiapkan pembayaran, mohon tunggu...");
+    setShowQrisModal(true);
+
+    try {
+      const { token, clientKey, isProduction } = await buatSnapToken(orderId);
+      await loadMidtransScript(clientKey, isProduction);
+
+      setShowQrisModal(false); // biar popup Snap yang tampil, bukan numpuk sama modal kita
+
+      window.snap.pay(token, {
+        onSuccess: () => {
+          tampilkanPesan(`Pembayaran ${orderId} berhasil.`, "success");
+          // Gantiin peran webhook: minta backend cek ulang status ASLI ke Midtrans & simpan
+          // ke database. Tanpa ini, statusPembayaran/jumlahBayar di DB tetap nyangkut PENDING/0
+          // walau popup Snap sudah bilang sukses -- soalnya webhook butuh URL publik (ngrok dkk).
+          cekStatusPembayaran(orderId).catch((err) => console.error("Gagal sinkronkan status:", err));
+        },
+        onPending: () => {
+          tampilkanPesan(`Pembayaran ${orderId} tertunda, menunggu konfirmasi.`, "warning");
+          cekStatusPembayaran(orderId).catch((err) => console.error("Gagal sinkronkan status:", err));
+        },
+        onError: () => tampilkanPesan(`Pembayaran ${orderId} gagal, silakan coba lagi.`, "error"),
+        onClose: () => tampilkanPesan(`Pembayaran ${orderId} dibatalkan.`, "error"),
+      });
+      return true;
+    } catch (error) {
+      console.error(error);
+      setQrisStatus("error");
+      setQrisMessage(error?.response?.data?.error || error.message || "Gagal menyiapkan pembayaran QRIS. Coba lagi.");
+      return false;
     }
   };
 
@@ -122,6 +179,7 @@ export function TransaksiProvider({ children }) {
     keranjang, tambahKeKeranjang, ubahQty, hapusItem, ubahHarga, waktu,
     jumlahBayar, setJumlahBayar, totalPesanan, kembalian, isCashless,
     submitting, pesan, pesanType, prosesPesanan, tampilkanPesan,
+    showQrisModal, qrisStatus, qrisMessage, closeQrisModal,
   };
 
   return <TransaksiContext.Provider value={value}>{children}</TransaksiContext.Provider>;

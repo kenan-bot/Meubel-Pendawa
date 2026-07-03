@@ -36,6 +36,10 @@ public class Transaksi {
 
     private Double kembalian;
 
+    // [BARU] Untuk cashless via Midtrans: PENDING (menunggu bayar) -> SUCCESS / FAILED / CHALLENGE.
+    // Untuk CASH, langsung diisi "SUCCESS" saat prosesPembayaran() dipanggil (lihat TransaksiService).
+    private String statusPembayaran = "PENDING";
+
     public Transaksi() {
     }
 
@@ -133,5 +137,13 @@ public class Transaksi {
 
     public void setDriver(Karyawan driver) {
         this.driver = driver;
-    }   
+    }
+
+    public String getStatusPembayaran() {
+        return statusPembayaran;
+    }
+
+    public void setStatusPembayaran(String statusPembayaran) {
+        this.statusPembayaran = statusPembayaran;
+    }
 }
