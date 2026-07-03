@@ -74,7 +74,7 @@ const ProductCard = ({
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.5) }}
+              transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.2) }}
             >
               <div
                 onClick={() => onCardClick?.(item)}

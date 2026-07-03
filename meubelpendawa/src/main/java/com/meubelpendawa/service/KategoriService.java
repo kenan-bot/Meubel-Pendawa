@@ -27,10 +27,17 @@ public class KategoriService {
     }
 
     public Kategori updateKategori(Kategori kategori) {
-        return kategoriRepository.save(kategori);
+
+        Kategori existing = kategoriRepository.findById(kategori.getIdKategori())
+                .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
+
+        existing.setNamaKategori(kategori.getNamaKategori());
+
+        return kategoriRepository.save(existing);
     }
 
     public void hapusKategori(String idKategori) {
         kategoriRepository.deleteById(idKategori);
     }
+
 }

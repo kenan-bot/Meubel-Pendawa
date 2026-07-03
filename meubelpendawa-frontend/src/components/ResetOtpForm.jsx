@@ -1,21 +1,26 @@
 import { useState } from "react";
 import FormInput from "./FormInput";
 import { HiCheckCircle } from "react-icons/hi2";
+import { FiLoader } from "react-icons/fi";
 
 const ResetOtpForm = ({
   email,
   onClose,
   onVerify,
   loading = false,
+
+  sendingOtp = false,
+  sendError = "",
+
   otpVerified = false,
   countdown = 3,
 }) => {
-  const [otp, setOtp] = useState("");
+  const [kodeOtp, setKodeOtp] = useState("");
 
   const handleSubmit = () => {
-    if (otp.length !== 6) return;
+    if (kodeOtp.length !== 6) return;
 
-    onVerify?.(otp);
+    onVerify?.(kodeOtp);
   };
 
   if (otpVerified) {
@@ -45,43 +50,48 @@ const ResetOtpForm = ({
   return (
     <div className="space-y-5">
       <div className="text-center">
-        <p className="text-gray-500">Kode OTP telah dikirim ke</p>
+        {sendingOtp ? (
+          <>
+            <FiLoader
+              className="mx-auto mb-3 animate-spin text-orange-500"
+              size={30}
+            />
 
-        <p className="font-semibold text-[#FF6B00] mt-1">{email}</p>
+            <p className="font-medium">Mengirim kode OTP...</p>
+          </>
+        ) : sendError ? (
+          <>
+            <p className="text-red-500 font-medium">{sendError}</p>
+          </>
+        ) : (
+          <>
+            <p className="text-gray-500">Kode OTP telah dikirim ke</p>
+
+            <p className="font-semibold text-[#FF6B00] mt-1">{email}</p>
+          </>
+        )}
       </div>
 
       <FormInput
         label="Kode OTP"
         placeholder="Masukkan 6 digit OTP"
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
+        value={kodeOtp}
+        onChange={(e) => setKodeOtp(e.target.value)}
         maxLength={6}
       />
 
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="
-              px-5 py-2
-              rounded-lg
-              border
-              border-gray-300 hover:bg-gray-100
-            "
+          className="px-5 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
         >
           Batal
         </button>
 
         <button
           onClick={handleSubmit}
-          disabled={loading}
-          className="
-              px-5 py-2
-              rounded-lg
-              bg-orange-500
-              text-white
-              hover:bg-orange-600
-              transition
-            "
+          disabled={loading || sendingOtp}
+          className="px-5 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition disabled:opacity-60"
         >
           {loading ? "Memverifikasi..." : "Verifikasi OTP"}
         </button>

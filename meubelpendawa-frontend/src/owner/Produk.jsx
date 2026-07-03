@@ -99,6 +99,7 @@ export default function Produk() {
       </Modal>
 
       <Modal
+        maxWidth="max-w-3xl"
         isOpen={openUpdateProduk}
         onClose={() => {
           setOpenUpdateProduk(false);

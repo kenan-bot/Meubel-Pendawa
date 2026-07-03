@@ -6,6 +6,7 @@ import { MdOutlineInsights } from "react-icons/md";
 import { MdShoppingCart } from "react-icons/md";
 import { RiHistoryLine } from "react-icons/ri";
 import { FaProductHunt } from "react-icons/fa";
+import { MdOutlineSecurity } from "react-icons/md";
 
 export const ownerMenus = [
   {
@@ -25,7 +26,7 @@ export const ownerMenus = [
   },
   {
     icon: <MdCategory size={30} />,
-    label: "Kategori",
+    label: "Atribut Produk",
     path: "/owner/kategori",
   },
   {
@@ -37,6 +38,11 @@ export const ownerMenus = [
     icon: <MdOutlineInsights size={30} />,
     label: "Laporan Penjualan",
     path: "/owner/laporanpenjualan",
+  },
+  {
+    icon: <MdOutlineSecurity size={30} />,
+    label: "Riwayat Login",
+    path: "/owner/riwayatlogin",
   },
 ];
 

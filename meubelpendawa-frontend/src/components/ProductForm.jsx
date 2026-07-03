@@ -20,7 +20,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
   const { kategori } = useKategori();
   const { merek } = useMerek();
-  const { addProduk, updateProdukState } = useProduk();
+  const { produk: produkList, addProduk, updateProdukState } = useProduk();
 
   const [namaProduk, setNamaProduk] = useState("");
   const [stok, setStok] = useState("");
@@ -33,7 +33,12 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
   const [gambar, setGambar] = useState(null);
   const [gambarUrl, setGambarUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const normalizeNamaProduk = (nama) =>
+    nama.toLowerCase().trim().replace(/\s+/g, " ").split(" ").sort().join(" ");
 
   useEffect(() => {
     if (mode !== "edit" || !produk) return;
@@ -47,6 +52,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
     setMerekId(produk.merek?.idMerek || "");
 
     setGambarUrl(produk.gambarUrl || "");
+    setPreviewUrl("");
   }, [produk, mode]);
 
   useEffect(() => {
@@ -63,17 +69,44 @@ const ProductForm = ({ mode = "create", produk = null }) => {
     const file = e.target.files[0];
 
     if (!file) return;
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+    if (!allowedTypes.includes(file.type)) {
+      setToast({
+        type: "warning",
+        message: "Format gambar harus JPG, PNG, atau WEBP",
+      });
+      return;
+    }
+
+    const MAX_SIZE = 5 * 1024 * 1024;
+
+    if (file.size > MAX_SIZE) {
+      setToast({
+        type: "warning",
+        message: "Ukuran gambar maksimal 5 MB",
+      });
+      return;
+    }
+
+    // preview langsung
     setGambar(file);
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
+
+    setUploadingImage(true);
 
     try {
-      const url = await uploadGambar(file);
-      setGambarUrl(url);
+      const uploadedUrl = await uploadGambar(file);
+
+      setGambarUrl(uploadedUrl);
     } catch (error) {
       setToast({
         type: "error",
         message: "Upload gambar gagal",
       });
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -112,11 +145,37 @@ const ProductForm = ({ mode = "create", produk = null }) => {
       return;
     }
 
+    // VALIDASI DUPLIKAT NAMA PRODUK
+    const namaBaru = normalizeNamaProduk(namaProduk);
+
+    const sudahAda = produkList.some((item) => {
+      const namaExisting =
+        item.namaProdukNormalized ?? normalizeNamaProduk(item.namaProduk);
+
+      if (mode === "edit") {
+        return (
+          item.idProduk !== produk?.idProduk &&
+          namaExisting === namaBaru &&
+          item.merek?.idMerek === merekId
+        );
+      }
+
+      return namaExisting === namaBaru && item.merek?.idMerek === merekId;
+    });
+
+    if (sudahAda) {
+      setToast({
+        type: "warning",
+        message: "Nama produk sudah ada",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
       const data = {
-        namaProduk,
+        namaProduk: namaProduk.trim(),
         stok: Number(stok || 0),
         hargaDefault: Number(hargaDefault || 0),
         deskripsi,
@@ -141,7 +200,6 @@ const ProductForm = ({ mode = "create", produk = null }) => {
           message: "Produk berhasil ditambahkan",
         });
 
-        // reset form
         setNamaProduk("");
         setStok("");
         setHargaDefault("");
@@ -150,6 +208,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
         setDeskripsi("");
         setGambar(null);
         setGambarUrl("");
+        setPreviewUrl("");
       } else {
         const dataUpdate = {
           ...data,
@@ -166,12 +225,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
         });
       }
     } catch (error) {
-      console.error("ERROR UPDATE/CREATE:", error);
-
-      if (error.response) {
-        console.error("STATUS:", error.response.status);
-        console.error("DATA:", error.response.data);
-      }
+      console.error(error);
 
       setToast({
         type: "error",
@@ -192,17 +246,11 @@ const ProductForm = ({ mode = "create", produk = null }) => {
             <div className="w-full">
               <div
                 className="w-full h-52 border-2 border-dashed border-gray-300
-              rounded-xl flex items-center justify-center overflow-hidden"
+                rounded-xl flex items-center justify-center overflow-hidden"
               >
-                {gambar ? (
+                {previewUrl || gambarUrl ? (
                   <img
-                    src={URL.createObjectURL(gambar)}
-                    alt="Preview"
-                    className="w-full h-full object-contain"
-                  />
-                ) : gambarUrl ? (
-                  <img
-                    src={gambarUrl}
+                    src={previewUrl || gambarUrl}
                     alt="Preview"
                     className="w-full h-full object-contain"
                   />
@@ -213,7 +261,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
 
               <input
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp,.svg"
+                accept=".jpg,.jpeg,.png,.webp"
                 className="mt-2 text-sm w-full"
                 onChange={handleImageChange}
               />
@@ -316,15 +364,23 @@ const ProductForm = ({ mode = "create", produk = null }) => {
             <div className="flex justify-end pt-3">
               <button
                 type="submit"
-                disabled={loading}
-                className="bg-orange-500 text-white px-5 py-2 rounded-md
-              hover:bg-orange-600 hover:scale-105 active:scale-95 transition-all duration-20"
+                disabled={loading || uploadingImage}
+                className={`
+                px-5 py-2 rounded-md text-white
+                transition-all duration-200
+                ${
+                  loading || uploadingImage
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105 active:scale-95"
+                }`}
               >
-                {loading
-                  ? "Menyimpan..."
-                  : mode === "edit"
-                    ? "Update"
-                    : "Simpan"}
+                {uploadingImage
+                  ? "Mengunggah gambar..."
+                  : loading
+                    ? "Menyimpan..."
+                    : mode === "edit"
+                      ? "Update"
+                      : "Simpan"}
               </button>
             </div>
           </div>

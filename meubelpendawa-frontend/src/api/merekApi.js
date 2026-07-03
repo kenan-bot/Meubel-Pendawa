@@ -12,11 +12,25 @@ export const createMerek = async (data) => {
   return response.data;
 };
 
-export const updateMerek = async (id, data) => {
-  const response = await axios.put(`${BASE_URL}/${id}`, data);
+export const updateMerek = async (data) => {
+  const response = await axios.put(BASE_URL, data);
   return response.data;
 };
 
-export const deleteMerek = async (id) => {
-  await axios.delete(`${BASE_URL}/${id}`);
+export const isMerekUsed = async (idMerek) => {
+  const response = await axios.get(
+    `${BASE_URL}/${idMerek}/is-used`
+  );
+
+  return response.data;
+}
+
+export const getMerekUsageCount = async (
+  idMerek
+) => {
+  const response = await axios.get(
+    `${BASE_URL}/${idMerek}/usage-count`
+  );
+
+  return response.data;
 };

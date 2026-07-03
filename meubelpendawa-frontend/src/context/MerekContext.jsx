@@ -8,25 +8,42 @@ export const MerekProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadMerek = async () => {
-      try {
-        const data = await getAllMerek();
-        setMerek(data);
-      } catch (error) {
-        console.error("Gagal mengambil merek:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadMerek();
   }, []);
+
+  const loadMerek = async () => {
+    setLoading(true);
+
+    try {
+      const data = await getAllMerek();
+      setMerek(data);
+    } catch (error) {
+      console.error("Gagal mengambil merek:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addMerek = (merekBaru) => {
+    setMerek((prev) => [...prev, merekBaru]);
+  };
+
+  const updateMerekState = (merekUpdate) => {
+    setMerek((prev) =>
+      prev.map((item) =>
+        item.idMerek === merekUpdate.idMerek ? merekUpdate : item,
+      ),
+    );
+  };
 
   return (
     <MerekContext.Provider
       value={{
         merek,
         loading,
+        reloadMerek: loadMerek,
+        addMerek,
+        updateMerekState,
       }}
     >
       {children}
