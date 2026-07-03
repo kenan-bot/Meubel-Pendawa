@@ -8,30 +8,36 @@ function Pagination({ currentPage, totalPages, onPageChange, onNext, onPrev }) {
   const generatePages = () => {
     const pages = [];
 
+    // Jika halaman sedikit tampilkan semua
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
-    } else {
-      pages.push(1);
 
-      if (currentPage > 3) {
-        pages.push("...");
-      }
-
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      if (currentPage < totalPages - 2) {
-        pages.push("...");
-      }
-
-      pages.push(totalPages);
+      return pages;
     }
+
+    // ===== Awal =====
+    if (currentPage <= 2) {
+      pages.push(1, 2, 3, "...", totalPages);
+      return pages;
+    }
+
+    // ===== Akhir =====
+    if (currentPage >= totalPages - 1) {
+      pages.push(totalPages - 2, totalPages - 1, totalPages);
+
+      return pages;
+    }
+
+    // ===== Tengah =====
+    pages.push(currentPage - 1, currentPage, currentPage + 1);
+
+    if (currentPage + 1 < totalPages) {
+      pages.push("...");
+    }
+
+    pages.push(totalPages);
 
     return pages;
   };
@@ -72,32 +78,34 @@ function Pagination({ currentPage, totalPages, onPageChange, onNext, onPrev }) {
       </button>
 
       {/* Nomor Halaman */}
-      {generatePages().map((page, index) =>
-        page === "..." ? (
-          <span key={index} className="px-2 text-gray-500 font-semibold">
+      {generatePages().map((page, index) => {
+        const uniqueKey = `${page}-${index}`;
+
+        return page === "..." ? (
+          <span key={uniqueKey} className="px-2 text-gray-500 font-semibold">
             ...
           </span>
         ) : (
           <button
-            key={page}
+            key={uniqueKey}
             onClick={() => onPageChange(page)}
             className={`
-              w-10 h-10
-              rounded-full
-              font-semibold
-              transition-all
-              duration-300
-              ${
-                currentPage === page
-                  ? "bg-orange-500 text-white shadow-md"
-                  : "bg-white border border-gray-300 hover:bg-orange-100"
-              }
-            `}
+        w-10 h-10
+        rounded-full
+        font-semibold
+        transition-all
+        duration-300
+        ${
+          currentPage === page
+            ? "bg-orange-500 text-white shadow-md"
+            : "bg-white border border-gray-300 hover:bg-orange-100"
+        }
+      `}
           >
             {page}
           </button>
-        ),
-      )}
+        );
+      })}
 
       {/* Next */}
       <button
