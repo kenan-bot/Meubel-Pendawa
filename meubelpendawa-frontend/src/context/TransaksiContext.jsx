@@ -8,7 +8,7 @@ import { buatSnapToken, loadMidtransScript, cekStatusPembayaran } from "../api/m
 const TransaksiContext = createContext(null);
 
 export function TransaksiProvider({ children }) {
-  const { produk, loading } = useProduk();
+  const { produk, loading, updateProdukState } = useProduk();
 
   // ----- form pemesan -----
   const [namaPemesan, setNamaPemesan] = useState("");
@@ -65,14 +65,34 @@ export function TransaksiProvider({ children }) {
     return () => clearTimeout(timer);
   }, [pesan]);
 
-  const tambahKeKeranjang = (item) => setKeranjang((prev) => {
-    const ada = prev.find((c) => c.produk.idProduk === item.idProduk);
-    if (ada) return prev.map((c) => c.produk.idProduk === item.idProduk ? { ...c, qty: c.qty + 1 } : c);
-    return [...prev, { produk: item, qty: 1, hargaJual: item.hargaDefault }];
-  });
+  const tambahKeKeranjang = (item) => {
+    if (item.stok === 0) {
+      tampilkanPesan(`${item.namaProduk} stoknya habis.`, "error");
+      return;
+    }
+    setKeranjang((prev) => {
+      const ada = prev.find((c) => c.produk.idProduk === item.idProduk);
+      if (ada) {
+        if (ada.qty >= item.stok) {
+          tampilkanPesan(`Stok ${item.namaProduk} cuma tersisa ${item.stok}.`, "error");
+          return prev;
+        }
+        return prev.map((c) => c.produk.idProduk === item.idProduk ? { ...c, qty: c.qty + 1 } : c);
+      }
+      return [...prev, { produk: item, qty: 1, hargaJual: item.hargaDefault }];
+    });
+  };
 
   const ubahQty = (idProduk, delta) => setKeranjang((prev) =>
-    prev.map((c) => c.produk.idProduk === idProduk ? { ...c, qty: Math.max(1, c.qty + delta) } : c));
+    prev.map((c) => {
+      if (c.produk.idProduk !== idProduk) return c;
+      const qtyBaru = Math.max(1, c.qty + delta);
+      if (delta > 0 && qtyBaru > c.produk.stok) {
+        tampilkanPesan(`Stok ${c.produk.namaProduk} cuma tersisa ${c.produk.stok}.`, "error");
+        return c;
+      }
+      return { ...c, qty: qtyBaru };
+    }));
 
   const hapusItem = (idProduk) => setKeranjang((prev) => prev.filter((c) => c.produk.idProduk !== idProduk));
 
@@ -112,6 +132,9 @@ export function TransaksiProvider({ children }) {
           produk: { idProduk: item.produk.idProduk },
           transaksi: { orderId: transaksiBaru.orderId },
         });
+        // Backend sudah decrement stok di titik ini (lihat DetailTransaksiService), jadi
+        // sinkronkan juga stok di ProdukContext biar grid produk ikut update tanpa refresh manual.
+        updateProdukState({ ...item.produk, stok: item.produk.stok - item.qty });
       }
 
       if (isCashless) {
