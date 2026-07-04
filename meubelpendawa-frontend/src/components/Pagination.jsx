@@ -1,45 +1,45 @@
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function Pagination({ currentPage, totalPages, onPageChange, onNext, onPrev }) {
   if (totalPages <= 1) return null;
 
+  const previousPage = useRef(currentPage);
+  const [direction, setDirection] = useState("forward");
+
+  useEffect(() => {
+    if (currentPage > previousPage.current) {
+      setDirection("forward");
+    } else if (currentPage < previousPage.current) {
+      setDirection("backward");
+    }
+
+    previousPage.current = currentPage;
+  }, [currentPage]);
+
   const generatePages = () => {
-    const pages = [];
-
-    // Jika halaman sedikit tampilkan semua
+    // sedikit halaman
     if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-
-      return pages;
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
-    // ===== Awal =====
+    // halaman awal
     if (currentPage <= 2) {
-      pages.push(1, 2, 3, "...", totalPages);
-      return pages;
+      return [1, 2, 3, "...", totalPages];
     }
 
-    // ===== Akhir =====
+    // halaman terakhir
     if (currentPage >= totalPages - 1) {
-      pages.push(totalPages - 2, totalPages - 1, totalPages);
-
-      return pages;
+      return [1, "...", totalPages - 2, totalPages - 1, totalPages];
     }
 
-    // ===== Tengah =====
-    pages.push(currentPage - 1, currentPage, currentPage + 1);
-
-    if (currentPage + 1 < totalPages) {
-      pages.push("...");
+    //  gerak maju
+    if (direction === "forward") {
+      return [currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
     }
 
-    pages.push(totalPages);
-
-    return pages;
+    // gerak mundur
+    return [1, "...", currentPage - 1, currentPage, currentPage + 1];
   };
 
   useEffect(() => {

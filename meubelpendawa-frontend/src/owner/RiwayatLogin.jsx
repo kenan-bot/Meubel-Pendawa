@@ -44,7 +44,7 @@ function RiwayatLogin() {
     nextPage,
     prevPage,
     goToPage,
-  } = usePagination(filteredLoginLogs, 5);
+  } = usePagination(filteredLoginLogs, 10);
 
   return (
     <div className="px-3 py-5 md:p-5">

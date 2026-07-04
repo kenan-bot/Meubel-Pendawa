@@ -48,12 +48,15 @@ export const LoginLogProvider = ({ children }) => {
       (!endDate || tanggalLogin <= endDate);
 
     // Status
-    const cocokStatus = !statusFilter || item.status === statusFilter.value;
+    const cocokStatus =
+      !statusFilter ||
+      statusFilter.value === "__ALL__" ||
+      item.status === statusFilter.value;
 
     // Jam Kerja
     const cocokJamKerja =
-      jamKerjaFilter === null ||
-      jamKerjaFilter === undefined ||
+      !jamKerjaFilter ||
+      jamKerjaFilter.value === "__ALL__" ||
       item.loginDiluarJamOperasional === jamKerjaFilter.value;
 
     return cocokNama && cocokTanggal && cocokStatus && cocokJamKerja;

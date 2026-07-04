@@ -44,17 +44,19 @@ const DropDownFilter = ({
           ${isOpen ? "max-h-56 opacity-100" : "max-h-0 opacity-0"}`}
         >
           {/* Semua */}
+          {/* Semua */}
           <div
             className={`pl-3 py-2 cursor-pointer transition-all duration-200
-            hover:font-bold hover:scale-[1.02]
-            ${
-              isOrange
-                ? "bg-orange-50 text-orange-500"
-                : "bg-purple-100 text-[#5F04E8]"
-            }`}
+  hover:font-bold hover:scale-[1.02]
+  ${
+    isOrange ? "bg-orange-50 text-orange-500" : "bg-purple-100 text-[#5F04E8]"
+  }`}
             onClick={() => {
-              onSelect(null);
-              toggleOpen();
+              onSelect({
+                value: "__ALL__",
+                label: "Semua",
+              });
+              setIsOpen(false);
             }}
           >
             Semua

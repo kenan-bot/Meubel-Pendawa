@@ -147,7 +147,12 @@ function Karyawan() {
     nextPage,
     prevPage,
     goToPage,
+    setCurrentPage,
   } = usePagination(filteredKaryawan, 10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, setCurrentPage]);
 
   return (
     <div className="px-3 py-5 md:p-5">
