@@ -59,7 +59,7 @@ export const kasirMenus = [
   },
   {
     icon: <RiHistoryLine size={30} />,
-    label: "Riwayat Harian",
+    label: "Laporan Harian",
     path: "/kasir/riwayatharian",
   },
 ];
