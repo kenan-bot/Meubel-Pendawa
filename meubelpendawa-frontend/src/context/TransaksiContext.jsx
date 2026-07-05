@@ -57,6 +57,12 @@ export function TransaksiProvider({ children }) {
   const [qrisMessage, setQrisMessage] = useState("");
   const closeQrisModal = () => setShowQrisModal(false);
 
+  // ----- struk pesanan (muncul setelah pesanan berhasil diproses) -----
+  // Diisi dari snapshot data pesanan (bukan dibaca ulang dari keranjang/form) karena
+  // keranjang & form sudah direset begitu pesanan selesai diproses.
+  const [strukData, setStrukData] = useState(null);
+  const closeStruk = () => setStrukData(null);
+
   const tampilkanPesan = (text, type = "error") => { setPesan(text); setPesanType(type); };
 
   useEffect(() => {
@@ -118,6 +124,19 @@ export function TransaksiProvider({ children }) {
       return tampilkanPesan("Jumlah bayar belum mencukupi total pesanan.");
     }
 
+    // Snapshot data pesanan SEBELUM keranjang/form direset -- dipakai untuk tampilkan
+    // struk setelah pesanan selesai diproses (baik jalur CASH langsung, maupun CASHLESS
+    // yang baru "selesai" setelah callback Snap sukses, saat form sudah kosong lagi).
+    const snapshotItems = keranjang.map((c) => ({
+      namaProduk: c.produk.namaProduk, qty: c.qty, hargaJual: c.hargaJual,
+    }));
+    const buatSnapshotStruk = (orderId, jumlahBayarFinal, kembalianFinal) => ({
+      orderId, namaPemesan, noWhatsapp,
+      metodePengiriman, alamatPengiriman: isDelivery ? alamatPengiriman : "-",
+      metodePembayaran, items: snapshotItems, totalPesanan,
+      jumlahBayar: jumlahBayarFinal, kembalian: kembalianFinal,
+    });
+
     try {
       setSubmitting(true);
       const transaksiBaru = await createTransaksi({
@@ -140,11 +159,16 @@ export function TransaksiProvider({ children }) {
       if (isCashless) {
         // Order & detail sudah tersimpan; sisanya (buka Snap, tunggu bayar) ditangani terpisah.
         // Kalau gagal siapkan Snap Token, JANGAN resetForm -- biarkan kasir retry tanpa input ulang.
-        const berhasilSiapkanQris = await bayarViaMidtrans(transaksiBaru.orderId);
+        const berhasilSiapkanQris = await bayarViaMidtrans(
+          transaksiBaru.orderId,
+          () => buatSnapshotStruk(transaksiBaru.orderId, totalPesanan, 0)
+        );
         if (!berhasilSiapkanQris) return;
       } else {
         await prosesPembayaran(transaksiBaru.orderId, Number(jumlahBayar));
+        const kembalianFinal = Number(jumlahBayar) - totalPesanan;
         tampilkanPesan(`Pesanan ${transaksiBaru.orderId} berhasil diproses.`, "success");
+        setStrukData(buatSnapshotStruk(transaksiBaru.orderId, Number(jumlahBayar), kembalianFinal));
       }
       resetForm();
     } catch (error) {
@@ -158,7 +182,7 @@ export function TransaksiProvider({ children }) {
   // Ambil Snap Token dari backend lalu buka popup pembayaran Midtrans.
   // Status akhir (SUCCESS/FAILED) sebenarnya diputuskan lewat webhook backend (langkah 6),
   // callback di sini cuma untuk feedback cepat ke kasir di layar.
-  const bayarViaMidtrans = async (orderId) => {
+  const bayarViaMidtrans = async (orderId, buatSnapshotStruk) => {
     setQrisStatus("loading");
     setQrisMessage("Menyiapkan pembayaran, mohon tunggu...");
     setShowQrisModal(true);
@@ -172,6 +196,7 @@ export function TransaksiProvider({ children }) {
       window.snap.pay(token, {
         onSuccess: () => {
           tampilkanPesan(`Pembayaran ${orderId} berhasil.`, "success");
+          if (buatSnapshotStruk) setStrukData(buatSnapshotStruk());
           // Gantiin peran webhook: minta backend cek ulang status ASLI ke Midtrans & simpan
           // ke database. Tanpa ini, statusPembayaran/jumlahBayar di DB tetap nyangkut PENDING/0
           // walau popup Snap sudah bilang sukses -- soalnya webhook butuh URL publik (ngrok dkk).
@@ -203,6 +228,7 @@ export function TransaksiProvider({ children }) {
     jumlahBayar, setJumlahBayar, totalPesanan, kembalian, isCashless,
     submitting, pesan, pesanType, prosesPesanan, tampilkanPesan,
     showQrisModal, qrisStatus, qrisMessage, closeQrisModal,
+    strukData, closeStruk,
   };
 
   return <TransaksiContext.Provider value={value}>{children}</TransaksiContext.Provider>;

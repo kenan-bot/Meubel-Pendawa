@@ -13,6 +13,7 @@ import ProductCard from "../components/ProductCard";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
 import QrisPaymentModal from "../components/QrisPaymentModal";
+import StrukModal from "../components/StrukModal";
 import usePagination from "../hooks/usePagination";
 import Pagination from "../components/Pagination";
 
@@ -187,6 +188,10 @@ function TransaksiContent() {
         message={t.qrisMessage}
         onClose={t.closeQrisModal}
       />
+
+      {/* Muncul begitu pesanan berhasil diproses -- bisa dicetak/download PDF-nya,
+          dan salinannya sudah otomatis terkirim ke email toko oleh backend. */}
+      <StrukModal data={t.strukData} onClose={t.closeStruk} />
     </div>
   );
 }
