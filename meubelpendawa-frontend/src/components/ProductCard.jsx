@@ -28,11 +28,15 @@ const ProductCard = ({
     return (
       <div className="flex justify-center items-center py-20">
         <div className="text-center">
-          <h3 className={`text-xl font-bold ${isHome ? "text-white" : "text-black"}`}>
+          <h3
+            className={`text-xl font-bold ${isHome ? "text-white" : "text-black"}`}
+          >
             Produk tidak ditemukan
           </h3>
 
-          <p className={`text-sm mt-0 ${isHome ? "text-gray-200" : "text-gray-600"}`}>
+          <p
+            className={`text-sm mt-0 ${isHome ? "text-gray-200" : "text-gray-600"}`}
+          >
             Coba gunakan kata kunci atau filter lain
           </p>
         </div>
@@ -64,21 +68,23 @@ const ProductCard = ({
                 : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           }
         >
-          {produk.map((item, index) => (
+          {produk.map((item, index) => {
+            const stokHabis = isCashier && item.stok === 0;
+            return (
             <motion.div
               key={item.idProduk}
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.3) }}
+              transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.5) }}
             >
               <div
-                onClick={() => onCardClick?.(item)}
-                className="cursor-pointer"
+                onClick={() => !stokHabis && onCardClick?.(item)}
+                className={stokHabis ? "cursor-not-allowed" : "cursor-pointer"}
               >
                 <Card
                   padding="none"
-                  className={isOwner ? "cursor-pointer" : ""}
+                  className={`${isOwner ? "cursor-pointer" : ""} ${stokHabis ? "opacity-50 grayscale" : ""}`}
                   onClick={() => isOwner && onEdit?.(item)}
                 >
                   {" "}
@@ -198,7 +204,8 @@ const ProductCard = ({
                 </Card>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
