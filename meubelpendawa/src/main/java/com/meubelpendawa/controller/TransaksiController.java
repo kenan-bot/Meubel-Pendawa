@@ -5,10 +5,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.meubelpendawa.model.Transaksi;
+import com.meubelpendawa.service.StrukService;
 import com.meubelpendawa.service.TransaksiService;
 import com.midtrans.httpclient.error.MidtransError;
 
@@ -21,6 +24,9 @@ public class TransaksiController {
 
     @Autowired
     private TransaksiService transaksiService;
+
+    @Autowired
+    private StrukService strukService;
 
     @GetMapping
     public List<Transaksi> getAllTransaksi() {
@@ -76,6 +82,37 @@ public class TransaksiController {
         } catch (Exception e) {
             log.error("Gagal cek status pembayaran untuk order {}: {}", orderId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // [BARU] Ambil struk PDF sebuah order -- dipakai frontend untuk buka di tab baru
+    // (kasir tinggal Ctrl+P / pakai tombol print bawaan viewer PDF browser) maupun untuk
+    // diunduh langsung. Tidak memicu pengiriman email, cuma generate & kembalikan PDF-nya.
+    @GetMapping(value = "/{orderId}/struk", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> cetakStruk(@PathVariable String orderId) {
+        try {
+            byte[] pdf = strukService.generateStrukPdf(orderId);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=Struk-" + orderId + ".pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdf);
+        } catch (Exception e) {
+            log.error("Gagal membuat struk PDF untuk order {}: {}", orderId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // [BARU] Kirim ulang struk ke email toko secara manual (misalnya kalau pengiriman
+    // otomatis sebelumnya gagal, kasir bisa trigger ulang dari sini).
+    @PostMapping("/{orderId}/struk/kirim-email")
+    public ResponseEntity<Map<String, String>> kirimUlangStruk(@PathVariable String orderId) {
+        try {
+            strukService.kirimStrukEmail(orderId);
+            return ResponseEntity.ok(Map.of("message", "Struk berhasil dikirim ke email."));
+        } catch (Exception e) {
+            log.error("Gagal kirim ulang struk untuk order {}: {}", orderId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Gagal mengirim struk."));
         }
     }
 

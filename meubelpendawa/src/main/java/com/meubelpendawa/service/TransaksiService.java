@@ -37,6 +37,9 @@ public class TransaksiService {
     @Autowired
     private MidtransCoreApi midtransCoreApi;
 
+    @Autowired
+    private StrukService strukService;
+
     // Client Key & flag production TIDAK rahasia (Midtrans desainnya memang buat dipakai di browser),
     // jadi aman dikirim ke frontend lewat response ini -- frontend jadi tidak perlu simpan salinan
     // config-nya sendiri (misal lewat .env), cukup sekali sumber kebenaran di application.properties.
@@ -89,7 +92,12 @@ public class TransaksiService {
         transaksi.setKembalian(jumlahBayar - transaksi.getTotalPesanan());
         transaksi.setStatusPembayaran("SUCCESS"); // CASH: uang sudah di tangan kasir, langsung final
 
-        return transaksiRepository.save(transaksi);
+        Transaksi tersimpan = transaksiRepository.save(transaksi);
+
+        // [BARU] Order CASH sudah final di titik ini -> langsung kirim struk ke email toko.
+        strukService.kirimStrukEmail(tersimpan.getOrderId());
+
+        return tersimpan;
 
     }
 
@@ -154,6 +162,11 @@ public class TransaksiService {
         Transaksi transaksi = transaksiRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
 
+        // Simpan status SEBELUM diupdate -- dipakai di bawah supaya struk tidak terkirim
+        // dobel kalau method ini kepanggil berkali-kali untuk order yang sama (webhook
+        // Midtrans + pengecekan manual dari frontend keduanya bisa memicu ini).
+        String statusSebelumnya = transaksi.getStatusPembayaran();
+
         if ("capture".equals(transactionStatus) || "settlement".equals(transactionStatus)) {
             if ("challenge".equals(fraudStatus)) {
                 transaksi.setStatusPembayaran("CHALLENGE"); // butuh review manual di dashboard Midtrans
@@ -169,7 +182,17 @@ public class TransaksiService {
             transaksi.setStatusPembayaran("PENDING");
         }
 
-        return transaksiRepository.save(transaksi);
+        Transaksi tersimpan = transaksiRepository.save(transaksi);
+
+        // [BARU] Order CASHLESS baru final kalau statusnya sudah SUCCESS (settlement/capture
+        // tanpa challenge) -- kirim struk ke email toko di titik ini, bukan di status lain
+        // (PENDING/FAILED/CHALLENGE). Guard "belum SUCCESS sebelumnya" mencegah struk terkirim
+        // dobel kalau webhook & pengecekan manual dari frontend sama-sama memanggil method ini.
+        if ("SUCCESS".equals(tersimpan.getStatusPembayaran()) && !"SUCCESS".equals(statusSebelumnya)) {
+            strukService.kirimStrukEmail(tersimpan.getOrderId());
+        }
+
+        return tersimpan;
     }
 
     public List<Transaksi> searchTransaksi(String keyword) {
