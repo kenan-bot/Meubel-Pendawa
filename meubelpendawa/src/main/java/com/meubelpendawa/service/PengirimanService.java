@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.meubelpendawa.model.Pengiriman;
 import com.meubelpendawa.repository.PengirimanRepository;
+import java.time.LocalDateTime;
 
 @Service
 public class PengirimanService {
@@ -39,19 +40,24 @@ public class PengirimanService {
     }
 
     public Pengiriman updateStatus(String idPengiriman, String statusBaru) {
-        Pengiriman pengiriman = pengirimanRepository.findById(idPengiriman)
+
+    Pengiriman pengiriman = pengirimanRepository.findById(idPengiriman)
         .orElseThrow(() -> new RuntimeException("Pengiriman tidak ditemukan"));
-        
-        if ("COMPLETED".equals(pengiriman.getStatusPengiriman())) {
-            throw new RuntimeException("Pengiriman sudah selesai dan tidak dapat diubah");
-        }
-        
-        if (!"COMPLETED".equals(statusBaru)) {
-            throw new RuntimeException("Status hanya boleh diubah menjadi COMPLETED");
-        }
-        
-        pengiriman.setStatusPengiriman("COMPLETED");
-        return pengirimanRepository.save(pengiriman);
+
+    if ("COMPLETED".equals(pengiriman.getStatusPengiriman())) {
+        throw new RuntimeException("Pengiriman sudah selesai dan tidak dapat diubah");
     }
+
+    if (!"COMPLETED".equals(statusBaru)) {
+        throw new RuntimeException("Status hanya boleh diubah menjadi COMPLETED");
+    }
+
+    pengiriman.setStatusPengiriman("COMPLETED");
+
+    // simpan waktu selesai
+    pengiriman.setTanggalSelesai(LocalDateTime.now());
+
+    return pengirimanRepository.save(pengiriman);
+}
 
 }

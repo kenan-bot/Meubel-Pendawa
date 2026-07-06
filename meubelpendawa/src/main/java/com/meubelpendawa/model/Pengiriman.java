@@ -1,5 +1,7 @@
 package com.meubelpendawa.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -15,7 +17,9 @@ public class Pengiriman {
     private String idPengiriman;
 
     private String statusPengiriman;
-    
+
+    private LocalDateTime tanggalSelesai;
+
     @ManyToOne
     @JoinColumn(name = "idKaryawan")
     private Karyawan driver;
@@ -27,8 +31,14 @@ public class Pengiriman {
     public Pengiriman() {
     }
 
-    public Pengiriman(String statusPengiriman, Karyawan driver, Transaksi transaksi) {
+    public Pengiriman(
+            String statusPengiriman,
+            LocalDateTime tanggalSelesai,
+            Karyawan driver,
+            Transaksi transaksi) {
+
         this.statusPengiriman = statusPengiriman;
+        this.tanggalSelesai = tanggalSelesai;
         this.driver = driver;
         this.transaksi = transaksi;
     }
@@ -49,6 +59,14 @@ public class Pengiriman {
         this.statusPengiriman = statusPengiriman;
     }
 
+    public LocalDateTime getTanggalSelesai() {
+        return tanggalSelesai;
+    }
+
+    public void setTanggalSelesai(LocalDateTime tanggalSelesai) {
+        this.tanggalSelesai = tanggalSelesai;
+    }
+
     public Karyawan getDriver() {
         return driver;
     }
@@ -64,6 +82,4 @@ public class Pengiriman {
     public void setTransaksi(Transaksi transaksi) {
         this.transaksi = transaksi;
     }
-
-
-}    
+}

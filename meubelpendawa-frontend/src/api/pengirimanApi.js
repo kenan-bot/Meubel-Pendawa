@@ -8,13 +8,24 @@ export const getAllPengiriman = async () => {
 };
 
 export const getPengirimanByDriver = async (idKaryawan) => {
-  const response = await axiosClient.get(`${BASE_URL}/driver/${idKaryawan}`);
+  const response = await axiosClient.get(
+    `${BASE_URL}/driver/${idKaryawan}`
+  );
+
   return response.data;
 };
 
-export const updateStatusPengiriman = async (idPengiriman, status) => {
-  const response = await axiosClient.put(`${BASE_URL}/${idPengiriman}/status`, null, {
-    params: { status },
-  });
+export const updateStatusPengiriman = async (
+  idPengiriman,
+  status = "COMPLETED"
+) => {
+  const response = await axiosClient.put(
+    `${BASE_URL}/${idPengiriman}/status`,
+    null,
+    {
+      params: { status },
+    }
+  );
+
   return response.data;
 };
