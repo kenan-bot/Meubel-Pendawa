@@ -9,7 +9,6 @@ import com.meubelpendawa.service.ProdukService;
 
 @RestController
 @RequestMapping("/produk")
-@CrossOrigin("*")
 public class ProdukController {
 
     @Autowired

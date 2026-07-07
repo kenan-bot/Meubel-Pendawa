@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/merek")
-@CrossOrigin("*")
 public class MerekController {
 
     @Autowired

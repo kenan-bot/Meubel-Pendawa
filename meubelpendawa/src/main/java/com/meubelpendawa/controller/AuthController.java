@@ -14,7 +14,6 @@ import com.meubelpendawa.dto.VerifyOtpRequest;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
 public class AuthController {
 
     private final OtpService otpService;

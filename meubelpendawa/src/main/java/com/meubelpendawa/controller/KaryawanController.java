@@ -9,7 +9,6 @@ import com.meubelpendawa.dto.ResetPasswordRequest;
 
 @RestController
 @RequestMapping("/karyawan")
-@CrossOrigin("*")
 public class KaryawanController {
 
     @Autowired

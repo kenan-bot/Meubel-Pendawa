@@ -17,7 +17,6 @@ import com.midtrans.httpclient.error.MidtransError;
 
 @RestController
 @RequestMapping("/transaksi")
-@CrossOrigin("*")
 public class TransaksiController {
 
     private static final Logger log = LoggerFactory.getLogger(TransaksiController.class);

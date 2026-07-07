@@ -1,12 +1,10 @@
 import { CgDanger } from "react-icons/cg";
 
-const Toast = ({ show, message, type = "error" }) => {
-  if (!show) return null;
-
+const Toast = ({ message, type = "error" }) => {
   return (
     <div
       className={`
-        fixed top-5 left-1/2 -translate-x-1/2 z-[9999]
+        absolute top-3 left-1/2 -translate-x-1/2 z-[9999]
         flex items-center gap-2
         px-4 py-2
         rounded-lg shadow-lg
@@ -18,7 +16,6 @@ const Toast = ({ show, message, type = "error" }) => {
       `}
     >
       <CgDanger size={18} />
-
       <span>{message}</span>
     </div>
   );

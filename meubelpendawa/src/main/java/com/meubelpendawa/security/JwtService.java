@@ -2,19 +2,30 @@ package com.meubelpendawa.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
 import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET = "meubelpendawa-secret-key-minimal-32-character";
+    private final SecretKey key;
 
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    public JwtService(
+            @Value("${jwt.secret}") String secret) {
 
-    public String generateToken(String idKaryawan, String role) {
+        this.key = Keys.hmacShaKeyFor(
+                secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String generateToken(
+            String idKaryawan,
+            String role) {
 
         return Jwts.builder()
                 .claim("idKaryawan", idKaryawan)
@@ -27,7 +38,8 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractIdKaryawan(String token) {
+    public String extractIdKaryawan(
+            String token) {
 
         return Jwts.parser()
                 .verifyWith(key)
@@ -36,5 +48,4 @@ public class JwtService {
                 .getPayload()
                 .get("idKaryawan", String.class);
     }
-
 }

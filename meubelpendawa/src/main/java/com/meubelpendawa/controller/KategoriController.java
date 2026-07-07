@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/kategori")
-@CrossOrigin("*")
 public class KategoriController {
 
     @Autowired

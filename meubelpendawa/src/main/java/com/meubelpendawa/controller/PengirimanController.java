@@ -8,7 +8,6 @@ import com.meubelpendawa.service.PengirimanService;
 
 @RestController
 @RequestMapping("/pengiriman")
-@CrossOrigin("*")   // <-- tambahkan baris ini
 public class PengirimanController {
 
     @Autowired

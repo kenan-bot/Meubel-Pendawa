@@ -8,7 +8,6 @@ import com.meubelpendawa.service.DetailTransaksiService;
 
 @RestController
 @RequestMapping("/detail-transaksi")
-@CrossOrigin("*")
 public class DetailTransaksiController {
 
     @Autowired

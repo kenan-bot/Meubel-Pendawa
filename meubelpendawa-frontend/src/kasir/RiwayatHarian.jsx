@@ -221,9 +221,7 @@ function RiwayatHarian() {
 
       setToast({
         show: true,
-
         type: "success",
-
         message:
           "Laporan harian berhasil dibuat dan dikirim ke email perusahaan.",
       });
@@ -232,18 +230,15 @@ function RiwayatHarian() {
 
       setToast({
         show: true,
-
         type: "error",
-
         message: "Gagal membuat laporan harian.",
       });
     } finally {
       setExportLoading(false);
-
       setShowConfirmExport(false);
     }
   };
-
+  
   return (
     <div className="relative px-3 py-5 md:px-5">
       {/* Header */}
@@ -377,18 +372,7 @@ function RiwayatHarian() {
 
       {/* TOAST */}
 
-      <Toast
-        show={toast.show}
-        type={toast.type}
-        message={toast.message}
-        onClose={() =>
-          setToast({
-            show: false,
-            type: "",
-            message: "",
-          })
-        }
-      />
+      {toast.show && <Toast type={toast.type} message={toast.message} />}
     </div>
   );
 }

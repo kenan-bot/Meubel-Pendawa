@@ -11,7 +11,6 @@ import com.meubelpendawa.service.CloudinaryService;
 
 @RestController
 @RequestMapping("/upload")
-@CrossOrigin("*")
 public class UploadController {
 
     @Autowired

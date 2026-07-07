@@ -11,7 +11,6 @@ import com.meubelpendawa.service.LoginLogService;
 
 @RestController
 @RequestMapping("/login-log")
-@CrossOrigin("*")
 public class LoginLogController {
 
     @Autowired
