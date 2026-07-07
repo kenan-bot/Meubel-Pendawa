@@ -3,23 +3,17 @@ import { useMemo, useState, useEffect } from "react";
 const usePagination = (data = [], itemsPerPage = 10) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Hitung total halaman
   const totalPages = Math.max(
     1,
     Math.ceil(data.length / itemsPerPage)
   );
 
-  // Jika data berkurang sehingga halaman sekarang tidak valid
+  // Jika jumlah data berkurang dan halaman saat ini tidak valid
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);
-
-  // Reset ke halaman pertama jika data berubah
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data]);
 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;

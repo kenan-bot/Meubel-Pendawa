@@ -11,6 +11,8 @@ import usePagination from "../hooks/usePagination";
 import TransaksiCard from "./TransaksiCard";
 import ConfirmModal from "./ConfirmModal";
 import Toast from "./Toast";
+import DateRangePicker from "./DateRangePicker";
+import DropDownFilter from "./DropDownFilter";
 
 const TAB_LIST = [
   {
@@ -30,6 +32,7 @@ const TAB_LIST = [
 function StatusPengirimanPage({ role = "kasir" }) {
   const { pengiriman, completePengiriman } = usePengiriman();
 
+  // State
   const [transaksiList, setTransaksiList] = useState([]);
   const [detailList, setDetailList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,8 +40,13 @@ function StatusPengirimanPage({ role = "kasir" }) {
   const [keyword, setKeyword] = useState("");
   const [tabStatus, setTabStatus] = useState("ON_PROCESS");
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [selectedTransaksi, setSelectedTransaksi] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const [selectedDriver, setSelectedDriver] = useState(null);
 
   const [toast, setToast] = useState({
     show: false,
@@ -48,6 +56,12 @@ function StatusPengirimanPage({ role = "kasir" }) {
 
   const canUpdate = role === "driver";
 
+  // Pagination Reset
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [keyword, tabStatus, startDate, endDate, selectedDriver]);
+
+  // Load Data
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -64,11 +78,12 @@ function StatusPengirimanPage({ role = "kasir" }) {
         const detailData =
           detailRes.status === "fulfilled" ? detailRes.value : [];
 
-        const deliveryOnly = transaksiData.filter(
-          (t) => t.metodePengiriman?.toUpperCase() === "DELIVERY",
+        setTransaksiList(
+          transaksiData.filter(
+            (t) => t.metodePengiriman?.toUpperCase() === "DELIVERY",
+          ),
         );
 
-        setTransaksiList(deliveryOnly);
         setDetailList(detailData);
       } catch (error) {
         console.error("Gagal mengambil data status pengiriman:", error);
@@ -80,11 +95,12 @@ function StatusPengirimanPage({ role = "kasir" }) {
     loadData();
   }, []);
 
+  // Mapping Detail
   const itemsByOrder = useMemo(() => {
     const map = {};
 
-    detailList.forEach((d) => {
-      const orderId = d.transaksi?.orderId;
+    detailList.forEach((item) => {
+      const orderId = item.transaksi?.orderId;
 
       if (!orderId) return;
 
@@ -92,18 +108,46 @@ function StatusPengirimanPage({ role = "kasir" }) {
         map[orderId] = [];
       }
 
-      map[orderId].push(d);
+      map[orderId].push(item);
     });
 
     return map;
   }, [detailList]);
 
-  const getPengirimanByOrder = (orderId) =>
-    pengiriman.find((p) => p.transaksi?.orderId === orderId);
+  // Mapping Pengiriman
+  const pengirimanByOrder = useMemo(() => {
+    const map = {};
 
-  const getStatusPengiriman = (orderId) =>
-    getPengirimanByOrder(orderId)?.statusPengiriman || "ON_PROCESS";
+    pengiriman.forEach((item) => {
+      const orderId = item.transaksi?.orderId;
 
+      if (orderId) {
+        map[orderId] = item;
+      }
+    });
+
+    return map;
+  }, [pengiriman]);
+
+  // data driver
+  const driverOptions = useMemo(() => {
+    const uniqueDriver = new Map();
+
+    pengiriman.forEach((item) => {
+      const driver = item.driver;
+
+      if (!driver) return;
+
+      uniqueDriver.set(driver.idKaryawan, {
+        value: driver.idKaryawan,
+        label: driver.namaKaryawan,
+      });
+    });
+
+    return [...uniqueDriver.values()];
+  }, [pengiriman]);
+
+  // Helpers
   const handleUpdateStatus = (transaksi) => {
     setSelectedTransaksi(transaksi);
     setShowConfirm(true);
@@ -128,7 +172,7 @@ function StatusPengirimanPage({ role = "kasir" }) {
     try {
       if (!selectedTransaksi) return;
 
-      const dataPengiriman = getPengirimanByOrder(selectedTransaksi.orderId);
+      const dataPengiriman = pengirimanByOrder[selectedTransaksi.orderId];
 
       if (!dataPengiriman) return;
 
@@ -145,29 +189,69 @@ function StatusPengirimanPage({ role = "kasir" }) {
     }
   };
 
+  // Filter + Sort
   const dataTersaring = useMemo(() => {
-    const kw = keyword.toLowerCase();
+    const kw = keyword.trim().toLowerCase();
 
     return transaksiList
-      .filter((t) => {
-        const status = getStatusPengiriman(t.orderId);
+      .filter((transaksi) => {
+        const dataPengiriman = pengirimanByOrder[transaksi.orderId];
 
-        const cocokStatus = status === tabStatus;
+        if (!dataPengiriman) return false;
+
+        const cocokStatus = dataPengiriman.statusPengiriman === tabStatus;
 
         const cocokKeyword =
-          t.namaPemesan?.toLowerCase().includes(kw) ||
-          t.orderId?.toLowerCase().includes(kw);
+          transaksi.namaPemesan?.toLowerCase().includes(kw) ||
+          transaksi.orderId?.toLowerCase().includes(kw);
 
-        return cocokStatus && cocokKeyword;
+        const cocokDriver =
+          !selectedDriver ||
+          selectedDriver.value === "__ALL__" ||
+          dataPengiriman.driver?.idKaryawan === selectedDriver.value;
+
+        let cocokTanggal = true;
+
+        if (tabStatus === "COMPLETED") {
+          const tanggalSelesai = dataPengiriman.tanggalSelesai;
+
+          if (tanggalSelesai) {
+            const tanggal = new Date(tanggalSelesai);
+
+            if (startDate) {
+              cocokTanggal = cocokTanggal && tanggal >= new Date(startDate);
+            }
+
+            if (endDate) {
+              const end = new Date(endDate);
+              end.setHours(23, 59, 59, 999);
+
+              cocokTanggal = cocokTanggal && tanggal <= end;
+            }
+          }
+        }
+
+        return cocokStatus && cocokKeyword && cocokDriver && cocokTanggal;
       })
       .sort((a, b) => {
         if (tabStatus === "ON_PROCESS") {
           return new Date(a.tanggalTransaksi) - new Date(b.tanggalTransaksi);
         }
 
-        return new Date(b.tanggalTransaksi) - new Date(a.tanggalTransaksi);
+        const selesaiA = pengirimanByOrder[a.orderId]?.tanggalSelesai;
+
+        const selesaiB = pengirimanByOrder[b.orderId]?.tanggalSelesai;
+
+        return new Date(selesaiB || 0) - new Date(selesaiA || 0);
       });
-  }, [transaksiList, pengiriman, tabStatus, keyword]);
+  }, [
+    transaksiList,
+    pengirimanByOrder,
+    tabStatus,
+    keyword,
+    startDate,
+    endDate,
+  ]);
 
   const {
     paginatedData,
@@ -176,14 +260,16 @@ function StatusPengirimanPage({ role = "kasir" }) {
     nextPage,
     prevPage,
     goToPage,
+    setCurrentPage,
   } = usePagination(dataTersaring, 9);
 
   return (
     <>
       {toast.show && <Toast message={toast.message} type={toast.type} />}
 
-      <div className="mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
-        <div className="flex flex-wrap items-center gap-3 w-full">
+      <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        {/* KIRI */}
+        <div className="flex flex-wrap items-center gap-3">
           {TAB_LIST.map((tab) => (
             <button
               key={tab.key}
@@ -202,7 +288,31 @@ function StatusPengirimanPage({ role = "kasir" }) {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
+
+          {(role === "owner" || role === "kasir") && (
+            <DropDownFilter
+              title="Pilih Driver"
+              items={driverOptions}
+              value={selectedDriver}
+              onSelect={setSelectedDriver}
+              theme="orange"
+            />
+          )}
         </div>
+
+        {/* KANAN */}
+        {tabStatus === "COMPLETED" && (
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+            onReset={() => {
+              setStartDate("");
+              setEndDate("");
+            }}
+          />
+        )}
       </div>
 
       {loading ? (
@@ -222,7 +332,9 @@ function StatusPengirimanPage({ role = "kasir" }) {
                 transaksi={t}
                 items={itemsByOrder[t.orderId] || []}
                 variant="pengiriman"
-                statusPengiriman={getStatusPengiriman(t.orderId)}
+                statusPengiriman={
+                  pengirimanByOrder[t.orderId]?.statusPengiriman
+                }
                 canUpdate={canUpdate}
                 onUpdateStatus={canUpdate ? handleUpdateStatus : undefined}
               />

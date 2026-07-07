@@ -43,7 +43,7 @@ const DropDownFilter = ({
           ${isOrange ? "bg-orange-500" : "bg-white"}
           ${isOpen ? "max-h-56 opacity-100" : "max-h-0 opacity-0"}`}
         >
-          {/* Semua */}
+          
           {/* Semua */}
           <div
             className={`pl-3 py-2 cursor-pointer transition-all duration-200
