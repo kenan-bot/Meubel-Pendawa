@@ -2,9 +2,6 @@ HELP.md
 
 # Maven
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
 # Spring Tool Suite (STS)
 .apt_generated
@@ -28,8 +25,6 @@ target/
 /nbdist/
 /.nb-gradle/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 # VS Code
 .vscode/
@@ -38,5 +33,10 @@ build/
 .env
 .env.*
 
-# Log Files
+# Local Spring Profiles
+src/main/resources/application-development.properties
+src/main/resources/application-local.properties
+
+# Logs
 *.log
+logs/
