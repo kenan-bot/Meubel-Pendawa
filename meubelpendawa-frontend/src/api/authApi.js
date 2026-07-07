@@ -1,7 +1,9 @@
 import axiosClient from "./axiosClient";
 
+const BASE_URL = "/auth";
+
 export const login = async (username, password) => {
-  const response = await axiosClient.post("/auth/login", {
+  const response = await axiosClient.post(`${BASE_URL}/login`, {
     username,
     password,
   });
@@ -10,7 +12,7 @@ export const login = async (username, password) => {
 };
 
 export const requestOtp = async (email) => {
-  const response = await axiosClient.post("/auth/request-otp", {
+  const response = await axiosClient.post(`${BASE_URL}/request-otp`, {
     email,
   });
 
@@ -18,7 +20,7 @@ export const requestOtp = async (email) => {
 };
 
 export const verifyOtp = async (email, kodeOtp) => {
-  const response = await axiosClient.post("/auth/verify-otp", {
+  const response = await axiosClient.post(`${BASE_URL}/verify-otp`, {
     email,
     kodeOtp,
   });
@@ -27,7 +29,7 @@ export const verifyOtp = async (email, kodeOtp) => {
 };
 
 export const resetPassword = async (email, passwordBaru) => {
-  const response = await axiosClient.post("/auth/reset-password", {
+  const response = await axiosClient.post(`${BASE_URL}/reset-password`, {
     email,
     passwordBaru,
   });

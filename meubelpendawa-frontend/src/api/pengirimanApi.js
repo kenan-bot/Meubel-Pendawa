@@ -11,7 +11,6 @@ export const getPengirimanByDriver = async (idKaryawan) => {
   const response = await axiosClient.get(
     `${BASE_URL}/driver/${idKaryawan}`
   );
-
   return response.data;
 };
 
