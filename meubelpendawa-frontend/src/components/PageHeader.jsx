@@ -10,7 +10,7 @@ const PageHeader = ({
           {title}
         </h1>
 
-        <p className="text-sm md:text-base text-gray-500 mt-0">
+        <p className="text-xs md:text-base text-gray-500 mt-0">
           {subtitle}
         </p>
       </div>
