@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import {
   getAllPengiriman,
+  getPengirimanByDriver,
   updateStatusPengiriman,
 } from "../api/pengirimanApi";
 
@@ -23,22 +24,26 @@ export const PengirimanProvider = ({ children }) => {
 
   const loadPengiriman = async () => {
     try {
-      const data = await getAllPengiriman();
+      const role = localStorage.getItem("role");
+      const idKaryawan = localStorage.getItem("idKaryawan");
+
+      let data = [];
+
+      if (role === "DRIVER") {
+        data = await getPengirimanByDriver(idKaryawan);
+      } else {
+        data = await getAllPengiriman();
+      }
+
       setPengiriman(data);
     } catch (error) {
-      console.error(
-        "Gagal mengambil data pengiriman",
-        error
-      );
+      console.error("Gagal mengambil data pengiriman", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateStatusState = (
-    idPengiriman,
-    statusPengiriman
-  ) => {
+  const updateStatusState = (idPengiriman, statusPengiriman) => {
     setPengiriman((prev) =>
       prev.map((item) =>
         item.idPengiriman === idPengiriman
@@ -46,24 +51,15 @@ export const PengirimanProvider = ({ children }) => {
               ...item,
               statusPengiriman,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
-  const completePengiriman = async (
-    idPengiriman
-  ) => {
-    const updated =
-      await updateStatusPengiriman(
-        idPengiriman,
-        "COMPLETED"
-      );
+  const completePengiriman = async (idPengiriman) => {
+    const updated = await updateStatusPengiriman(idPengiriman, "COMPLETED");
 
-    updateStatusState(
-      idPengiriman,
-      "COMPLETED"
-    );
+    updateStatusState(idPengiriman, "COMPLETED");
 
     return updated;
   };

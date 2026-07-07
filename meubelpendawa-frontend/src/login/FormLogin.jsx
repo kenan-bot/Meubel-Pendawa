@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AnimatedSection from "../components/AnimatedSection";
-import axios from "axios";
 import Toast from "../components/Toast";
+import { login } from "../api/authApi";
 
 export default function FormLogin() {
   const navigate = useNavigate();
@@ -29,12 +29,7 @@ export default function FormLogin() {
     try {
       setLoading(true);
 
-      const response = await axios.post("http://localhost:8080/auth/login", {
-        username,
-        password,
-      });
-
-      const data = response.data;
+      const data = await login(username, password);
 
       if (!data.success) {
         setToast({
@@ -298,14 +293,8 @@ export default function FormLogin() {
             </AnimatedSection>
           </form>
         </div>
-        {toast && (
-      <Toast
-        type={toast.type}
-        message={toast.message}
-      />
-    )}
+        {toast && <Toast type={toast.type} message={toast.message} />}
       </div>
     </div>
   );
-  
 }
