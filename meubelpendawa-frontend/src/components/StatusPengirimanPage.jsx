@@ -285,7 +285,7 @@ function StatusPengirimanPage({ role = "kasir" }) {
 
           <SearchBar
             theme="orange"
-            placeholder="Cari nama customer atau ID order..."
+            placeholder="cari id, nama.."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
