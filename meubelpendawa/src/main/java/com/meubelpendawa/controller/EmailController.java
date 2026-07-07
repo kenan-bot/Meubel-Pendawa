@@ -15,21 +15,4 @@ public class EmailController {
     ) {
         this.emailService = emailService;
     }
-
-    @GetMapping("/test-email")
-    public String testEmail(
-            @RequestParam String email
-    ) {
-
-        emailService.sendEmail(
-                email,
-                "Test Email Meubel Pendawa",
-                """
-                <h2>Email berhasil dikirim 🎉</h2>
-                <p>Integrasi Resend berhasil.</p>
-                """
-        );
-
-        return "Email terkirim";
-    }
 }
