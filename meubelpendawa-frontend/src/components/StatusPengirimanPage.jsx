@@ -195,21 +195,15 @@ function StatusPengirimanPage({ role = "kasir" }) {
 
     return transaksiList
       .filter((t) => {
-        // [BARU] hanya tampilkan order yang memang SUDAH punya record pengiriman asli.
-        // Record pengiriman baru dibuat backend setelah statusPembayaran = SUCCESS, jadi
-        // order cashless yang masih pending/batal/gagal otomatis tidak akan lolos di sini.
-        const dataPengiriman = getPengirimanByOrder(t.orderId);
-        if (!dataPengiriman) return false;
-
-        const status = dataPengiriman.statusPengiriman || "ON_PROCESS";
+        const dataPengiriman = pengirimanByOrder[t.orderId];
 
         if (!dataPengiriman) return false;
 
         const cocokStatus = dataPengiriman.statusPengiriman === tabStatus;
 
         const cocokKeyword =
-          transaksi.namaPemesan?.toLowerCase().includes(kw) ||
-          transaksi.orderId?.toLowerCase().includes(kw);
+          t.namaPemesan?.toLowerCase().includes(kw) ||
+          t.orderId?.toLowerCase().includes(kw);
 
         const cocokDriver =
           !selectedDriver ||
@@ -257,6 +251,7 @@ function StatusPengirimanPage({ role = "kasir" }) {
     keyword,
     startDate,
     endDate,
+    selectedDriver,
   ]);
 
   const {
