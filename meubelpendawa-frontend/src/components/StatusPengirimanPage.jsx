@@ -4,6 +4,7 @@ import { usePengiriman } from "../context/PengirimanContext";
 
 import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
+import { getAllKaryawan } from "../api/karyawanApi";
 
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
@@ -47,6 +48,7 @@ function StatusPengirimanPage({ role = "kasir" }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [selectedDriver, setSelectedDriver] = useState(null);
+  const [driverOptions, setDriverOptions] = useState([]);
 
   const [toast, setToast] = useState({
     show: false,
@@ -67,9 +69,10 @@ function StatusPengirimanPage({ role = "kasir" }) {
       try {
         setLoading(true);
 
-        const [transaksiRes, detailRes] = await Promise.allSettled([
+        const [transaksiRes, detailRes, driverRes] = await Promise.allSettled([
           getAllTransaksi(),
           getAllDetailTransaksi(),
+          getAllKaryawan(),
         ]);
 
         const transaksiData =
@@ -85,6 +88,19 @@ function StatusPengirimanPage({ role = "kasir" }) {
         );
 
         setDetailList(detailData);
+        if (driverRes.status === "fulfilled") {
+          const driverAktif = driverRes.value
+            .filter(
+              (k) =>
+                k.role?.toUpperCase() === "DRIVER" && k.statusAktif === true,
+            )
+            .map((driver) => ({
+              value: driver.idKaryawan,
+              label: driver.namaKaryawan,
+            }));
+
+          setDriverOptions(driverAktif);
+        }
       } catch (error) {
         console.error("Gagal mengambil data status pengiriman:", error);
       } finally {
@@ -127,24 +143,6 @@ function StatusPengirimanPage({ role = "kasir" }) {
     });
 
     return map;
-  }, [pengiriman]);
-
-  // data driver
-  const driverOptions = useMemo(() => {
-    const uniqueDriver = new Map();
-
-    pengiriman.forEach((item) => {
-      const driver = item.driver;
-
-      if (!driver) return;
-
-      uniqueDriver.set(driver.idKaryawan, {
-        value: driver.idKaryawan,
-        label: driver.namaKaryawan,
-      });
-    });
-
-    return [...uniqueDriver.values()];
   }, [pengiriman]);
 
   // Helpers
@@ -202,8 +200,8 @@ function StatusPengirimanPage({ role = "kasir" }) {
         const cocokStatus = dataPengiriman.statusPengiriman === tabStatus;
 
         const cocokKeyword =
-          t.namaPemesan?.toLowerCase().includes(kw) ||
-          t.orderId?.toLowerCase().includes(kw);
+          (t.namaPemesan || "").toLowerCase().includes(kw) ||
+          (t.orderId || "").toLowerCase().includes(kw);
 
         const cocokDriver =
           !selectedDriver ||

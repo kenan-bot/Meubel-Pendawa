@@ -153,7 +153,7 @@ function RiwayatHarian() {
           </div>
 
           <PageHeader
-            title="Riwayat Harian"
+            title="Laporan Harian"
             subtitle="Informasi direset setiap pukul 23.59"
           />
 
