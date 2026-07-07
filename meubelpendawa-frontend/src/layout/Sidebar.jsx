@@ -17,7 +17,7 @@ export default function Sidebar({ menus }) {
   const handleLogout = async () => {
     try {
       const idKaryawan = localStorage.getItem("idKaryawan");
-      await axios.post(`http://localhost:8080/auth/logout/${idKaryawan}`);
+      await axios.post(`https://meubelpendawa.up.railway.app//auth/logout/${idKaryawan}`);
     } catch (error) {
       console.error("Logout Error:", error);
     } finally {
