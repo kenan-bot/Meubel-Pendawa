@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface PengirimanRepository extends JpaRepository<Pengiriman, String> {
     List<Pengiriman> findByDriver_IdKaryawan(String idKaryawan);
+    boolean existsByTransaksi_OrderId(String orderId);
 }

@@ -48,6 +48,25 @@ public class TransaksiController {
         return transaksiService.prosesPembayaran(orderId, jumlahBayar);
     }
 
+    // [BARU] Dipanggil frontend saat popup QRIS ditutup/error tanpa selesai bayar (Snap
+    // onClose/onError). Order & itemnya dihapus permanen + stok dikembalikan -- kecuali
+    // ternyata sudah terlanjur SUCCESS (race condition), lihat batalkanTransaksi().
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<Map<String, String>> batalkanTransaksi(@PathVariable String orderId) {
+        try {
+            transaksiService.batalkanTransaksi(orderId);
+            return ResponseEntity.ok(Map.of("message", "Order " + orderId + " dibatalkan."));
+        } catch (MidtransError e) {
+            log.error("Gagal cek status Midtrans saat batalkan order {}: {}", orderId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(Map.of("error", "Gagal terhubung ke Midtrans: " + e.getMessage()));
+        } catch (Exception e) {
+            log.error("Gagal membatalkan order {}: {}", orderId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Gagal membatalkan order."));
+        }
+    }
+
     // [BARU] Frontend panggil ini saat kasir confirm "Proses Pesanan" untuk metode CASHLESS.
     // Return Snap Token yang dipakai frontend untuk buka window.snap.pay(token).
     @PostMapping("/{orderId}/midtrans-token")

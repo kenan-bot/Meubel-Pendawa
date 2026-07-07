@@ -13,6 +13,10 @@ import com.meubelpendawa.model.Transaksi;
 import com.meubelpendawa.repository.TransaksiRepository;
 import com.meubelpendawa.model.Pengiriman;
 import com.meubelpendawa.repository.PengirimanRepository;
+import com.meubelpendawa.model.DetailTransaksi;
+import com.meubelpendawa.model.Produk;
+import com.meubelpendawa.repository.DetailTransaksiRepository;
+import com.meubelpendawa.repository.ProdukRepository;
 import com.midtrans.httpclient.error.MidtransError;
 import com.midtrans.service.MidtransCoreApi;
 import com.midtrans.service.MidtransSnapApi;
@@ -30,6 +34,12 @@ public class TransaksiService {
 
     @Autowired
     private PengirimanRepository pengirimanRepository;
+
+    @Autowired
+    private DetailTransaksiRepository detailTransaksiRepository;
+
+    @Autowired
+    private ProdukRepository produkRepository;
 
     @Autowired
     private MidtransSnapApi midtransSnapApi;
@@ -68,18 +78,42 @@ public class TransaksiService {
 
         Transaksi transaksiTersimpan = transaksiRepository.save(transaksi);
 
-        if ("DELIVERY".equalsIgnoreCase(transaksi.getMetodePengiriman())) {
-
-            Pengiriman pengiriman = new Pengiriman();
-            long nomorPengiriman = pengirimanRepository.count() + 1;
-            pengiriman.setIdPengiriman(idGeneratorService.generatePengirimanId(nomorPengiriman));
-            pengiriman.setTransaksi(transaksiTersimpan);
-            pengiriman.setDriver(transaksi.getDriver());
-            pengiriman.setStatusPengiriman("ON_PROCESS");
-            pengirimanRepository.save(pengiriman);
-        }
+        // [DIUBAH] Pengiriman TIDAK lagi dibuat di sini. Kalau dibuat sekarang, order
+        // CASHLESS yang pembayarannya dibatalkan/gagal (X di QRIS, expired, dsb) akan
+        // tetap punya row `pengiriman` walau uangnya belum pernah masuk -- makanya order
+        // yang belum SUCCESS bisa "nyelip" muncul di Status Pengiriman & Laporan Harian.
+        // Sekarang pembuatan Pengiriman dipindah ke titik saat statusPembayaran benar-benar
+        // menjadi SUCCESS: lihat prosesPembayaran() (untuk CASH) dan cekDanUpdateStatus()
+        // (untuk CASHLESS). Lihat juga buatPengirimanJikaBelumAda().
 
         return transaksiTersimpan;
+    }
+
+    /**
+     * Buat row Pengiriman HANYA kalau: (1) metode pengirimannya DELIVERY, dan
+     * (2) belum ada Pengiriman untuk order ini (idempotent -- aman dipanggil berkali-kali,
+     * misalnya kalau cekDanUpdateStatus() sempat terpanggil lebih dari sekali untuk order
+     * yang sama lewat webhook + pengecekan manual frontend).
+     *
+     * Dipanggil hanya SETELAH statusPembayaran benar-benar SUCCESS, supaya order yang
+     * pembayarannya batal/gagal/masih pending tidak pernah masuk ke Status Pengiriman
+     * ataupun ikut terhitung di Laporan Harian.
+     */
+    private void buatPengirimanJikaBelumAda(Transaksi transaksi) {
+        if (!"DELIVERY".equalsIgnoreCase(transaksi.getMetodePengiriman())) {
+            return;
+        }
+        if (pengirimanRepository.existsByTransaksi_OrderId(transaksi.getOrderId())) {
+            return;
+        }
+
+        Pengiriman pengiriman = new Pengiriman();
+        long nomorPengiriman = pengirimanRepository.count() + 1;
+        pengiriman.setIdPengiriman(idGeneratorService.generatePengirimanId(nomorPengiriman));
+        pengiriman.setTransaksi(transaksi);
+        pengiriman.setDriver(transaksi.getDriver());
+        pengiriman.setStatusPengiriman("ON_PROCESS");
+        pengirimanRepository.save(pengiriman);
     }
 
     public Transaksi prosesPembayaran(String orderId, Double jumlahBayar) {
@@ -93,6 +127,9 @@ public class TransaksiService {
         transaksi.setStatusPembayaran("SUCCESS"); // CASH: uang sudah di tangan kasir, langsung final
 
         Transaksi tersimpan = transaksiRepository.save(transaksi);
+
+        // [DIUBAH] Baru buat Pengiriman di sini, setelah statusPembayaran dipastikan SUCCESS.
+        buatPengirimanJikaBelumAda(tersimpan);
 
         // [BARU] Order CASH sudah final di titik ini -> langsung kirim struk ke email toko.
         strukService.kirimStrukEmail(tersimpan.getOrderId());
@@ -189,6 +226,10 @@ public class TransaksiService {
         // (PENDING/FAILED/CHALLENGE). Guard "belum SUCCESS sebelumnya" mencegah struk terkirim
         // dobel kalau webhook & pengecekan manual dari frontend sama-sama memanggil method ini.
         if ("SUCCESS".equals(tersimpan.getStatusPembayaran()) && !"SUCCESS".equals(statusSebelumnya)) {
+            // [DIUBAH] Baru sekarang Pengiriman dibuat -- order CASHLESS yang tadinya
+            // dibatalkan/gagal/expired tidak pernah sampai ke titik ini, jadi tidak pernah
+            // dapat row Pengiriman dan otomatis tidak akan muncul di Status Pengiriman.
+            buatPengirimanJikaBelumAda(tersimpan);
             strukService.kirimStrukEmail(tersimpan.getOrderId());
         }
 
@@ -197,5 +238,73 @@ public class TransaksiService {
 
     public List<Transaksi> searchTransaksi(String keyword) {
         return transaksiRepository.findByNamaPemesanContainingIgnoreCaseOrOrderIdContainingIgnoreCase(keyword, keyword);
+    }
+
+    /**
+     * Batalkan order yang belum/gagal dibayar -- dipanggil frontend saat customer nutup
+     * popup QRIS (Snap onClose/onError) tanpa menyelesaikan pembayaran.
+     *
+     * Order & seluruh DetailTransaksi-nya DIHAPUS PERMANEN dari database (bukan cuma
+     * ditandai FAILED), dan stok produk yang sempat dikurangi saat item ditambahkan ke
+     * keranjang DIKEMBALIKAN. Jadi order yang batal benar-benar tidak nyisa jejak apapun.
+     *
+     * PENTING -- jaring pengaman race condition: event "ditutup" dari browser TIDAK selalu
+     * berarti pembayaran gagal (bisa saja customer sudah keburu bayar sebelum sempat nutup
+     * tab). Makanya untuk CASHLESS, status ASLI dicek ulang ke Midtrans dulu sebelum hapus:
+     * kalau ternyata sudah settlement/capture, order TIDAK dihapus -- malah disinkronkan
+     * jadi SUCCESS lewat cekDanUpdateStatus(), supaya order & uangnya tetap tercatat.
+     */
+    @Transactional
+    public void batalkanTransaksi(String orderId) throws MidtransError {
+        Transaksi transaksi = transaksiRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+
+        if ("SUCCESS".equals(transaksi.getStatusPembayaran())) {
+            throw new RuntimeException("Transaksi sudah berhasil dibayar, tidak bisa dibatalkan");
+        }
+
+        if ("CASHLESS".equalsIgnoreCase(transaksi.getMetodePembayaran())) {
+            boolean sudahTerlanjurBayar = false;
+            try {
+                JSONObject statusResult = midtransCoreApi.checkTransaction(orderId);
+                String status = statusResult.getString("transaction_status");
+                sudahTerlanjurBayar = "capture".equals(status) || "settlement".equals(status);
+            } catch (MidtransError e) {
+                // Midtrans belum punya catatan transaksi ini sama sekali (mis. customer nutup
+                // sebelum sempat memilih metode QRIS) -- aman dilanjutkan untuk dihapus.
+                sudahTerlanjurBayar = false;
+            }
+
+            if (sudahTerlanjurBayar) {
+                // Ternyata sudah bayar -- JANGAN dihapus, sinkronkan saja statusnya. Sengaja
+                // dipanggil DI LUAR try-catch di atas: kalau checkTransaction kedua di dalam
+                // cekDanUpdateStatus() ini gagal/timeout, errornya harus tetap dilempar apa
+                // adanya (bukan tertelan dan dianggap "aman dihapus" oleh catch di atas).
+                cekDanUpdateStatus(orderId);
+                throw new RuntimeException(
+                        "Pembayaran ternyata sudah berhasil sebelum dibatalkan, order tetap disimpan");
+            }
+        }
+
+        // Kembalikan stok tiap item SEBELUM baris detail-nya dihapus.
+        List<DetailTransaksi> items = detailTransaksiRepository.findByTransaksi_OrderId(orderId);
+        for (DetailTransaksi item : items) {
+            Produk produk = item.getProduk();
+            if (produk != null) {
+                produk.setStok(produk.getStok() + item.getQty());
+                produkRepository.save(produk);
+            }
+        }
+        detailTransaksiRepository.deleteAll(items);
+
+        // Pengiriman seharusnya belum pernah dibuat untuk order yang belum SUCCESS (lihat
+        // buatPengirimanJikaBelumAda()), tapi dicek juga untuk jaga-jaga.
+        if (pengirimanRepository.existsByTransaksi_OrderId(orderId)) {
+            pengirimanRepository.findAll().stream()
+                    .filter(p -> orderId.equals(p.getTransaksi() != null ? p.getTransaksi().getOrderId() : null))
+                    .forEach(p -> pengirimanRepository.deleteById(p.getIdPengiriman()));
+        }
+
+        transaksiRepository.delete(transaksi);
     }
 }

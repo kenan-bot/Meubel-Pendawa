@@ -150,7 +150,13 @@ function StatusPengirimanPage({ role = "kasir" }) {
 
     return transaksiList
       .filter((t) => {
-        const status = getStatusPengiriman(t.orderId);
+        // [BARU] hanya tampilkan order yang memang SUDAH punya record pengiriman asli.
+        // Record pengiriman baru dibuat backend setelah statusPembayaran = SUCCESS, jadi
+        // order cashless yang masih pending/batal/gagal otomatis tidak akan lolos di sini.
+        const dataPengiriman = getPengirimanByOrder(t.orderId);
+        if (!dataPengiriman) return false;
+
+        const status = dataPengiriman.statusPengiriman || "ON_PROCESS";
 
         const cocokStatus = status === tabStatus;
 
