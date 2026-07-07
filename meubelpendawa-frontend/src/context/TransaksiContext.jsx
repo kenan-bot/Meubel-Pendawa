@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { useProduk } from "./ProdukContext";
-import { createTransaksi, prosesPembayaran } from "../api/transaksiApi";
+import { createTransaksi, prosesPembayaran, batalkanTransaksi } from "../api/transaksiApi";
 import { createDetailTransaksi } from "../api/detailTransaksiApi";
 import { getAllKaryawan } from "../api/karyawanApi";
 import { buatSnapToken, loadMidtransScript, cekStatusPembayaran } from "../api/midtransApi";
@@ -8,7 +8,7 @@ import { buatSnapToken, loadMidtransScript, cekStatusPembayaran } from "../api/m
 const TransaksiContext = createContext(null);
 
 export function TransaksiProvider({ children }) {
-  const { produk, loading, updateProdukState } = useProduk();
+  const { produk, loading, updateProdukState, reloadProduk } = useProduk();
 
   // ----- form pemesan -----
   const [namaPemesan, setNamaPemesan] = useState("");
@@ -179,6 +179,19 @@ export function TransaksiProvider({ children }) {
     }
   };
 
+  // Dipanggil saat popup QRIS ditutup/error tanpa selesai bayar. Order dihapus di backend
+  // (kecuali ternyata sudah terlanjur SUCCESS -- lihat batalkanTransaksi di TransaksiService),
+  // lalu daftar produk di-reload supaya stok yang dikembalikan backend ikut kesinkron di UI.
+  const batalkanOrderQris = (orderId) => {
+    batalkanTransaksi(orderId)
+      .then(() => reloadProduk())
+      .catch((err) => {
+        // Kalau ternyata order sudah SUCCESS (race condition), backend menolak hapus --
+        // itu bukan error yang perlu ditampilkan sebagai kegagalan, cukup dicatat di console.
+        console.error(`Gagal membatalkan order ${orderId}:`, err?.response?.data?.error || err.message);
+      });
+  };
+
   // Ambil Snap Token dari backend lalu buka popup pembayaran Midtrans.
   // Status akhir (SUCCESS/FAILED) sebenarnya diputuskan lewat webhook backend (langkah 6),
   // callback di sini cuma untuk feedback cepat ke kasir di layar.
@@ -206,8 +219,14 @@ export function TransaksiProvider({ children }) {
           tampilkanPesan(`Pembayaran ${orderId} tertunda, menunggu konfirmasi.`, "warning");
           cekStatusPembayaran(orderId).catch((err) => console.error("Gagal sinkronkan status:", err));
         },
-        onError: () => tampilkanPesan(`Pembayaran ${orderId} gagal, silakan coba lagi.`, "error"),
-        onClose: () => tampilkanPesan(`Pembayaran ${orderId} dibatalkan.`, "error"),
+        onError: () => {
+          tampilkanPesan(`Pembayaran ${orderId} gagal, silakan coba lagi.`, "error");
+          batalkanOrderQris(orderId);
+        },
+        onClose: () => {
+          tampilkanPesan(`Pembayaran ${orderId} dibatalkan.`, "error");
+          batalkanOrderQris(orderId);
+        },
       });
       return true;
     } catch (error) {

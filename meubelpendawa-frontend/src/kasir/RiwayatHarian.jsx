@@ -102,8 +102,14 @@ function RiwayatHarian() {
   }, [detailList]);
 
   // hanya transaksi hari ini (reset otomatis tiap pukul 23.59 karena tanggalnya beda)
+  // DAN hanya yang pembayarannya sudah SUCCESS -- order cashless yang masih PENDING,
+  // dibatalkan (FAILED), atau butuh review (CHALLENGE) belum boleh dihitung sebagai
+  // pemasukan ataupun muncul di riwayat, karena uangnya belum tentu (atau belum) masuk.
   const transaksiHariIni = useMemo(
-    () => transaksiList.filter((t) => isHariIni(t.tanggalTransaksi)),
+    () =>
+      transaksiList.filter(
+        (t) => isHariIni(t.tanggalTransaksi) && t.statusPembayaran === "SUCCESS"
+      ),
     [transaksiList]
   );
 
@@ -147,7 +153,7 @@ function RiwayatHarian() {
           </div>
 
           <PageHeader
-            title="Laporan Harian"
+            title="Riwayat Harian"
             subtitle="Informasi direset setiap pukul 23.59"
           />
 

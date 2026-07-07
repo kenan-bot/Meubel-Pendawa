@@ -25,3 +25,12 @@ export const prosesPembayaran = async (orderId, jumlahBayar) => {
   });
   return response.data;
 };
+
+// [BARU] Batalkan order yang belum/gagal dibayar (dipanggil saat popup QRIS ditutup
+// tanpa selesai bayar). Backend akan hapus order + kembalikan stok -- kecuali ternyata
+// pembayarannya sudah terlanjur berhasil, dalam hal ini backend akan menolak & tetap
+// menyimpan order tersebut.
+export const batalkanTransaksi = async (orderId) => {
+  const response = await axiosClient.delete(`${BASE_URL}/${orderId}`);
+  return response.data;
+};
