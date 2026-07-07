@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
 
+import ConfirmModal from "../components/ConfirmModal";
+import Toast from "../components/Toast";
+import { exportLaporanHarian } from "../api/laporanHarianApi";
 import { LuDownload } from "react-icons/lu";
 import SearchBar from "../components/SearchBar";
 import Card from "../components/Card"; // [REUSE] kartu ringkasan pakai Card generic
@@ -10,22 +13,25 @@ import TransaksiCard from "../components/TransaksiCard"; // [REUSE] kartu transa
 import { FaMoneyBillWave, FaQrcode, FaShoppingBag } from "react-icons/fa";
 
 function formatRupiah(nominal) {
-  if (!nominal && nominal !== 0) return "Rp 0";
-  return "Rp" + Number(nominal).toLocaleString("id-ID");
+  const angka = Number(nominal || 0);
+
+  return "Rp" + angka.toLocaleString("id-ID");
 }
 
 function isHariIni(tanggal) {
   if (!tanggal) return false;
-  const d = new Date(tanggal);
-  const now = new Date();
+
+  const tanggalData = new Date(tanggal);
+  const sekarang = new Date();
+
   return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
+    tanggalData.getDate() === sekarang.getDate() &&
+    tanggalData.getMonth() === sekarang.getMonth() &&
+    tanggalData.getFullYear() === sekarang.getFullYear()
   );
 }
 
-// ringkasan yang ditampilkan di atas (label, icon, value, style card)
+// Card ringkasan laporan
 function buildRingkasanCards(ringkasan) {
   return [
     {
@@ -36,6 +42,7 @@ function buildRingkasanCards(ringkasan) {
       variant: "default",
       valueClass: "text-[#5F04E8]",
     },
+
     {
       key: "cashless",
       icon: <FaQrcode className="text-orange-500" />,
@@ -44,6 +51,7 @@ function buildRingkasanCards(ringkasan) {
       variant: "default",
       valueClass: "text-[#5F04E8]",
     },
+
     {
       key: "jumlah",
       icon: <FaShoppingBag className="text-orange-500" />,
@@ -52,6 +60,7 @@ function buildRingkasanCards(ringkasan) {
       variant: "default",
       valueClass: "text-[#5F04E8]",
     },
+
     {
       key: "total",
       icon: null,
@@ -66,19 +75,53 @@ function buildRingkasanCards(ringkasan) {
 
 function RiwayatHarian() {
   const [transaksiList, setTransaksiList] = useState([]);
+
   const [detailList, setDetailList] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [keyword, setKeyword] = useState("");
 
+  // Export laporan
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const [showConfirmExport, setShowConfirmExport] = useState(false);
+
+  // Toast
+  const [toast, setToast] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
+
+  // Auto hide toast 3 detik
+  useEffect(() => {
+    if (!toast.show) return;
+
+    const timer = setTimeout(() => {
+      setToast({
+        show: false,
+        type: "",
+        message: "",
+      });
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toast.show]);
+
+  // Load transaksi
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
+
         const [transaksiData, detailData] = await Promise.all([
           getAllTransaksi(),
           getAllDetailTransaksi(),
         ]);
+
         setTransaksiList(transaksiData);
+
         setDetailList(detailData);
       } catch (error) {
         console.error("Gagal mengambil data riwayat harian:", error);
@@ -86,48 +129,64 @@ function RiwayatHarian() {
         setLoading(false);
       }
     };
+
     loadData();
   }, []);
 
   const itemsByOrder = useMemo(() => {
     const map = {};
-    detailList.forEach((d) => {
-      const id = d.transaksi?.orderId;
-      if (!id) return;
-      if (!map[id]) map[id] = [];
-      map[id].push(d);
+
+    detailList.forEach((detail) => {
+      const orderId = detail.transaksi?.orderId;
+
+      if (!orderId) return;
+
+      if (!map[orderId]) {
+        map[orderId] = [];
+      }
+
+      map[orderId].push(detail);
     });
+
     return map;
   }, [detailList]);
 
-  // hanya transaksi hari ini (reset otomatis tiap pukul 23.59 karena tanggalnya beda)
-  // DAN hanya yang pembayarannya sudah SUCCESS -- order cashless yang masih PENDING,
-  // dibatalkan (FAILED), atau butuh review (CHALLENGE) belum boleh dihitung sebagai
-  // pemasukan ataupun muncul di riwayat, karena uangnya belum tentu (atau belum) masuk.
-  const transaksiHariIni = useMemo(
-    () =>
-      transaksiList.filter(
-        (t) =>
-          isHariIni(t.tanggalTransaksi) && t.statusPembayaran === "SUCCESS",
-      ),
-    [transaksiList],
-  );
+  const transaksiHariIni = useMemo(() => {
+    return transaksiList.filter((t) => {
+      return (
+        isHariIni(t.tanggalTransaksi) &&
+        t.statusPembayaran?.toUpperCase() === "SUCCESS"
+      );
+    });
+  }, [transaksiList]);
 
   const ringkasan = useMemo(() => {
-    let cash = 0;
-    let cashless = 0;
-    transaksiHariIni.forEach((t) => {
-      if (t.metodePembayaran?.toUpperCase() === "CASH") {
-        cash += Number(t.totalPesanan || 0);
-      } else {
-        cashless += Number(t.totalPesanan || 0);
-      }
-    });
+    const hasil = transaksiHariIni.reduce(
+      (acc, transaksi) => {
+        const total = Number(transaksi.totalPesanan || 0);
+
+        if (transaksi.metodePembayaran?.toUpperCase() === "CASH") {
+          acc.cash += total;
+        } else {
+          acc.cashless += total;
+        }
+
+        acc.jumlahTransaksi++;
+
+        return acc;
+      },
+
+      {
+        cash: 0,
+        cashless: 0,
+        jumlahTransaksi: 0,
+      },
+    );
+
     return {
-      cash,
-      cashless,
-      jumlahTransaksi: transaksiHariIni.length,
-      totalPemasukan: cash + cashless,
+      ...hasil,
+
+      totalPemasukan: hasil.cash + hasil.cashless,
     };
   }, [transaksiHariIni]);
 
@@ -137,7 +196,12 @@ function RiwayatHarian() {
   );
 
   const dataTersaring = useMemo(() => {
-    const kw = keyword.toLowerCase();
+    const kw = keyword.toLowerCase().trim();
+
+    if (!kw) {
+      return transaksiHariIni;
+    }
+
     return transaksiHariIni.filter(
       (t) =>
         t.namaPemesan?.toLowerCase().includes(kw) ||
@@ -145,19 +209,54 @@ function RiwayatHarian() {
     );
   }, [transaksiHariIni, keyword]);
 
-  return (
-    <div className="px-3 md:px-5 py-5">
-      {/* Header */}
-      <div className="md:-mt-7 mb-6">
-        <h1 className="font-extrabold text-2xl md:text-3xl">Laporan Harian</h1>
+  const handleClickExport = () => {
+    setShowConfirmExport(true);
+  };
 
-        <p className="text-sm md:text-base text-gray-500">
+  const handleConfirmExport = async () => {
+    try {
+      setExportLoading(true);
+
+      await exportLaporanHarian();
+
+      setToast({
+        show: true,
+
+        type: "success",
+
+        message:
+          "Laporan harian berhasil dibuat dan dikirim ke email perusahaan.",
+      });
+    } catch (error) {
+      console.error("Export laporan gagal:", error);
+
+      setToast({
+        show: true,
+
+        type: "error",
+
+        message: "Gagal membuat laporan harian.",
+      });
+    } finally {
+      setExportLoading(false);
+
+      setShowConfirmExport(false);
+    }
+  };
+
+  return (
+    <div className="relative px-3 py-5 md:px-5">
+      {/* Header */}
+      <div className="mb-6 md:-mt-7">
+        <h1 className="text-2xl font-extrabold md:text-3xl">Laporan Harian</h1>
+
+        <p className="text-sm text-gray-500 md:text-base">
           Laporan akan direset pada pukul 23.59
         </p>
       </div>
 
       {/* Ringkasan */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {ringkasanCards.map((c) => (
           <Card
             key={c.key}
@@ -184,25 +283,45 @@ function RiwayatHarian() {
         ))}
       </div>
 
-      {/* Search dan ekspor button */}
-      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-5">
+      {/* Search dan Export */}
+      <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center">
         <SearchBar
           theme="orange"
-          placeholder="Cari nama pemesan atau Order ID..."
+          placeholder="Cari nama, ID..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
 
         <button
           type="button"
-          onClick={() => {
-            // nanti isi export PDF / Excel
-          }}
-          className="md:ml-auto flex items-center justify-center gap-2 bg-orange-500
-          text-white font-medium text-sm px-4 py-2 rounded-lg hover:scale-105 transition-all duration-300"
+          onClick={handleClickExport}
+          disabled={exportLoading}
+          className="
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-lg
+          bg-orange-500
+          px-4
+          py-2
+          text-sm
+          font-medium
+          text-white
+          transition-all
+          duration-300
+          hover:scale-105
+          hover:bg-orange-600
+          disabled:cursor-not-allowed
+          disabled:opacity-60
+          md:ml-auto
+          md:w-auto
+        "
         >
           <LuDownload size={18} />
-          Ekspor Laporan
+
+          {exportLoading ? "Mengirim..." : "Ekspor Laporan"}
         </button>
       </div>
 
@@ -213,19 +332,25 @@ function RiwayatHarian() {
             Memuat riwayat transaksi...
           </div>
         ) : dataTersaring.length === 0 ? (
-          <div className="p-10 text-center text-gray-400">
-            <div className="py-24 text-center">
-              <p className="text-lg font-semibold text-gray-500">
-                Belum ada transaksi hari ini
-              </p>
+          <div className="py-24 text-center">
+            <p className="text-lg font-semibold text-gray-500">
+              Belum ada transaksi hari ini
+            </p>
 
-              <p className="mt-1 text-sm text-gray-400">
-                Transaksi yang berhasil diproses akan muncul di sini.
-              </p>
-            </div>
+            <p className="mt-1 text-sm text-gray-400">
+              Transaksi yang berhasil diproses akan muncul di sini.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div
+            className="
+            grid
+            grid-cols-1
+            gap-4
+            sm:grid-cols-2
+            xl:grid-cols-3
+          "
+          >
             {dataTersaring.map((t) => (
               <TransaksiCard
                 key={t.orderId}
@@ -237,6 +362,33 @@ function RiwayatHarian() {
           </div>
         )}
       </div>
+
+      {/* CONFIRM EXPORT */}
+
+      <ConfirmModal
+        isOpen={showConfirmExport}
+        title="Ekspor Laporan Harian?"
+        message="Sistem akan membuat file PDF laporan hari ini dan mengirimkannya ke email perusahaan."
+        confirmText={exportLoading ? "Mengirim..." : "Ya, Ekspor"}
+        cancelText="Batal"
+        onConfirm={handleConfirmExport}
+        onClose={() => setShowConfirmExport(false)}
+      />
+
+      {/* TOAST */}
+
+      <Toast
+        show={toast.show}
+        type={toast.type}
+        message={toast.message}
+        onClose={() =>
+          setToast({
+            show: false,
+            type: "",
+            message: "",
+          })
+        }
+      />
     </div>
   );
 }
