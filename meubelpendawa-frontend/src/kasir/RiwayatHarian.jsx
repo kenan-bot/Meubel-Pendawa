@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { getAllTransaksi } from "../api/transaksiApi";
 import { getAllDetailTransaksi } from "../api/detailTransaksiApi";
 
-import PageHeader from "../components/PageHeader";
+import { LuDownload } from "react-icons/lu";
 import SearchBar from "../components/SearchBar";
-import DateTimeDisplay from "../components/DateTimeDisplay";
 import Card from "../components/Card"; // [REUSE] kartu ringkasan pakai Card generic
 import TransaksiCard from "../components/TransaksiCard"; // [REUSE] kartu transaksi variant="riwayat"
 
@@ -108,9 +107,10 @@ function RiwayatHarian() {
   const transaksiHariIni = useMemo(
     () =>
       transaksiList.filter(
-        (t) => isHariIni(t.tanggalTransaksi) && t.statusPembayaran === "SUCCESS"
+        (t) =>
+          isHariIni(t.tanggalTransaksi) && t.statusPembayaran === "SUCCESS",
       ),
-    [transaksiList]
+    [transaksiList],
   );
 
   const ringkasan = useMemo(() => {
@@ -131,91 +131,111 @@ function RiwayatHarian() {
     };
   }, [transaksiHariIni]);
 
-  const ringkasanCards = useMemo(() => buildRingkasanCards(ringkasan), [ringkasan]);
+  const ringkasanCards = useMemo(
+    () => buildRingkasanCards(ringkasan),
+    [ringkasan],
+  );
 
   const dataTersaring = useMemo(() => {
     const kw = keyword.toLowerCase();
     return transaksiHariIni.filter(
       (t) =>
         t.namaPemesan?.toLowerCase().includes(kw) ||
-        t.orderId?.toLowerCase().includes(kw)
+        t.orderId?.toLowerCase().includes(kw),
     );
   }, [transaksiHariIni, keyword]);
 
   return (
-    <div className="flex flex-col -m-8 p-4 bg-gray-50 h-[calc(100vh-2rem)] overflow-hidden text-sm">
-      <div className="bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col flex-1 min-h-0">
-        {/* header (TIDAK ikut scroll) */}
-        <div className="p-4 lg:p-5 pb-0 flex-shrink-0 relative">
-          {/* [SESUAI CONTOH] tanggal/jam nempel di pojok kanan atas, sejajar judul -- hanya di layar lg+ */}
-          <div className="hidden lg:block absolute top-5 right-5">
-            <DateTimeDisplay />
+    <div className="px-3 md:px-5 py-5">
+      {/* Header */}
+      <div className="md:-mt-7 mb-6">
+        <h1 className="font-extrabold text-2xl md:text-3xl">Laporan Harian</h1>
+
+        <p className="text-sm md:text-base text-gray-500">
+          Laporan akan direset pada pukul 23.59
+        </p>
+      </div>
+
+      {/* Ringkasan */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        {ringkasanCards.map((c) => (
+          <Card
+            key={c.key}
+            variant={c.variant}
+            padding="small"
+            hover={false}
+            className="flex flex-col justify-between"
+          >
+            <span
+              className={`flex items-center gap-1.5 text-[11px] font-semibold ${
+                c.labelClass || "text-gray-500"
+              }`}
+            >
+              {c.icon}
+              {c.label}
+            </span>
+
+            <p
+              className={`mt-2 text-xl font-extrabold leading-none ${c.valueClass}`}
+            >
+              {c.value}
+            </p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Search dan ekspor button */}
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-5">
+        <SearchBar
+          theme="orange"
+          placeholder="Cari nama pemesan atau Order ID..."
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            // nanti isi export PDF / Excel
+          }}
+          className="md:ml-auto flex items-center justify-center gap-2 bg-orange-500
+          text-white font-medium text-sm px-4 py-2 rounded-lg hover:scale-105 transition-all duration-300"
+        >
+          <LuDownload size={18} />
+          Ekspor Laporan
+        </button>
+      </div>
+
+      {/* Daftar Transaksi */}
+      <div className="mt-3">
+        {loading ? (
+          <div className="py-24 text-center text-gray-500">
+            Memuat riwayat transaksi...
           </div>
+        ) : dataTersaring.length === 0 ? (
+          <div className="p-10 text-center text-gray-400">
+            <div className="py-24 text-center">
+              <p className="text-lg font-semibold text-gray-500">
+                Belum ada transaksi hari ini
+              </p>
 
-          <PageHeader
-            title="Laporan Harian"
-            subtitle="Informasi direset setiap pukul 23.59"
-          />
-
-          {/* [RESPONSIVE] di layar kecil, tanggal/jam ditaruh di bawah judul (bukan absolute) supaya tidak numpuk */}
-          <div className="lg:hidden mb-4 -mt-4">
-            <DateTimeDisplay />
+              <p className="mt-1 text-sm text-gray-400">
+                Transaksi yang berhasil diproses akan muncul di sini.
+              </p>
+            </div>
           </div>
-
-          {/* ringkasan */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 items-stretch">
-            {ringkasanCards.map((c) => (
-              <Card
-                key={c.key}
-                variant={c.variant}
-                padding="small"
-                hover={false}
-                className="flex flex-col justify-between"
-              >
-                <span
-                  className={`flex items-center gap-1.5 text-[11px] font-semibold ${
-                    c.labelClass || "text-gray-500"
-                  }`}
-                >
-                  {c.icon}
-                  {c.label}
-                </span>
-                <p className={`text-lg font-bold mt-1 ${c.valueClass}`}>{c.value}</p>
-              </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {dataTersaring.map((t) => (
+              <TransaksiCard
+                key={t.orderId}
+                transaksi={t}
+                items={itemsByOrder[t.orderId] || []}
+                variant="riwayat"
+              />
             ))}
           </div>
-
-          <div className="flex justify-end mb-3">
-            <SearchBar
-              theme="purple"
-              placeholder="Search by name or order..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* grid kartu transaksi -- INI yang discroll */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 lg:px-5 pb-5">
-          {loading ? (
-            <div className="text-center py-8 text-gray-500">Memuat riwayat transaksi...</div>
-          ) : dataTersaring.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
-              Belum ada transaksi hari ini.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {dataTersaring.map((t) => (
-                <TransaksiCard
-                  key={t.orderId}
-                  transaksi={t}
-                  items={itemsByOrder[t.orderId] || []}
-                  variant="riwayat"
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
