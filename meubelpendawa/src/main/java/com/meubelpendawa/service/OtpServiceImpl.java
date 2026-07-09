@@ -46,10 +46,12 @@ public class OtpServiceImpl implements OtpService {
         // Pastikan email terdaftar
         Karyawan karyawan = karyawanRepository
                 .findByEmailAndAksesSistemTrue(email)
-                .orElseThrow(() -> new RuntimeException("Email tidak ditemukan"));
+                .orElseThrow(() ->
+                        new RuntimeException("Email tidak ditemukan"));
 
         // Nonaktifkan seluruh OTP lama
-        List<OtpResetPassword> otpAktif = otpRepository.findByEmailAndUsedFalse(email);
+        List<OtpResetPassword> otpAktif =
+                otpRepository.findByEmailAndUsedFalse(email);
 
         for (OtpResetPassword otp : otpAktif) {
             otp.setUsed(true);
@@ -115,17 +117,10 @@ public class OtpServiceImpl implements OtpService {
                         karyawan.getNamaKaryawan(),
                         kodeOtp);
 
-        System.out.println("========== OTP ==========");
-        System.out.println("OTP           : " + kodeOtp);
-        System.out.println("Tujuan Email  : " + email);
-        System.out.println("Mulai kirim email...");
-
         emailService.sendEmail(
                 email,
                 subject,
                 body);
-
-        System.out.println("Email berhasil dikirim.");
     }
 
     @Override
