@@ -38,12 +38,24 @@ public class KaryawanService {
         karyawan.setIdKaryawan(idGeneratorService.generateKaryawanId(nomor));
 
         if (karyawan.getAksesSistem()) {
-            if (karyawanRepository.existsByUsername(karyawan.getUsername())) {
+
+            System.out.println("===== TAMBAH KARYAWAN =====");
+            System.out.println("Username : " + karyawan.getUsername());
+            System.out.println("Email    : " + karyawan.getEmail());
+
+            boolean usernameAda = karyawanRepository.existsByUsername(karyawan.getUsername());
+            boolean emailAda = karyawanRepository.existsByEmail(karyawan.getEmail());
+
+            System.out.println("Username sudah ada : " + usernameAda);
+            System.out.println("Email sudah ada    : " + emailAda);
+
+            if (usernameAda) {
                 throw new RuntimeException("Username sudah digunakan");
             }
 
             if (!isValidUsername(karyawan.getUsername())) {
-                throw new RuntimeException("Username minimal 8 karakter dan harus mengandung huruf serta angka");
+                throw new RuntimeException(
+                        "Username minimal 8 karakter dan harus mengandung huruf serta angka");
             }
 
             if (!isValidPassword(karyawan.getPassword())) {
@@ -51,18 +63,20 @@ public class KaryawanService {
                         "Password minimal 12 karakter dan harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus");
             }
 
-            if (karyawanRepository.existsByEmail(karyawan.getEmail())) {
+            if (emailAda) {
                 throw new RuntimeException("Email sudah digunakan");
             }
 
             karyawan.setPassword(passwordEncoder.encode(karyawan.getPassword()));
+
         } else {
+
             karyawan.setRole(null);
             karyawan.setUsername(null);
             karyawan.setPassword(null);
         }
-        return karyawanRepository.save(karyawan);
 
+        return karyawanRepository.save(karyawan);
     }
 
     public Karyawan updateKaryawan(Karyawan karyawan) {
@@ -147,7 +161,7 @@ public class KaryawanService {
                 .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
 
         karyawan.setStatusAktif(statusAktif);
-        
+
         if (!statusAktif) {
             karyawan.setTanggalNonaktif(LocalDateTime.now());
         } else {
