@@ -188,24 +188,31 @@ const ProductCard = ({
                         </div>
 
                         {isOwner && (
-                          <div className="flex justify-center mt-3">
-                            <label className="relative inline-flex items-center cursor-pointer">
+                          <div
+                            className="flex justify-center mt-3"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <label
+                              className="relative inline-flex items-center cursor-pointer"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               <input
                                 type="checkbox"
                                 checked={item.statusAktif}
                                 className="sr-only peer"
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  onToggleStatus?.(item);
-                                }}
+                                onChange={() => onToggleStatus?.(item)}
                               />
 
                               <div
-                                className="w-11 h-6 bg-red-500 rounded-full peer peer-checked:bg-green-500
-                            after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
-                            after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"
-                              ></div>
+                                className="w-11 h-6 bg-red-500 rounded-full
+      peer peer-checked:bg-green-500
+      after:content-[''] after:absolute
+      after:top-[2px] after:left-[2px]
+      after:bg-white after:rounded-full
+      after:h-5 after:w-5
+      after:transition-all
+      peer-checked:after:translate-x-5"
+                              />
                             </label>
                           </div>
                         )}

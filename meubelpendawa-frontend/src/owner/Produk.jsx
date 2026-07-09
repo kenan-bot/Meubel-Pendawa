@@ -5,7 +5,6 @@ import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
 import usePagination from "../hooks/usePagination";
 import Pagination from "../components/Pagination";
-import { nonaktifkanProduk } from "../api/productApi";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
 import { nonaktifkanProduk, aktifkanProduk } from "../api/productApi";
@@ -87,19 +86,6 @@ export default function Produk() {
     }
   };
 
-  const handleEdit = (item) => {
-    console.log("EDIT TERPANGGIL");
-
-    setSelectedProduk(item);
-    setOpenUpdateProduk(true);
-  };
-
-  const handleToggleStatus = (produk) => {
-    console.log("TOGGLE TERPANGGIL");
-
-    setProdukToToggle(produk);
-    setOpenConfirmProduk(true);
-  };
   return (
     <>
       <div className="px-3 py-5 md:p-5">
