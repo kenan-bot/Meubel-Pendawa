@@ -28,8 +28,7 @@ public class EmailServiceImpl implements EmailService {
 
             MimeMessage message = mailSender.createMimeMessage();
 
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(to);
@@ -39,18 +38,22 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlContent, true);
 
             System.out.println(
-            "PASSWORD LENGTH = "
-            + System.getenv("MAIL_PASSWORD").length());
+                    "PASSWORD LENGTH = "
+                            + System.getenv("MAIL_PASSWORD").length());
 
             System.out.println("FROM EMAIL = " + fromEmail);
             mailSender.send(message);
 
         } catch (Exception e) {
 
+            System.out.println("EMAIL ERROR:");
+            System.out.println(e.getMessage());
+
+            e.printStackTrace();
+
             throw new RuntimeException(
                     "Gagal mengirim email ke " + to,
                     e);
-
         }
     }
 
@@ -68,8 +71,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
 
             // multipart=true wajib supaya lampiran (attachment) bisa ditambahkan
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(to);
