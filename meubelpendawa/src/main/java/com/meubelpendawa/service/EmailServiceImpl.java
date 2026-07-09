@@ -16,10 +16,10 @@ public class EmailServiceImpl implements EmailService {
         @Value("${brevo.api.key}")
         private String apiKey;
 
-        @Value("${spring.mail.from}")
+        @Value("${brevo.sender.email}")
         private String fromEmail;
 
-        @Value("${spring.mail.from.name}")
+        @Value("${brevo.sender.name}")
         private String fromName;
 
         private final RestTemplate restTemplate = new RestTemplate();
