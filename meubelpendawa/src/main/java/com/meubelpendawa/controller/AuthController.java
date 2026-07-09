@@ -11,23 +11,19 @@ import com.meubelpendawa.dto.ResetPasswordRequest;
 import com.meubelpendawa.service.AuthService;
 import com.meubelpendawa.service.OtpService;
 import com.meubelpendawa.dto.VerifyOtpRequest;
-import com.meubelpendawa.service.EmailService;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     private final OtpService otpService;
-    private final EmailService emailService;
 
     public AuthController(
             AuthService authService,
-            OtpService otpService,
-            EmailService emailService) {
+            OtpService otpService) {
 
         this.authService = authService;
         this.otpService = otpService;
-        this.emailService = emailService;
     }
 
     @Autowired
@@ -48,17 +44,6 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 "OTP berhasil dikirim");
-    }
-
-    @GetMapping("/test-email")
-    public String testEmail() {
-
-        emailService.sendEmail(
-                "kenbebele@gmail.com",
-                "Tes Email",
-                "<h1>Email berhasil dikirim!</h1>");
-
-        return "OK";
     }
 
     @PostMapping("/verify-otp")
