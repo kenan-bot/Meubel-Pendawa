@@ -21,14 +21,14 @@ public class AuthController {
     private final EmailService emailService;
 
     public AuthController(
-        AuthService authService,
-        OtpService otpService,
-        EmailService emailService) {
+            AuthService authService,
+            OtpService otpService,
+            EmailService emailService) {
 
-    this.authService = authService;
-    this.otpService = otpService;
-    this.emailService = emailService;
-}
+        this.authService = authService;
+        this.otpService = otpService;
+        this.emailService = emailService;
+    }
 
     @Autowired
     private AuthService authService;
@@ -48,6 +48,17 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 "OTP berhasil dikirim");
+    }
+
+    @GetMapping("/test-email")
+    public String testEmail() {
+
+        emailService.sendEmail(
+                "EMAIL_TUJUAN_KAMU@gmail.com",
+                "Tes Email",
+                "<h1>Email berhasil dikirim!</h1>");
+
+        return "OK";
     }
 
     @PostMapping("/verify-otp")
@@ -93,15 +104,4 @@ public class AuthController {
         return authService.getCurrentUser(token);
     }
 
-    @GetMapping("/test-email")
-public String testEmail() {
-
-    emailService.sendEmail(
-        "alamat_email_tujuan@gmail.com",
-        "Tes Email",
-        "<h1>Halo</h1>"
-    );
-
-    return "OK";
-}
 }
