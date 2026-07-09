@@ -38,6 +38,7 @@ public class EmailServiceImpl implements EmailService {
             // true = HTML
             helper.setText(htmlContent, true);
 
+            System.out.println("FROM EMAIL = " + fromEmail);
             mailSender.send(message);
 
         } catch (Exception e) {
