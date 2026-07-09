@@ -23,7 +23,9 @@ public class EmailServiceImpl implements EmailService {
             String to,
             String subject,
             String htmlContent) {
-
+System.out.println(
+            "PASSWORD LENGTH = "
+            + System.getenv("MAIL_PASSWORD").length());
         try {
 
             MimeMessage message = mailSender.createMimeMessage();
