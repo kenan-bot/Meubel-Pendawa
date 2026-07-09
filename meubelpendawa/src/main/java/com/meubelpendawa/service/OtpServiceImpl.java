@@ -115,20 +115,17 @@ public class OtpServiceImpl implements OtpService {
                         karyawan.getNamaKaryawan(),
                         kodeOtp);
 
-        emailService.sendEmail(
-                email,
-                subject,
-                body);
-
-        System.out.println("OTP : " + kodeOtp);
-        System.out.println("Kirim email ke : " + email);
+        System.out.println("========== OTP ==========");
+        System.out.println("OTP           : " + kodeOtp);
+        System.out.println("Tujuan Email  : " + email);
+        System.out.println("Mulai kirim email...");
 
         emailService.sendEmail(
                 email,
                 subject,
                 body);
 
-        System.out.println("Selesai kirim email");
+        System.out.println("Email berhasil dikirim.");
     }
 
     @Override
