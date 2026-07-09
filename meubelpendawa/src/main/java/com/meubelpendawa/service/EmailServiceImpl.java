@@ -23,9 +23,7 @@ public class EmailServiceImpl implements EmailService {
             String to,
             String subject,
             String htmlContent) {
-System.out.println(
-            "PASSWORD LENGTH = "
-            + System.getenv("MAIL_PASSWORD").length());
+
         try {
 
             MimeMessage message = mailSender.createMimeMessage();
@@ -39,6 +37,10 @@ System.out.println(
 
             // true = HTML
             helper.setText(htmlContent, true);
+
+            System.out.println(
+            "PASSWORD LENGTH = "
+            + System.getenv("MAIL_PASSWORD").length());
 
             System.out.println("FROM EMAIL = " + fromEmail);
             mailSender.send(message);
