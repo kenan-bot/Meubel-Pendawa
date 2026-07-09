@@ -47,9 +47,6 @@ public class TransaksiController {
         return transaksiService.prosesPembayaran(orderId, jumlahBayar);
     }
 
-    // [BARU] Dipanggil frontend saat popup QRIS ditutup/error tanpa selesai bayar (Snap
-    // onClose/onError). Order & itemnya dihapus permanen + stok dikembalikan -- kecuali
-    // ternyata sudah terlanjur SUCCESS (race condition), lihat batalkanTransaksi().
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Map<String, String>> batalkanTransaksi(@PathVariable String orderId) {
         try {
@@ -66,8 +63,7 @@ public class TransaksiController {
         }
     }
 
-    // [BARU] Frontend panggil ini saat kasir confirm "Proses Pesanan" untuk metode CASHLESS.
-    // Return Snap Token yang dipakai frontend untuk buka window.snap.pay(token).
+
     @PostMapping("/{orderId}/midtrans-token")
     public ResponseEntity<Map<String, Object>> buatSnapToken(@PathVariable String orderId) {
         try {
@@ -77,22 +73,14 @@ public class TransaksiController {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                     .body(Map.of("error", "Gagal terhubung ke Midtrans: " + e.getMessage()));
         } catch (Exception e) {
-            // Penting: tanpa ini, exception selain MidtransError (mis. transaksi tidak
-            // ditemukan, total belum valid, dll) lolos ke default error handler Spring
-            // dan cuma tampil "Internal Server Error" generik di frontend -- gak kelihatan
-            // penyebab aslinya tanpa buka log server.
+            
             log.error("Gagal buat Snap Token untuk order {}: {}", orderId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Terjadi kesalahan tak terduga."));
         }
     }
 
-    // [BARU] Cek status manual -- dipanggil FRONTEND (bukan server Midtrans) begitu Snap
-    // kasih callback onSuccess/onPending. Manfaatnya dua: (1) dev lokal jadi gak wajib
-    // pakai ngrok/tunnel buat testing, (2) di production jadi jaring pengaman tambahan
-    // kalau webhook telat/gagal terkirim -- status tetap ke-update tanpa nunggu webhook.
-    // Reuse logic yang sama persis dengan webhook (sama-sama nanya status ASLI ke Midtrans,
-    // bukan percaya begitu saja ke frontend).
+
     @PostMapping("/{orderId}/cek-status")
     public ResponseEntity<Transaksi> cekStatusPembayaran(@PathVariable String orderId) {
         try {
@@ -103,9 +91,7 @@ public class TransaksiController {
         }
     }
 
-    // [BARU] Ambil struk PDF sebuah order -- dipakai frontend untuk buka di tab baru
-    // (kasir tinggal Ctrl+P / pakai tombol print bawaan viewer PDF browser) maupun untuk
-    // diunduh langsung. Tidak memicu pengiriman email, cuma generate & kembalikan PDF-nya.
+
     @GetMapping(value = "/{orderId}/struk", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> cetakStruk(@PathVariable String orderId) {
         try {
@@ -120,8 +106,6 @@ public class TransaksiController {
         }
     }
 
-    // [BARU] Kirim ulang struk ke email toko secara manual (misalnya kalau pengiriman
-    // otomatis sebelumnya gagal, kasir bisa trigger ulang dari sini).
     @PostMapping("/{orderId}/struk/kirim-email")
     public ResponseEntity<Map<String, String>> kirimUlangStruk(@PathVariable String orderId) {
         try {
@@ -134,9 +118,7 @@ public class TransaksiController {
         }
     }
 
-    // [BARU] Webhook -- dipanggil SERVER Midtrans (bukan browser user), daftarkan URL publik
-    // endpoint ini di Dashboard Midtrans > Settings > Configuration > Payment Notification URL.
-    // Selalu balas 200 OK supaya Midtrans tidak retry-kirim notifikasi berkali-kali.
+    
     @PostMapping("/notification")
     public ResponseEntity<String> notifikasiMidtrans(@RequestBody Map<String, Object> payload) {
         String orderId = (String) payload.get("order_id");
