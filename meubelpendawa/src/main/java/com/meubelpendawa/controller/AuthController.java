@@ -54,7 +54,7 @@ public class AuthController {
     public String testEmail() {
 
         emailService.sendEmail(
-                "EMAIL_TUJUAN_KAMU@gmail.com",
+                "kenbebele@gmail.com",
                 "Tes Email",
                 "<h1>Email berhasil dikirim!</h1>");
 
