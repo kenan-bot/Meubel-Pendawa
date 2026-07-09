@@ -45,7 +45,7 @@ public class OtpServiceImpl implements OtpService {
 
         // Pastikan email terdaftar
         Karyawan karyawan = karyawanRepository
-                .findByEmail(email)
+                .findByEmailAndAksesSistemTrue(email)
                 .orElseThrow(() ->
                         new RuntimeException("Email tidak ditemukan"));
 

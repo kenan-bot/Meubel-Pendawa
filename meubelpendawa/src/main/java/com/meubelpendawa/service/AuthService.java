@@ -116,7 +116,7 @@ public class AuthService {
         }
 
         Karyawan karyawan = karyawanRepository
-                .findByEmail(email)
+                .findByEmailAndAksesSistemTrue(email)
                 .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
 
         karyawanService.resetPassword(

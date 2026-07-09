@@ -6,9 +6,10 @@ import java.util.Optional;
 import java.util.List;
 
 public interface KaryawanRepository extends JpaRepository<Karyawan, String> {
+
     Optional<Karyawan> findByUsername(String username);
     List<Karyawan> findByNamaKaryawanContainingIgnoreCase(String namaKaryawan);
-    Optional<Karyawan> findByEmail(String email);
+    Optional<Karyawan> findByEmailAndAksesSistemTrue(String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 }

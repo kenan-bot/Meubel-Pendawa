@@ -26,13 +26,6 @@ public class EmailServiceImpl implements EmailService {
 
         try {
 
-            System.out.println("======================================");
-            System.out.println("EMAIL SERVICE");
-            System.out.println("FROM    : " + fromEmail);
-            System.out.println("TO      : " + to);
-            System.out.println("SUBJECT : " + subject);
-            System.out.println("======================================");
-
             MimeMessage message = mailSender.createMimeMessage();
 
             MimeMessageHelper helper =
@@ -41,18 +34,18 @@ public class EmailServiceImpl implements EmailService {
             helper.setFrom(fromEmail);
             helper.setTo(to);
             helper.setSubject(subject);
+
+            // true = HTML
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
 
-            System.out.println("EMAIL BERHASIL DIKIRIM");
-
         } catch (Exception e) {
 
-            System.out.println("EMAIL GAGAL DIKIRIM");
-            e.printStackTrace();
+            throw new RuntimeException(
+                    "Gagal mengirim email ke " + to,
+                    e);
 
-            throw new RuntimeException("Gagal mengirim email ke " + to, e);
         }
     }
 
@@ -67,17 +60,9 @@ public class EmailServiceImpl implements EmailService {
 
         try {
 
-            System.out.println("======================================");
-            System.out.println("EMAIL ATTACHMENT");
-            System.out.println("FROM    : " + fromEmail);
-            System.out.println("TO      : " + to);
-            System.out.println("SUBJECT : " + subject);
-            System.out.println("FILE    : " + attachmentFilename);
-            System.out.println("SIZE    : " + attachmentBytes.length + " bytes");
-            System.out.println("======================================");
-
             MimeMessage message = mailSender.createMimeMessage();
 
+            // multipart=true wajib supaya lampiran (attachment) bisa ditambahkan
             MimeMessageHelper helper =
                     new MimeMessageHelper(message, true, "UTF-8");
 
@@ -88,22 +73,16 @@ public class EmailServiceImpl implements EmailService {
 
             helper.addAttachment(
                     attachmentFilename,
-                    new ByteArrayDataSource(
-                            attachmentBytes,
-                            attachmentContentType));
+                    new ByteArrayDataSource(attachmentBytes, attachmentContentType));
 
             mailSender.send(message);
 
-            System.out.println("EMAIL ATTACHMENT BERHASIL DIKIRIM");
-
         } catch (Exception e) {
-
-            System.out.println("EMAIL ATTACHMENT GAGAL");
-            e.printStackTrace();
 
             throw new RuntimeException(
                     "Gagal mengirim email (dengan lampiran) ke " + to,
                     e);
+
         }
     }
 }
