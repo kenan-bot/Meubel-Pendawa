@@ -1,22 +1,28 @@
 package com.meubelpendawa.service;
 
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.util.ByteArrayDataSource;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${BREVO_API_KEY}")
+    private String apiKey;
 
-    @Value("${spring.mail.from}")
+    @Value("${BREVO_SENDER}")
     private String fromEmail;
+
+    @Value("${BREVO_NAME}")
+    private String fromName;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
     public void sendEmail(
@@ -26,19 +32,29 @@ public class EmailServiceImpl implements EmailService {
 
         try {
 
-            MimeMessage message = mailSender.createMimeMessage();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", apiKey);
 
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
+            Map<String, Object> body = new HashMap<>();
 
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
+            body.put("sender", Map.of(
+                    "name", fromName,
+                    "email", fromEmail));
 
-            // true = HTML
-            helper.setText(htmlContent, true);
+            body.put("to", List.of(
+                    Map.of("email", to)));
 
-            mailSender.send(message);
+            body.put("subject", subject);
+            body.put("htmlContent", htmlContent);
+
+            HttpEntity<Map<String, Object>> request =
+                    new HttpEntity<>(body, headers);
+
+            restTemplate.postForEntity(
+                    "https://api.brevo.com/v3/smtp/email",
+                    request,
+                    String.class);
 
         } catch (Exception e) {
 
@@ -60,27 +76,43 @@ public class EmailServiceImpl implements EmailService {
 
         try {
 
-            MimeMessage message = mailSender.createMimeMessage();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", apiKey);
 
-            // multipart=true wajib supaya lampiran (attachment) bisa ditambahkan
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
+            String encodedFile =
+                    Base64.getEncoder()
+                            .encodeToString(attachmentBytes);
 
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
+            Map<String, Object> body = new HashMap<>();
 
-            helper.addAttachment(
-                    attachmentFilename,
-                    new ByteArrayDataSource(attachmentBytes, attachmentContentType));
+            body.put("sender", Map.of(
+                    "name", fromName,
+                    "email", fromEmail));
 
-            mailSender.send(message);
+            body.put("to", List.of(
+                    Map.of("email", to)));
+
+            body.put("subject", subject);
+            body.put("htmlContent", htmlContent);
+
+            body.put("attachment", List.of(
+                    Map.of(
+                            "name", attachmentFilename,
+                            "content", encodedFile)));
+
+            HttpEntity<Map<String, Object>> request =
+                    new HttpEntity<>(body, headers);
+
+            restTemplate.postForEntity(
+                    "https://api.brevo.com/v3/smtp/email",
+                    request,
+                    String.class);
 
         } catch (Exception e) {
 
             throw new RuntimeException(
-                    "Gagal mengirim email (dengan lampiran) ke " + to,
+                    "Gagal mengirim email (lampiran) ke " + to,
                     e);
 
         }
