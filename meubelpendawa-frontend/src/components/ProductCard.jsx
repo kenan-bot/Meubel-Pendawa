@@ -5,7 +5,7 @@ import CardHeader from "./CardHeader";
 import CardFooter from "./CardFooter";
 import CardBody from "./CardBody";
 import { motion } from "framer-motion";
-
+import StatusToggle from "./StatusToggle";
 import { MdEditSquare } from "react-icons/md";
 
 const ProductCard = ({
@@ -192,30 +192,16 @@ const ProductCard = ({
                             className="flex justify-center mt-3"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <label
-                              className="relative inline-flex items-center cursor-pointer"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={item.statusAktif}
-                                className="sr-only peer"
-                                onChange={() => onToggleStatus?.(item)}
-                              />
-
-                              <div
-                                className="w-11 h-6 bg-red-500 rounded-full
-      peer peer-checked:bg-green-500
-      after:content-[''] after:absolute
-      after:top-[2px] after:left-[2px]
-      after:bg-white after:rounded-full
-      after:h-5 after:w-5
-      after:transition-all
-      peer-checked:after:translate-x-5"
-                              />
-                            </label>
+                            <StatusToggle
+                              checked={item.statusAktif}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                onToggleStatus?.(item);
+                              }}
+                            />
                           </div>
                         )}
+                        
                       </CardFooter>
                     </div>
                   </Card>
