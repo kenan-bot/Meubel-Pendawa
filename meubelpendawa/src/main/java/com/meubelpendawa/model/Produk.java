@@ -23,6 +23,7 @@ public class Produk {
 
     private String gambarUrl;
 
+    private Boolean statusAktif = true;
 
     @ManyToOne
     @JoinColumn(name = "idKategori")
@@ -36,12 +37,12 @@ public class Produk {
     }
 
     public Produk(String namaProduk,
-                  Double hargaDefault,
-                  Integer stok,
-                  String deskripsi,
-                  String gambarUrl,
-                  Kategori kategori,
-                  Merek merek) {
+            Double hargaDefault,
+            Integer stok,
+            String deskripsi,
+            String gambarUrl,
+            Kategori kategori,
+            Merek merek, Boolean statusAktif) {
 
         this.namaProduk = namaProduk;
         this.hargaDefault = hargaDefault;
@@ -50,6 +51,7 @@ public class Produk {
         this.gambarUrl = gambarUrl;
         this.kategori = kategori;
         this.merek = merek;
+        this.statusAktif = statusAktif;
     }
 
     public String getIdProduk() {
@@ -114,5 +116,13 @@ public class Produk {
 
     public void setMerek(Merek merek) {
         this.merek = merek;
+    }
+
+    public Boolean getStatusAktif() {
+        return statusAktif;
+    }
+
+    public void setStatusAktif(Boolean statusAktif) {
+        this.statusAktif = statusAktif;
     }
 }

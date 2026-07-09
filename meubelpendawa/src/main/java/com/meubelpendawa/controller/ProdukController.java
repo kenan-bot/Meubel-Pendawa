@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import com.meubelpendawa.model.Produk;
 import com.meubelpendawa.service.ProdukService;
 
-
 @RestController
 @RequestMapping("/produk")
 public class ProdukController {
@@ -28,7 +27,7 @@ public class ProdukController {
     public List<Produk> getProdukByKategori(@PathVariable String idKategori) {
         return produkService.getProdukByKategori(idKategori);
     }
-    
+
     @GetMapping("/merek/{idMerek}")
     public List<Produk> getProdukByMerek(@PathVariable String idMerek) {
         return produkService.getProdukByMerek(idMerek);
@@ -48,5 +47,19 @@ public class ProdukController {
     public void hapusProduk(@PathVariable String id) {
         produkService.hapusProduk(id);
     }
-    
+
+    @PatchMapping("/{id}/nonaktif")
+    public Produk nonaktifkanProduk(
+            @PathVariable String id) {
+
+        return produkService.nonaktifkanProduk(id);
+    }
+
+    @PatchMapping("/{id}/aktif")
+    public Produk aktifkanProduk(
+            @PathVariable String id) {
+
+        return produkService.aktifkanProduk(id);
+    }
+
 }

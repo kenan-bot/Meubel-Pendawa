@@ -26,3 +26,17 @@ export const deleteProduk = async (id) => {
   const response = await axiosClient.delete(`${BASE_URL}/${id}`);
   return response.data;
 };
+
+export const nonaktifkanProduk = async (idProduk) => {
+  const response = await axiosClient.patch(
+    `${BASE_URL}/${idProduk}/nonaktif`
+  );
+  return response.data;
+};
+
+export const aktifkanProduk = async (idProduk) => {
+  const response = await axiosClient.patch(
+    `${BASE_URL}/${idProduk}/aktif`
+  );
+  return response.data;
+};

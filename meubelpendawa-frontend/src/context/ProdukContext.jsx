@@ -1,11 +1,31 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getAllProduk } from "../api/productApi";
+import {
+  getAllProduk,
+  nonaktifkanProduk,
+  aktifkanProduk,
+} from "../api/productApi";
 
 const ProdukContext = createContext();
 
 export function ProdukProvider({ children }) {
   const [produk, setProduk] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const nonaktifProduk = async (idProduk) => {
+    const produkUpdate = await nonaktifkanProduk(idProduk);
+
+    updateProdukState(produkUpdate);
+
+    return produkUpdate;
+  };
+
+  const aktifProduk = async (idProduk) => {
+    const produkUpdate = await aktifkanProduk(idProduk);
+
+    updateProdukState(produkUpdate);
+
+    return produkUpdate;
+  };
 
   useEffect(() => {
     console.log("LOAD PRODUK");
@@ -52,7 +72,6 @@ export function ProdukProvider({ children }) {
     return kategoriMatch && merekMatch && searchMatch;
   });
 
-
   return (
     <ProdukContext.Provider
       value={{
@@ -72,6 +91,9 @@ export function ProdukProvider({ children }) {
         reloadProduk: loadProduk,
         addProduk,
         updateProdukState,
+
+        nonaktifProduk,
+        aktifProduk,
       }}
     >
       {children}

@@ -80,4 +80,24 @@ public class ProdukService {
         return produkRepository.findByMerek_IdMerek(idMerek);
     }
 
+    public Produk nonaktifkanProduk(String idProduk) {
+
+        Produk produk = produkRepository.findById(idProduk)
+                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
+
+        produk.setStatusAktif(false);
+
+        return produkRepository.save(produk);
+    }
+
+    public Produk aktifkanProduk(String idProduk) {
+
+        Produk produk = produkRepository.findById(idProduk)
+                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
+
+        produk.setStatusAktif(true);
+
+        return produkRepository.save(produk);
+    }
+    
 }

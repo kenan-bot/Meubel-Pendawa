@@ -3,9 +3,12 @@ import { useProduk } from "../context/ProdukContext";
 import SearchBar from "../components/SearchBar";
 import FilterKategori from "../components/FilterKategori";
 import FilterMerek from "../components/FilterMerek";
-import FormInput from "../components/FormInput";
 import usePagination from "../hooks/usePagination";
 import Pagination from "../components/Pagination";
+import { nonaktifkanProduk } from "../api/productApi";
+import Toast from "../components/Toast";
+import ConfirmModal from "../components/ConfirmModal";
+import { nonaktifkanProduk, aktifkanProduk } from "../api/productApi";
 
 import Modal from "../components/Modal";
 import ProductForm from "../components/ProductForm";
@@ -17,6 +20,9 @@ export default function Produk() {
   const [openUpdateProduk, setOpenUpdateProduk] = useState(false);
   const [selectedProduk, setSelectedProduk] = useState(null);
   const [openTambahProduk, setOpenTambahProduk] = useState(false);
+  const [openConfirmProduk, setOpenConfirmProduk] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [produkToToggle, setProdukToToggle] = useState(null);
   const {
     filteredProduk,
     loading,
@@ -24,14 +30,17 @@ export default function Produk() {
     setSearchTerm,
     setSelectedKategori,
     setSelectedMerek,
+    reloadProduk,
   } = useProduk();
 
   const handleEdit = (item) => {
     setSelectedProduk(item);
     setOpenUpdateProduk(true);
   };
-  const handleDelete = (idProduk) => {
-    console.log("Hapus:", idProduk);
+
+  const handleToggleStatus = (produk) => {
+    setProdukToToggle(produk);
+    setOpenConfirmProduk(true);
   };
 
   const {
@@ -46,6 +55,37 @@ export default function Produk() {
   if (loading) {
     return <div className="p-6">Memuat produk...</div>;
   }
+
+  const handleConfirmNonaktif = async () => {
+    try {
+      if (produkToToggle.statusAktif) {
+        await nonaktifkanProduk(produkToToggle.idProduk);
+      } else {
+        await aktifkanProduk(produkToToggle.idProduk);
+      }
+
+      await reloadProduk();
+
+      setToast({
+        type: "success",
+        message: produkToToggle.statusAktif
+          ? "Produk berhasil dinonaktifkan"
+          : "Produk berhasil diaktifkan",
+      });
+
+      setTimeout(() => setToast(null), 3000);
+    } catch (error) {
+      setToast({
+        type: "error",
+        message: "Gagal mengubah status produk",
+      });
+
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setOpenConfirmProduk(false);
+      setProdukToToggle(null);
+    }
+  };
 
   return (
     <>
@@ -95,7 +135,7 @@ export default function Produk() {
             produk={paginatedData}
             mode="owner"
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
           />
 
           <Pagination
@@ -135,6 +175,26 @@ export default function Produk() {
           }}
         />
       </Modal>
+
+      <ConfirmModal
+        isOpen={openConfirmProduk}
+        title={
+          produkToToggle?.statusAktif ? "Nonaktifkan Produk" : "Aktifkan Produk"
+        }
+        message={
+          produkToToggle?.statusAktif
+            ? "Yakin ingin menonaktifkan produk ini? Produk tidak dapat digunakan untuk transaksi."
+            : "Yakin ingin mengaktifkan produk ini? Produk dapat digunakan kembali untuk transaksi."
+        }
+        confirmText={produkToToggle?.statusAktif ? "Nonaktifkan" : "Aktifkan"}
+        cancelText="Batal"
+        onConfirm={handleConfirmNonaktif}
+        onClose={() => {
+          setOpenConfirmProduk(false);
+          setProdukToToggle(null);
+        }}
+      />
+      {toast && <Toast type={toast.type} message={toast.message} />}
     </>
   );
 }

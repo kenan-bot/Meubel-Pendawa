@@ -21,4 +21,9 @@ public interface ProdukRepository extends JpaRepository<Produk, String> {
     Long countByMerek_IdMerek(String idMerek);
 
     Produk findFirstByOrderByIdProdukDesc();
+
+    List<Produk> findByStatusAktifTrue();
+
+    List<Produk> findByNamaProdukContainingIgnoreCaseAndStatusAktifTrue(
+            String keyword);
 }
