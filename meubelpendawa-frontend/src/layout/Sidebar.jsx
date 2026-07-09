@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.svg";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../api/axiosClient";
 import { useNavigate } from "react-router-dom";
 
 import { MdMenuOpen } from "react-icons/md";
@@ -17,7 +17,8 @@ export default function Sidebar({ menus }) {
   const handleLogout = async () => {
     try {
       const idKaryawan = localStorage.getItem("idKaryawan");
-      await axios.post(`https://meubelpendawa.up.railway.app//auth/logout/${idKaryawan}`);
+
+      await axiosClient.post(`/auth/logout/${idKaryawan}`);
     } catch (error) {
       console.error("Logout Error:", error);
     } finally {
@@ -67,7 +68,8 @@ export default function Sidebar({ menus }) {
                 <li className="px-2 md:px-3 py-2 my-1 cursor-pointer flex gap-1 md:gap-2 items-center relative group">
                   <div>{item.icon}</div>
 
-                  <p className={`overflow-hidden whitespace-nowrap duration-300 text-[10px] sm:text-xs md:text-base ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0"}`}
+                  <p
+                    className={`overflow-hidden whitespace-nowrap duration-300 text-[10px] sm:text-xs md:text-base ${open ? "opacity-100 ml-2" : "opacity-0 w-0 ml-0"}`}
                   >
                     {" "}
                     {item.label}{" "}
