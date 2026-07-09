@@ -21,8 +21,14 @@ public class ProdukService {
 
     public Produk simpanProduk(Produk produk) {
 
-        long nomor = produkRepository.count() + 1;
-        produk.setIdProduk(idGeneratorService.generateProdukId(nomor));
+        Produk lastProduk = produkRepository.findFirstByOrderByIdProdukDesc();
+
+        String lastId = lastProduk == null
+                ? null
+                : lastProduk.getIdProduk();
+
+        produk.setIdProduk(
+                idGeneratorService.generateNextId(lastId, "PRD"));
 
         if (produk.getStok() < 0) {
             throw new RuntimeException("Stok tidak boleh negatif");

@@ -15,7 +15,7 @@ public class DetailTransaksiService {
 
     @Autowired
     private ProdukRepository produkRepository;
-    
+
     @Autowired
     private TransaksiRepository transaksiRepository;
 
@@ -32,26 +32,32 @@ public class DetailTransaksiService {
     public DetailTransaksi simpanDetailTransaksi(DetailTransaksi detailTransaksi) {
 
         Produk produk = produkRepository.findById(detailTransaksi.getProduk().getIdProduk())
-        .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
-        
-    if (produk.getStok() < detailTransaksi.getQty()) {
-        throw new RuntimeException("Stok tidak mencukupi");
-    }
+                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
 
-    if (detailTransaksi.getHargaJual() == null) {
-        throw new RuntimeException("Harga jual wajib diisi");
-    }
+        if (produk.getStok() < detailTransaksi.getQty()) {
+            throw new RuntimeException("Stok tidak mencukupi");
+        }
 
-    if (detailTransaksi.getHargaJual() <= 0) {
-        throw new RuntimeException("Harga jual harus lebih dari 0");
-    }
+        if (detailTransaksi.getHargaJual() == null) {
+            throw new RuntimeException("Harga jual wajib diisi");
+        }
 
-    if (detailTransaksi.getQty() == null || detailTransaksi.getQty() <= 0) {
-        throw new RuntimeException("Qty harus lebih dari 0");
-    }
+        if (detailTransaksi.getHargaJual() <= 0) {
+            throw new RuntimeException("Harga jual harus lebih dari 0");
+        }
 
-        long nomor = detailTransaksiRepository.count() + 1;
-        detailTransaksi.setIdDetailTransaksi(idGeneratorService.generateDetailTransaksiId(nomor));
+        if (detailTransaksi.getQty() == null || detailTransaksi.getQty() <= 0) {
+            throw new RuntimeException("Qty harus lebih dari 0");
+        }
+
+        DetailTransaksi lastDetail = detailTransaksiRepository.findFirstByOrderByIdDetailTransaksiDesc();
+
+        String lastId = lastDetail == null
+                ? null
+                : lastDetail.getIdDetailTransaksi();
+
+        detailTransaksi.setIdDetailTransaksi(
+                idGeneratorService.generateNextId(lastId, "DTL"));
         detailTransaksi.setSubtotal(detailTransaksi.getQty() * detailTransaksi.getHargaJual());
 
         DetailTransaksi hasil = detailTransaksiRepository.save(detailTransaksi);
@@ -61,10 +67,11 @@ public class DetailTransaksiService {
 
         String orderId = hasil.getTransaksi().getOrderId();
 
-        Transaksi transaksi = transaksiRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+        Transaksi transaksi = transaksiRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
 
         double totalBaru = detailTransaksiRepository.findByTransaksi_OrderId(orderId)
-        .stream().mapToDouble(DetailTransaksi::getSubtotal).sum();
+                .stream().mapToDouble(DetailTransaksi::getSubtotal).sum();
 
         transaksi.setTotalPesanan(totalBaru);
         if (transaksi.getJumlahBayar() != null) {

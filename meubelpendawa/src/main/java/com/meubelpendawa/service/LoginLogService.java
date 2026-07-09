@@ -1,13 +1,15 @@
 package com.meubelpendawa.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.meubelpendawa.dto.LoginLogResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.meubelpendawa.dto.LoginLogResponse;
 import com.meubelpendawa.model.Karyawan;
 import com.meubelpendawa.model.LoginLog;
 import com.meubelpendawa.repository.LoginLogRepository;
@@ -23,17 +25,22 @@ public class LoginLogService {
 
     public LoginLog catatLogin(Karyawan karyawan) {
 
-        long nomor = loginLogRepository.count() + 1;
-
         LocalTime sekarang = LocalTime.now();
 
-        boolean diluarJamOperasional = sekarang.isBefore(LocalTime.of(8, 0))
+        boolean diluarJamOperasional =
+                sekarang.isBefore(LocalTime.of(8, 0))
                 || sekarang.isAfter(LocalTime.of(18, 0));
 
         LoginLog log = new LoginLog();
 
+        LoginLog lastLog =
+                loginLogRepository.findFirstByOrderByIdLogDesc();
+
+        String lastId =
+                lastLog == null ? null : lastLog.getIdLog();
+
         log.setIdLog(
-                idGeneratorService.generateLoginLogId(nomor));
+                idGeneratorService.generateNextId(lastId, "LOG"));
 
         log.setKaryawan(karyawan);
         log.setLoginAt(LocalDateTime.now());
@@ -90,16 +97,12 @@ public class LoginLogService {
         if (log.getLogoutAt() == null) {
 
             status = "Aktif";
-            durasi = formatDurasi(
-                    log.getLoginAt(),
-                    LocalDateTime.now());
+            durasi = formatDurasi(log.getLoginAt(), LocalDateTime.now());
 
         } else {
 
             status = "Logout";
-            durasi = formatDurasi(
-                    log.getLoginAt(),
-                    log.getLogoutAt());
+            durasi = formatDurasi(log.getLoginAt(), log.getLogoutAt());
         }
 
         Boolean logoutDiluarJamOperasional = null;
@@ -108,12 +111,12 @@ public class LoginLogService {
 
             LocalTime jamLogout = log.getLogoutAt().toLocalTime();
 
-            logoutDiluarJamOperasional = jamLogout.isBefore(LocalTime.of(8, 0))
+            logoutDiluarJamOperasional =
+                    jamLogout.isBefore(LocalTime.of(8, 0))
                     || jamLogout.isAfter(LocalTime.of(18, 0));
         }
 
         return new LoginLogResponse(
-
                 log.getIdLog(),
                 log.getKaryawan().getIdKaryawan(),
                 log.getKaryawan().getNamaKaryawan(),
@@ -128,7 +131,7 @@ public class LoginLogService {
 
     private String formatDurasi(LocalDateTime mulai, LocalDateTime selesai) {
 
-        java.time.Duration duration = java.time.Duration.between(mulai, selesai);
+        Duration duration = Duration.between(mulai, selesai);
 
         long totalDetik = duration.getSeconds();
 
@@ -152,5 +155,4 @@ public class LoginLogService {
 
         return hasil.toString().trim();
     }
-
 }

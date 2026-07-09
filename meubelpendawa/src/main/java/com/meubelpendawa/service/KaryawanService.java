@@ -34,11 +34,17 @@ public class KaryawanService {
 
     public Karyawan simpanKaryawan(Karyawan karyawan) {
 
-        long nomor = karyawanRepository.count() + 1;
-        karyawan.setIdKaryawan(idGeneratorService.generateKaryawanId(nomor));
+        Karyawan lastKaryawan = karyawanRepository.findFirstByOrderByIdKaryawanDesc();
+
+        String lastId = lastKaryawan == null
+                ? null
+                : lastKaryawan.getIdKaryawan();
+
+        karyawan.setIdKaryawan(
+                idGeneratorService.generateNextId(lastId, "KRY"));
 
         if (karyawan.getAksesSistem()) {
-            
+
             if (karyawanRepository.existsByUsername(karyawan.getUsername())) {
                 throw new RuntimeException("Username sudah digunakan");
             }
@@ -148,7 +154,7 @@ public class KaryawanService {
                 .orElseThrow(() -> new RuntimeException("Karyawan tidak ditemukan"));
 
         karyawan.setStatusAktif(statusAktif);
-        
+
         if (!statusAktif) {
             karyawan.setTanggalNonaktif(LocalDateTime.now());
         } else {

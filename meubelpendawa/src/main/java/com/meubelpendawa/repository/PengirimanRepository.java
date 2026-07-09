@@ -13,4 +13,5 @@ public interface PengirimanRepository extends JpaRepository<Pengiriman, String> 
     boolean existsByTransaksi_OrderId(String orderId);
 
     Optional<Pengiriman> findByTransaksi_OrderId(String orderId);
+    Pengiriman findFirstByOrderByIdPengirimanDesc();
 }

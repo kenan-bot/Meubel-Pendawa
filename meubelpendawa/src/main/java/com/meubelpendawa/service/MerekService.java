@@ -21,8 +21,15 @@ public class MerekService {
 
     public Merek simpanMerek(Merek merek) {
 
-        long nomor = merekRepository.count() + 1;
-        merek.setIdMerek(idGeneratorService.generateMerekId(nomor));
+        Merek lastMerek = merekRepository.findFirstByOrderByIdMerekDesc();
+
+        String lastId = lastMerek == null
+                ? null
+                : lastMerek.getIdMerek();
+
+        merek.setIdMerek(
+                idGeneratorService.generateNextId(lastId, "MRK"));
+
         return merekRepository.save(merek);
     }
 

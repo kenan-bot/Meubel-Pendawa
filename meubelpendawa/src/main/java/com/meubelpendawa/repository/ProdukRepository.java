@@ -19,4 +19,6 @@ public interface ProdukRepository extends JpaRepository<Produk, String> {
     boolean existsByMerek_IdMerek(String idMerek);
 
     Long countByMerek_IdMerek(String idMerek);
+
+    Produk findFirstByOrderByIdProdukDesc();
 }

@@ -22,8 +22,14 @@ public class PengirimanService {
 
     public Pengiriman simpanPengiriman(Pengiriman pengiriman) {
 
-        long nomor = pengirimanRepository.count() + 1;
-        pengiriman.setIdPengiriman(idGeneratorService.generatePengirimanId(nomor));
+        Pengiriman lastPengiriman = pengirimanRepository.findFirstByOrderByIdPengirimanDesc();
+
+        String lastId = lastPengiriman == null
+                ? null
+                : lastPengiriman.getIdPengiriman();
+
+        pengiriman.setIdPengiriman(
+                idGeneratorService.generateNextId(lastId, "PNG"));
         return pengirimanRepository.save(pengiriman);
     }
 
@@ -41,23 +47,23 @@ public class PengirimanService {
 
     public Pengiriman updateStatus(String idPengiriman, String statusBaru) {
 
-    Pengiriman pengiriman = pengirimanRepository.findById(idPengiriman)
-        .orElseThrow(() -> new RuntimeException("Pengiriman tidak ditemukan"));
+        Pengiriman pengiriman = pengirimanRepository.findById(idPengiriman)
+                .orElseThrow(() -> new RuntimeException("Pengiriman tidak ditemukan"));
 
-    if ("COMPLETED".equals(pengiriman.getStatusPengiriman())) {
-        throw new RuntimeException("Pengiriman sudah selesai dan tidak dapat diubah");
+        if ("COMPLETED".equals(pengiriman.getStatusPengiriman())) {
+            throw new RuntimeException("Pengiriman sudah selesai dan tidak dapat diubah");
+        }
+
+        if (!"COMPLETED".equals(statusBaru)) {
+            throw new RuntimeException("Status hanya boleh diubah menjadi COMPLETED");
+        }
+
+        pengiriman.setStatusPengiriman("COMPLETED");
+
+        // simpan waktu selesai
+        pengiriman.setTanggalSelesai(LocalDateTime.now());
+
+        return pengirimanRepository.save(pengiriman);
     }
-
-    if (!"COMPLETED".equals(statusBaru)) {
-        throw new RuntimeException("Status hanya boleh diubah menjadi COMPLETED");
-    }
-
-    pengiriman.setStatusPengiriman("COMPLETED");
-
-    // simpan waktu selesai
-    pengiriman.setTanggalSelesai(LocalDateTime.now());
-
-    return pengirimanRepository.save(pengiriman);
-}
 
 }

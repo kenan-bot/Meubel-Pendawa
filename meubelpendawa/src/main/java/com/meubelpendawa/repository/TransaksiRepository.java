@@ -23,4 +23,5 @@ public interface TransaksiRepository extends JpaRepository<Transaksi, String> {
             String statusPembayaran
     );
 
+    Transaksi findFirstByOrderIdStartingWithOrderByOrderIdDesc(String prefix);
 }

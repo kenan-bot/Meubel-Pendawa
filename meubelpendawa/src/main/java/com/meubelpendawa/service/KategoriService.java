@@ -21,8 +21,15 @@ public class KategoriService {
 
     public Kategori simpanKategori(Kategori kategori) {
 
-        long nomor = kategoriRepository.count() + 1;
-        kategori.setIdKategori(idGeneratorService.generateKategoriId(nomor));
+        Kategori lastKategori = kategoriRepository.findFirstByOrderByIdKategoriDesc();
+
+        String lastId = lastKategori == null
+                ? null
+                : lastKategori.getIdKategori();
+
+        kategori.setIdKategori(
+                idGeneratorService.generateNextId(lastId, "KTG"));
+
         return kategoriRepository.save(kategori);
     }
 

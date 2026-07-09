@@ -64,21 +64,27 @@ public class TransaksiService {
     @Transactional
     public Transaksi simpanTransaksi(Transaksi transaksi) {
 
-        String tanggal = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
-        String prefix = "ORD" + tanggal;
-        long jumlahHariIni = transaksiRepository.countByOrderIdStartingWith(prefix);
+        String tanggal = LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("yyMMdd"));
 
-        transaksi.setOrderId(idGeneratorService.generateOrderId(prefix, jumlahHariIni));
+        String prefix = "ORD" + tanggal;
+
+        Transaksi lastTransaksi = transaksiRepository.findFirstByOrderIdStartingWithOrderByOrderIdDesc(prefix);
+
+        String lastOrderId = lastTransaksi == null
+                ? null
+                : lastTransaksi.getOrderId();
+
+        transaksi.setOrderId(
+                idGeneratorService.generateNextOrderId(prefix, lastOrderId));
+
         transaksi.setTanggalTransaksi(
                 LocalDateTime.now(ZoneId.of("Asia/Jakarta")));
-        transaksi.setTanggalTransaksi(LocalDateTime.now());
 
         transaksi.setTotalPesanan(0.0);
         transaksi.setKembalian(0.0);
 
-        Transaksi transaksiTersimpan = transaksiRepository.save(transaksi);
-
-        return transaksiTersimpan;
+        return transaksiRepository.save(transaksi);
     }
 
     private void buatPengirimanJikaBelumAda(Transaksi transaksi) {
@@ -90,8 +96,14 @@ public class TransaksiService {
         }
 
         Pengiriman pengiriman = new Pengiriman();
-        long nomorPengiriman = pengirimanRepository.count() + 1;
-        pengiriman.setIdPengiriman(idGeneratorService.generatePengirimanId(nomorPengiriman));
+        Pengiriman lastPengiriman = pengirimanRepository.findFirstByOrderByIdPengirimanDesc();
+
+        String lastId = lastPengiriman == null
+                ? null
+                : lastPengiriman.getIdPengiriman();
+
+        pengiriman.setIdPengiriman(
+                idGeneratorService.generateNextId(lastId, "PNG"));
         pengiriman.setTransaksi(transaksi);
         pengiriman.setDriver(transaksi.getDriver());
         pengiriman.setStatusPengiriman("ON_PROCESS");

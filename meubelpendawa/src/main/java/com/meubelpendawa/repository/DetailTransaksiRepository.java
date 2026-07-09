@@ -9,4 +9,5 @@ import java.util.List;
 public interface DetailTransaksiRepository extends JpaRepository<DetailTransaksi, String> {
     List<DetailTransaksi> findByTransaksi_OrderId(String orderId);
     List<DetailTransaksi> findByTransaksiIn(List<Transaksi> transaksi);
+    DetailTransaksi findFirstByOrderByIdDetailTransaksiDesc();
 }
