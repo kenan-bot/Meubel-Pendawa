@@ -13,108 +13,105 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    @Value("${BREVO_API_KEY}")
-    private String apiKey;
+        @Value("${brevo.api.key}")
+        private String apiKey;
 
-    @Value("${BREVO_SENDER}")
-    private String fromEmail;
+        @Value("${brevo.sender.email}")
+        private String fromEmail;
 
-    @Value("${BREVO_NAME}")
-    private String fromName;
+        @Value("${brevo.sender.name}")
+        private String fromName;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+        private final RestTemplate restTemplate = new RestTemplate();
 
-    @Override
-    public void sendEmail(
-            String to,
-            String subject,
-            String htmlContent) {
+        @Override
+        public void sendEmail(
+                        String to,
+                        String subject,
+                        String htmlContent) {
 
-        try {
+                try {
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("api-key", apiKey);
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                        headers.set("api-key", apiKey);
 
-            Map<String, Object> body = new HashMap<>();
+                        Map<String, Object> body = new HashMap<>();
 
-            body.put("sender", Map.of(
-                    "name", fromName,
-                    "email", fromEmail));
+                        body.put("sender", Map.of(
+                                        "name", fromName,
+                                        "email", fromEmail));
 
-            body.put("to", List.of(
-                    Map.of("email", to)));
+                        body.put("to", List.of(
+                                        Map.of("email", to)));
 
-            body.put("subject", subject);
-            body.put("htmlContent", htmlContent);
+                        body.put("subject", subject);
+                        body.put("htmlContent", htmlContent);
 
-            HttpEntity<Map<String, Object>> request =
-                    new HttpEntity<>(body, headers);
+                        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-            restTemplate.postForEntity(
-                    "https://api.brevo.com/v3/smtp/email",
-                    request,
-                    String.class);
+                        restTemplate.postForEntity(
+                                        "https://api.brevo.com/v3/smtp/email",
+                                        request,
+                                        String.class);
 
-        } catch (Exception e) {
+                } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "Gagal mengirim email ke " + to,
-                    e);
+                        throw new RuntimeException(
+                                        "Gagal mengirim email ke " + to,
+                                        e);
 
+                }
         }
-    }
 
-    @Override
-    public void sendEmailWithAttachment(
-            String to,
-            String subject,
-            String htmlContent,
-            String attachmentFilename,
-            byte[] attachmentBytes,
-            String attachmentContentType) {
+        @Override
+        public void sendEmailWithAttachment(
+                        String to,
+                        String subject,
+                        String htmlContent,
+                        String attachmentFilename,
+                        byte[] attachmentBytes,
+                        String attachmentContentType) {
 
-        try {
+                try {
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("api-key", apiKey);
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                        headers.set("api-key", apiKey);
 
-            String encodedFile =
-                    Base64.getEncoder()
-                            .encodeToString(attachmentBytes);
+                        String encodedFile = Base64.getEncoder()
+                                        .encodeToString(attachmentBytes);
 
-            Map<String, Object> body = new HashMap<>();
+                        Map<String, Object> body = new HashMap<>();
 
-            body.put("sender", Map.of(
-                    "name", fromName,
-                    "email", fromEmail));
+                        body.put("sender", Map.of(
+                                        "name", fromName,
+                                        "email", fromEmail));
 
-            body.put("to", List.of(
-                    Map.of("email", to)));
+                        body.put("to", List.of(
+                                        Map.of("email", to)));
 
-            body.put("subject", subject);
-            body.put("htmlContent", htmlContent);
+                        body.put("subject", subject);
+                        body.put("htmlContent", htmlContent);
 
-            body.put("attachment", List.of(
-                    Map.of(
-                            "name", attachmentFilename,
-                            "content", encodedFile)));
+                        body.put("attachment", List.of(
+                                        Map.of(
+                                                        "name", attachmentFilename,
+                                                        "content", encodedFile)));
 
-            HttpEntity<Map<String, Object>> request =
-                    new HttpEntity<>(body, headers);
+                        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-            restTemplate.postForEntity(
-                    "https://api.brevo.com/v3/smtp/email",
-                    request,
-                    String.class);
+                        restTemplate.postForEntity(
+                                        "https://api.brevo.com/v3/smtp/email",
+                                        request,
+                                        String.class);
 
-        } catch (Exception e) {
+                } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "Gagal mengirim email (lampiran) ke " + to,
-                    e);
+                        throw new RuntimeException(
+                                        "Gagal mengirim email (lampiran) ke " + to,
+                                        e);
 
+                }
         }
-    }
 }
