@@ -87,6 +87,19 @@ export default function Produk() {
     }
   };
 
+  const handleEdit = (item) => {
+    console.log("EDIT TERPANGGIL");
+
+    setSelectedProduk(item);
+    setOpenUpdateProduk(true);
+  };
+
+  const handleToggleStatus = (produk) => {
+    console.log("TOGGLE TERPANGGIL");
+
+    setProdukToToggle(produk);
+    setOpenConfirmProduk(true);
+  };
   return (
     <>
       <div className="px-3 py-5 md:p-5">
