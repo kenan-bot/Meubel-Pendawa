@@ -24,12 +24,14 @@ public class KategoriController {
     }
 
     @GetMapping("/{idKategori}/is-used")
-    public Map<String, Boolean> isUsed(
-            @PathVariable String idKategori) {
+    public Map<String, Boolean> isUsed(@PathVariable String idKategori) {
 
-        return Map.of(
-                "used",
-                produkRepository.existsByKategori_IdKategori(idKategori));
+        boolean used = produkRepository.existsByKategori_IdKategori(idKategori);
+
+        System.out.println("ID KATEGORI = " + idKategori);
+        System.out.println("USED = " + used);
+
+        return Map.of("used", used);
     }
 
     @GetMapping("/{idKategori}/usage-count")
