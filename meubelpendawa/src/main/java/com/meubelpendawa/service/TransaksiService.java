@@ -2,7 +2,6 @@ package com.meubelpendawa.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,7 @@ public class TransaksiService {
     @Autowired
     private StrukService strukService;
 
+   
     @Value("${midtrans.client-key}")
     private String clientKey;
 
@@ -69,18 +69,18 @@ public class TransaksiService {
         long jumlahHariIni = transaksiRepository.countByOrderIdStartingWith(prefix);
 
         transaksi.setOrderId(idGeneratorService.generateOrderId(prefix, jumlahHariIni));
-        transaksi.setTanggalTransaksi(
-                LocalDateTime.now(
-                        ZoneId.of("Asia/Jakarta")));
+        transaksi.setTanggalTransaksi(LocalDateTime.now());
 
         transaksi.setTotalPesanan(0.0);
         transaksi.setKembalian(0.0);
 
         Transaksi transaksiTersimpan = transaksiRepository.save(transaksi);
 
+
         return transaksiTersimpan;
     }
 
+    
     private void buatPengirimanJikaBelumAda(Transaksi transaksi) {
         if (!"DELIVERY".equalsIgnoreCase(transaksi.getMetodePengiriman())) {
             return;
@@ -110,6 +110,7 @@ public class TransaksiService {
 
         Transaksi tersimpan = transaksiRepository.save(transaksi);
 
+        
         buatPengirimanJikaBelumAda(tersimpan);
 
         strukService.kirimStrukEmail(tersimpan.getOrderId());
@@ -118,6 +119,7 @@ public class TransaksiService {
 
     }
 
+    
     public Map<String, Object> buatSnapToken(String orderId) throws MidtransError {
         Transaksi transaksi = transaksiRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
@@ -152,6 +154,7 @@ public class TransaksiService {
         return result;
     }
 
+    
     @Transactional
     public Transaksi cekDanUpdateStatus(String orderId) throws MidtransError {
         JSONObject statusResult = midtransCoreApi.checkTransaction(orderId);
@@ -161,6 +164,7 @@ public class TransaksiService {
         Transaksi transaksi = transaksiRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
 
+        
         String statusSebelumnya = transaksi.getStatusPembayaran();
 
         if ("capture".equals(transactionStatus) || "settlement".equals(transactionStatus)) {
@@ -180,8 +184,9 @@ public class TransaksiService {
 
         Transaksi tersimpan = transaksiRepository.save(transaksi);
 
+        
         if ("SUCCESS".equals(tersimpan.getStatusPembayaran()) && !"SUCCESS".equals(statusSebelumnya)) {
-
+           
             buatPengirimanJikaBelumAda(tersimpan);
             strukService.kirimStrukEmail(tersimpan.getOrderId());
         }
@@ -193,6 +198,7 @@ public class TransaksiService {
         return transaksiRepository.findByNamaPemesanContainingIgnoreCaseOrOrderIdContainingIgnoreCase(keyword, keyword);
     }
 
+    
     @Transactional
     public void batalkanTransaksi(String orderId) throws MidtransError {
         Transaksi transaksi = transaksiRepository.findById(orderId)
@@ -209,12 +215,12 @@ public class TransaksiService {
                 String status = statusResult.getString("transaction_status");
                 sudahTerlanjurBayar = "capture".equals(status) || "settlement".equals(status);
             } catch (MidtransError e) {
-
+                
                 sudahTerlanjurBayar = false;
             }
 
             if (sudahTerlanjurBayar) {
-
+                
                 cekDanUpdateStatus(orderId);
                 throw new RuntimeException(
                         "Pembayaran ternyata sudah berhasil sebelum dibatalkan, order tetap disimpan");
