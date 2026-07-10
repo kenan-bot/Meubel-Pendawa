@@ -11,6 +11,32 @@ export function ProdukProvider({ children }) {
   const [produk, setProduk] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadProduk();
+  }, []);
+
+  //load produk keseluruhan
+  const loadProduk = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllProduk();
+      setProduk(data);
+    } catch (error) {
+      console.error("Gagal mengambil produk", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //load produk yg diupdate aja
+  const updateProdukState = (produkUpdate) => {
+    setProduk((prev) =>
+      prev.map((item) =>
+        item.idProduk === produkUpdate.idProduk ? produkUpdate : item,
+      ),
+    );
+  };
+
   const nonaktifProduk = async (idProduk) => {
     const produkUpdate = await nonaktifkanProduk(idProduk);
 
@@ -25,32 +51,6 @@ export function ProdukProvider({ children }) {
     updateProdukState(produkUpdate);
 
     return produkUpdate;
-  };
-
-  useEffect(() => {
-    console.log("LOAD PRODUK");
-    loadProduk();
-  }, []);
-
-  //load produk yg diupdate aja
-  const updateProdukState = (produkUpdate) => {
-    setProduk((prev) =>
-      prev.map((item) =>
-        item.idProduk === produkUpdate.idProduk ? produkUpdate : item,
-      ),
-    );
-  };
-
-  //load produk keseluruhan
-  const loadProduk = async () => {
-    try {
-      const data = await getAllProduk();
-      setProduk(data);
-    } catch (error) {
-      console.error("Gagal mengambil produk", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const addProduk = (newProduk) => {

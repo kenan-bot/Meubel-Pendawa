@@ -44,6 +44,13 @@ const ProductCard = ({
     );
   }
 
+  const handleToggleStatus = (produk) => {
+    console.log("Masuk handleToggleStatus", produk);
+
+    setProdukToToggle(produk);
+    setOpenConfirmProduk(true);
+  };
+
   return (
     <div
       className={
@@ -81,16 +88,21 @@ const ProductCard = ({
                   delay: Math.min(index * 0.08, 0.5),
                 }}
               >
-                <div
-                  onClick={() => !stokHabis && onCardClick?.(item)}
-                  className={
-                    stokHabis ? "cursor-not-allowed" : "cursor-pointer"
-                  }
-                >
+                <div className={stokHabis ? "cursor-not-allowed" : ""}>
                   <Card
                     padding="none"
-                    className={`${isOwner ? "cursor-pointer" : ""} ${stokHabis ? "opacity-50 grayscale" : ""}`}
-                    onClick={() => isOwner && onEdit?.(item)}
+                    className={`${isOwner ? "cursor-pointer" : ""} ${
+                      stokHabis ? "opacity-50 grayscale" : ""
+                    }`}
+                    onClick={() => {
+                      if (stokHabis) return;
+
+                      if (isOwner) {
+                        onEdit?.(item);
+                      } else {
+                        onCardClick?.(item);
+                      }
+                    }}
                   >
                     {" "}
                     {item.gambarUrl && (
@@ -188,20 +200,26 @@ const ProductCard = ({
                         </div>
 
                         {isOwner && (
-                          <div
-                            className="flex justify-center mt-3"
-                            onClick={(e) => e.stopPropagation()}
-                          >
+                          <div className="flex flex-col items-center mt-3 gap-1">
                             <StatusToggle
                               checked={item.statusAktif}
-                              onChange={(e) => {
-                                e.stopPropagation();
+                              onChange={() => {
+                                console.log("Toggle diklik");
                                 onToggleStatus?.(item);
                               }}
                             />
+
+                            <span
+                              className={`text-xs font-semibold ${
+                                item.statusAktif
+                                  ? "text-green-600"
+                                  : "text-red-500"
+                              }`}
+                            >
+                              {item.statusAktif ? "Aktif" : "Nonaktif"}
+                            </span>
                           </div>
                         )}
-                        
                       </CardFooter>
                     </div>
                   </Card>

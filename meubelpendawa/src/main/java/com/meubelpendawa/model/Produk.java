@@ -1,10 +1,11 @@
 package com.meubelpendawa.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "produk")
@@ -23,6 +24,7 @@ public class Produk {
 
     private String gambarUrl;
 
+    @Column(nullable = false)
     private Boolean statusAktif = true;
 
     @ManyToOne
@@ -36,13 +38,14 @@ public class Produk {
     public Produk() {
     }
 
-    public Produk(String namaProduk,
+    public Produk(
+            String namaProduk,
             Double hargaDefault,
             Integer stok,
             String deskripsi,
             String gambarUrl,
             Kategori kategori,
-            Merek merek, Boolean statusAktif) {
+            Merek merek) {
 
         this.namaProduk = namaProduk;
         this.hargaDefault = hargaDefault;
@@ -51,7 +54,9 @@ public class Produk {
         this.gambarUrl = gambarUrl;
         this.kategori = kategori;
         this.merek = merek;
-        this.statusAktif = statusAktif;
+
+        // Setiap produk baru otomatis aktif
+        this.statusAktif = true;
     }
 
     public String getIdProduk() {
@@ -102,6 +107,14 @@ public class Produk {
         this.gambarUrl = gambarUrl;
     }
 
+    public Boolean getStatusAktif() {
+        return statusAktif;
+    }
+
+    public void setStatusAktif(Boolean statusAktif) {
+        this.statusAktif = statusAktif;
+    }
+
     public Kategori getKategori() {
         return kategori;
     }
@@ -116,13 +129,5 @@ public class Produk {
 
     public void setMerek(Merek merek) {
         this.merek = merek;
-    }
-
-    public Boolean getStatusAktif() {
-        return statusAktif;
-    }
-
-    public void setStatusAktif(Boolean statusAktif) {
-        this.statusAktif = statusAktif;
     }
 }

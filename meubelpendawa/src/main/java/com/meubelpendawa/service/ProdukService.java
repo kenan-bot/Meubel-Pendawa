@@ -1,8 +1,11 @@
 package com.meubelpendawa.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.meubelpendawa.model.Produk;
 import com.meubelpendawa.repository.ProdukRepository;
 
@@ -19,55 +22,6 @@ public class ProdukService {
         return produkRepository.findAll();
     }
 
-    public Produk simpanProduk(Produk produk) {
-
-        Produk lastProduk = produkRepository.findFirstByOrderByIdProdukDesc();
-
-        String lastId = lastProduk == null
-                ? null
-                : lastProduk.getIdProduk();
-
-        produk.setIdProduk(
-                idGeneratorService.generateNextId(lastId, "PRD"));
-
-        if (produk.getStok() < 0) {
-            throw new RuntimeException("Stok tidak boleh negatif");
-        }
-
-        if (produk.getHargaDefault() <= 0) {
-            throw new RuntimeException("Harga harus lebih dari 0");
-        }
-
-        if (produk.getNamaProduk() == null || produk.getNamaProduk().isBlank()) {
-            throw new RuntimeException("Nama produk wajib diisi");
-        }
-
-        return produkRepository.save(produk);
-    }
-
-    public Produk updateProduk(Produk produk) {
-        System.out.println("ID = " + produk.getIdProduk());
-        System.out.println("GAMBAR = " + produk.getGambarUrl());
-
-        if (produk.getStok() < 0) {
-            throw new RuntimeException("Stok tidak boleh negatif");
-        }
-
-        if (produk.getHargaDefault() <= 0) {
-            throw new RuntimeException("Harga harus lebih dari 0");
-        }
-
-        if (produk.getNamaProduk() == null || produk.getNamaProduk().isBlank()) {
-            throw new RuntimeException("Nama produk wajib diisi");
-        }
-
-        return produkRepository.save(produk);
-    }
-
-    public void hapusProduk(String idProduk) {
-        produkRepository.deleteById(idProduk);
-    }
-
     public List<Produk> searchProduk(String keyword) {
         return produkRepository.findByNamaProdukContainingIgnoreCase(keyword);
     }
@@ -80,6 +34,85 @@ public class ProdukService {
         return produkRepository.findByMerek_IdMerek(idMerek);
     }
 
+    @Transactional
+    public Produk simpanProduk(Produk produk) {
+
+        Produk lastProduk = produkRepository.findFirstByOrderByIdProdukDesc();
+
+        String lastId = lastProduk == null
+                ? null
+                : lastProduk.getIdProduk();
+
+        produk.setIdProduk(
+                idGeneratorService.generateNextId(lastId, "PRD"));
+
+        if (produk.getNamaProduk() == null || produk.getNamaProduk().isBlank()) {
+            throw new RuntimeException("Nama produk wajib diisi");
+        }
+
+        if (produk.getHargaDefault() == null || produk.getHargaDefault() <= 0) {
+            throw new RuntimeException("Harga harus lebih dari 0");
+        }
+
+        if (produk.getStok() == null || produk.getStok() < 0) {
+            throw new RuntimeException("Stok tidak boleh negatif");
+        }
+
+        // Produk baru selalu aktif
+        produk.setStatusAktif(true);
+
+        return produkRepository.save(produk);
+    }
+
+    @Transactional
+    public Produk updateProduk(Produk produk) {
+
+        Produk existing = produkRepository.findById(produk.getIdProduk())
+                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
+
+        if (produk.getNamaProduk() == null || produk.getNamaProduk().isBlank()) {
+            throw new RuntimeException("Nama produk wajib diisi");
+        }
+
+        if (produk.getHargaDefault() == null || produk.getHargaDefault() <= 0) {
+            throw new RuntimeException("Harga harus lebih dari 0");
+        }
+
+        if (produk.getStok() == null || produk.getStok() < 0) {
+            throw new RuntimeException("Stok tidak boleh negatif");
+        }
+
+        existing.setNamaProduk(produk.getNamaProduk());
+        existing.setHargaDefault(produk.getHargaDefault());
+        existing.setStok(produk.getStok());
+        existing.setDeskripsi(produk.getDeskripsi());
+        existing.setGambarUrl(produk.getGambarUrl());
+        existing.setKategori(produk.getKategori());
+        existing.setMerek(produk.getMerek());
+
+        // statusAktif sengaja tidak diubah di sini
+        // karena perubahan status hanya melalui endpoint aktif/nonaktif
+
+        return produkRepository.save(existing);
+    }
+
+    @Transactional
+    public void hapusProduk(String idProduk) {
+        produkRepository.deleteById(idProduk);
+    }
+
+    @Transactional
+    public Produk aktifkanProduk(String idProduk) {
+
+        Produk produk = produkRepository.findById(idProduk)
+                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
+
+        produk.setStatusAktif(true);
+
+        return produkRepository.save(produk);
+    }
+
+    @Transactional
     public Produk nonaktifkanProduk(String idProduk) {
 
         Produk produk = produkRepository.findById(idProduk)
@@ -90,14 +123,4 @@ public class ProdukService {
         return produkRepository.save(produk);
     }
 
-    public Produk aktifkanProduk(String idProduk) {
-
-        Produk produk = produkRepository.findById(idProduk)
-                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
-
-        produk.setStatusAktif(true);
-
-        return produkRepository.save(produk);
-    }
-    
 }

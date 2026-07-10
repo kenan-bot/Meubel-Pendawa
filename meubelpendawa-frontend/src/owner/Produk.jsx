@@ -7,7 +7,6 @@ import usePagination from "../hooks/usePagination";
 import Pagination from "../components/Pagination";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
-import { nonaktifkanProduk, aktifkanProduk } from "../api/productApi";
 
 import Modal from "../components/Modal";
 import ProductForm from "../components/ProductForm";
@@ -29,7 +28,8 @@ export default function Produk() {
     setSearchTerm,
     setSelectedKategori,
     setSelectedMerek,
-    reloadProduk,
+    nonaktifProduk,
+    aktifProduk,
   } = useProduk();
 
   const handleEdit = (item) => {
@@ -52,34 +52,38 @@ export default function Produk() {
   } = usePagination(filteredProduk, 12);
 
   if (loading) {
-    return <div className="p-6">Memuat produk...</div>;
+    return (
+      <div className="flex justify-center items-center h-72">
+        Memuat produk...
+      </div>
+    );
   }
 
-  const handleConfirmNonaktif = async () => {
+  const showToast = (type, message) => {
+    setToast({ type, message });
+
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
+
+  const handleConfirmToggleStatus = async () => {
+    if (!produkToToggle) return;
+
     try {
       if (produkToToggle.statusAktif) {
-        await nonaktifkanProduk(produkToToggle.idProduk);
+        await nonaktifProduk(produkToToggle.idProduk);
+
+        showToast("success", "Produk berhasil dinonaktifkan");
       } else {
-        await aktifkanProduk(produkToToggle.idProduk);
+        await aktifProduk(produkToToggle.idProduk);
+
+        showToast("success", "Produk berhasil diaktifkan");
       }
-
-      await reloadProduk();
-
-      setToast({
-        type: "success",
-        message: produkToToggle.statusAktif
-          ? "Produk berhasil dinonaktifkan"
-          : "Produk berhasil diaktifkan",
-      });
-
-      setTimeout(() => setToast(null), 3000);
     } catch (error) {
-      setToast({
-        type: "error",
-        message: "Gagal mengubah status produk",
-      });
+      console.error(error);
 
-      setTimeout(() => setToast(null), 3000);
+      showToast("error", "Gagal mengubah status produk");
     } finally {
       setOpenConfirmProduk(false);
       setProdukToToggle(null);
@@ -89,16 +93,18 @@ export default function Produk() {
   return (
     <>
       <div className="px-3 py-5 md:p-5">
+        {/* Header */}
         <div className="md:-mt-7 mb-6">
           <h1 className="font-extrabold text-2xl md:text-3xl leading-tight">
             Manajemen Produk
           </h1>
 
-          <p className="text-sm md:text-base text-gray-500 mt-0">
+          <p className="text-sm md:text-base text-gray-500">
             Kelola dengan mudah semua data produk
           </p>
         </div>
 
+        {/* Filter */}
         <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
           <SearchBar
             theme="orange"
@@ -106,29 +112,31 @@ export default function Produk() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+
           <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto">
             <FilterKategori
-              onSelect={(item) =>
-                setSelectedKategori(item ? item.idKategori : null)
-              }
+              onSelect={(item) => setSelectedKategori(item?.idKategori ?? null)}
             />
+
             <FilterMerek
-              onSelect={(item) => setSelectedMerek(item ? item.idMerek : null)}
+              onSelect={(item) => setSelectedMerek(item?.idMerek ?? null)}
             />
           </div>
 
-          {/* tambah produk */}
           <button
-            onClick={() => setOpenTambahProduk(true)}
-            className="md:ml-auto flex items-center gap-1.5 bg-orange-500 text-white text-sm font-medium
-            px-3 py-1.5 rounded-md hover:bg-orange-600 hover:scale-[1.02]
-            transition-all duration-300 ease-out"
+            type="button"
+            onClick={() => {
+              setSelectedProduk(null);
+              setOpenTambahProduk(true);
+            }}
+            className="md:ml-auto flex items-center gap-1.5 bg-orange-500 text-white text-sm font-medium px-3 py-1.5 rounded-md hover:bg-orange-600 hover:scale-[1.02] transition-all duration-300"
           >
             <FiPlus size={18} />
             Tambah Produk
           </button>
         </div>
 
+        {/* Card */}
         <div className="mt-3">
           <ProductCard
             produk={paginatedData}
@@ -147,23 +155,34 @@ export default function Produk() {
         </div>
       </div>
 
+      {/* Modal Tambah */}
       <Modal
         maxWidth="max-w-3xl"
         isOpen={openTambahProduk}
-        onClose={() => setOpenTambahProduk(false)}
         title="Tambah Produk"
+        onClose={() => {
+          setOpenTambahProduk(false);
+          setSelectedProduk(null);
+        }}
       >
-        <ProductForm />
+        <ProductForm
+          mode="create"
+          onSuccess={() => {
+            setOpenTambahProduk(false);
+            setSelectedProduk(null);
+          }}
+        />
       </Modal>
 
+      {/* Modal Edit */}
       <Modal
         maxWidth="max-w-3xl"
         isOpen={openUpdateProduk}
+        title="Update Produk"
         onClose={() => {
           setOpenUpdateProduk(false);
           setSelectedProduk(null);
         }}
-        title="Update Produk"
       >
         <ProductForm
           mode="edit"
@@ -175,24 +194,28 @@ export default function Produk() {
         />
       </Modal>
 
+      {/* Confirm Toggle */}
       <ConfirmModal
         isOpen={openConfirmProduk}
         title={
           produkToToggle?.statusAktif ? "Nonaktifkan Produk" : "Aktifkan Produk"
         }
         message={
-          produkToToggle?.statusAktif
-            ? "Yakin ingin menonaktifkan produk ini? Produk tidak dapat digunakan untuk transaksi."
-            : "Yakin ingin mengaktifkan produk ini? Produk dapat digunakan kembali untuk transaksi."
+          produkToToggle
+            ? produkToToggle.statusAktif
+              ? `Produk "${produkToToggle.namaProduk}" akan dinonaktifkan dan tidak dapat digunakan dalam transaksi.`
+              : `Produk "${produkToToggle.namaProduk}" akan diaktifkan kembali dan dapat digunakan dalam transaksi.`
+            : ""
         }
         confirmText={produkToToggle?.statusAktif ? "Nonaktifkan" : "Aktifkan"}
         cancelText="Batal"
-        onConfirm={handleConfirmNonaktif}
+        onConfirm={handleConfirmToggleStatus}
         onClose={() => {
           setOpenConfirmProduk(false);
           setProdukToToggle(null);
         }}
       />
+
       {toast && <Toast type={toast.type} message={toast.message} />}
     </>
   );
