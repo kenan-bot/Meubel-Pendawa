@@ -54,6 +54,18 @@ export function TransaksiProvider({ children }) {
   const [keyword, setKeyword] = useState("");
   const [kategoriPick, setKategoriPick] = useState(null);
   const [merekPick, setMerekPick] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  const statusOptions = [
+    {
+      value: true,
+      label: "Aktif",
+    },
+    {
+      value: false,
+      label: "Nonaktif",
+    },
+  ];
 
   const produkTersaring = useMemo(
     () =>
@@ -61,15 +73,21 @@ export function TransaksiProvider({ children }) {
         const cocokKeyword = item.namaProduk
           ?.toLowerCase()
           .includes(keyword.toLowerCase());
+
         const cocokKategori = kategoriPick
           ? item.kategori?.idKategori === kategoriPick.idKategori
           : true;
+
         const cocokMerek = merekPick
           ? item.merek?.idMerek === merekPick.idMerek
           : true;
-        return cocokKeyword && cocokKategori && cocokMerek;
+
+        const cocokStatus =
+          selectedStatus === null ? true : item.statusAktif === selectedStatus;
+
+        return cocokKeyword && cocokKategori && cocokMerek && cocokStatus;
       }),
-    [produk, keyword, kategoriPick, merekPick],
+    [produk, keyword, kategoriPick, merekPick, selectedStatus],
   );
 
   // ----- keranjang -----
@@ -104,12 +122,24 @@ export function TransaksiProvider({ children }) {
   }, [pesan]);
 
   const tambahKeKeranjang = (item) => {
+    // Produk nonaktif tidak boleh dijual
+    if (!item.statusAktif) {
+      tampilkanPesan(
+        `Produk "${item.namaProduk}" sedang dinonaktifkan dan tidak dapat dijual.`,
+        "error",
+      );
+      return;
+    }
+
+    // Stok habis
     if (item.stok === 0) {
       tampilkanPesan(`${item.namaProduk} stoknya habis.`, "error");
       return;
     }
+
     setKeranjang((prev) => {
       const ada = prev.find((c) => c.produk.idProduk === item.idProduk);
+
       if (ada) {
         if (ada.qty >= item.stok) {
           tampilkanPesan(
@@ -118,11 +148,20 @@ export function TransaksiProvider({ children }) {
           );
           return prev;
         }
+
         return prev.map((c) =>
           c.produk.idProduk === item.idProduk ? { ...c, qty: c.qty + 1 } : c,
         );
       }
-      return [...prev, { produk: item, qty: 1, hargaJual: item.hargaDefault }];
+
+      return [
+        ...prev,
+        {
+          produk: item,
+          qty: 1,
+          hargaJual: item.hargaDefault,
+        },
+      ];
     });
   };
 
@@ -381,6 +420,9 @@ export function TransaksiProvider({ children }) {
     closeQrisModal,
     strukData,
     closeStruk,
+    selectedStatus,
+    setSelectedStatus,
+    statusOptions,
   };
 
   return (

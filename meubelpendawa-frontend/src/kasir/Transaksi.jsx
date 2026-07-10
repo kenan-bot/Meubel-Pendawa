@@ -16,6 +16,7 @@ import QrisPaymentModal from "../components/QrisPaymentModal";
 import StrukModal from "../components/StrukModal";
 import usePagination from "../hooks/usePagination";
 import Pagination from "../components/Pagination";
+import DropDownFilter from "../components/DropDownFilter";
 
 import { GiShoppingBag } from "react-icons/gi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -110,6 +111,19 @@ function TransaksiContent() {
           />
           <FilterKategori onSelect={t.setKategoriPick} />
           <FilterMerek onSelect={t.setMerekPick} />
+          <DropDownFilter
+            title="Status"
+            items={t.statusOptions}
+            value={
+              t.selectedStatus === null
+                ? { value: "__ALL__", label: "Semua" }
+                : t.statusOptions.find((x) => x.value === t.selectedStatus)
+            }
+            theme="orange"
+            onSelect={(item) =>
+              t.setSelectedStatus(item.value === "__ALL__" ? null : item.value)
+            }
+          />
         </div>
 
         {/* Grid produk — klik untuk tambah ke keranjang.

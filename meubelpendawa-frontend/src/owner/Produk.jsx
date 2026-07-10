@@ -7,6 +7,7 @@ import usePagination from "../hooks/usePagination";
 import Pagination from "../components/Pagination";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
+import DropDownFilter from "../components/DropDownFilter";
 
 import Modal from "../components/Modal";
 import ProductForm from "../components/ProductForm";
@@ -30,6 +31,7 @@ export default function Produk() {
     setSelectedMerek,
     nonaktifProduk,
     aktifProduk,
+    setSelectedStatus,
   } = useProduk();
 
   const handleEdit = (item) => {
@@ -90,6 +92,17 @@ export default function Produk() {
     }
   };
 
+  const statusOptions = [
+    {
+      value: true,
+      label: "Aktif",
+    },
+    {
+      value: false,
+      label: "Nonaktif",
+    },
+  ];
+
   return (
     <>
       <div className="px-3 py-5 md:p-5">
@@ -120,6 +133,15 @@ export default function Produk() {
 
             <FilterMerek
               onSelect={(item) => setSelectedMerek(item?.idMerek ?? null)}
+            />
+
+            <DropDownFilter
+              title="Status"
+              items={statusOptions}
+              theme="orange"
+              onSelect={(item) =>
+                setSelectedStatus(item.value === "__ALL__" ? null : item.value)
+              }
             />
           </div>
 

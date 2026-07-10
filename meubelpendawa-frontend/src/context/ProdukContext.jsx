@@ -60,16 +60,22 @@ export function ProdukProvider({ children }) {
   const [selectedKategori, setSelectedKategori] = useState(null);
   const [selectedMerek, setSelectedMerek] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   const filteredProduk = produk.filter((item) => {
     const kategoriMatch =
       !selectedKategori || item.kategori?.idKategori === selectedKategori;
+
     const merekMatch = !selectedMerek || item.merek?.idMerek === selectedMerek;
+
+    const statusMatch =
+      selectedStatus === null || item.statusAktif === selectedStatus;
+
     const searchMatch =
       !searchTerm ||
       item.namaProduk?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return kategoriMatch && merekMatch && searchMatch;
+    return kategoriMatch && merekMatch && statusMatch && searchMatch;
   });
 
   return (
@@ -94,6 +100,9 @@ export function ProdukProvider({ children }) {
 
         nonaktifProduk,
         aktifProduk,
+
+        selectedStatus,
+        setSelectedStatus,
       }}
     >
       {children}
