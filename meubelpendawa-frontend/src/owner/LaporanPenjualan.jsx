@@ -20,6 +20,14 @@ import {
 import dayjs from "dayjs";
 
 function LaporanPenjualan() {
+  const getLocalDate = () => {
+    const today = new Date();
+
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
+      2,
+      "0",
+    )}-${String(today.getDate()).padStart(2, "0")}`;
+  };
   const [periode, setPeriode] = useState("HARIAN");
   const [openDetail, setOpenDetail] = useState(false);
   const [detailPenjualan, setDetailPenjualan] = useState([]);
@@ -27,13 +35,8 @@ function LaporanPenjualan() {
   const [kontribusiProduk, setKontribusiProduk] = useState([]);
   const [trenPenjualan, setTrenPenjualan] = useState([]);
 
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
-
-  const [endDate, setEndDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [startDate, setStartDate] = useState(getLocalDate());
+  const [endDate, setEndDate] = useState(getLocalDate());
 
   const [summary, setSummary] = useState({
     totalOmzet: 0,
@@ -109,7 +112,7 @@ function LaporanPenjualan() {
     const today = new Date();
 
     if (value === "HARIAN") {
-      const date = today.toISOString().split("T")[0];
+      const date = getLocalDate();
 
       setStartDate(date);
       setEndDate(date);
@@ -120,8 +123,14 @@ function LaporanPenjualan() {
 
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-      setStartDate(firstDay.toISOString().split("T")[0]);
-      setEndDate(lastDay.toISOString().split("T")[0]);
+      const formatDate = (date) =>
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+          2,
+          "0",
+        )}-${String(date.getDate()).padStart(2, "0")}`;
+
+      setStartDate(formatDate(firstDay));
+      setEndDate(formatDate(lastDay));
     }
 
     if (value === "TAHUNAN") {
@@ -185,8 +194,9 @@ function LaporanPenjualan() {
           onStartDateChange={setStartDate}
           onEndDateChange={setEndDate}
           onReset={() => {
-            const today = new Date().toISOString().split("T")[0];
+            const today = getLocalDate();
 
+            setPeriode("HARIAN");
             setStartDate(today);
             setEndDate(today);
           }}
@@ -398,9 +408,7 @@ function LaporanPenjualan() {
                 </p>
 
                 <div className="flex items-end gap-1 -mt-1">
-                  <h2
-                    className="text-3xl sm:text-4xl md:text-[25px] font-extrabold text-orange-500 leading-none"
-                  >
+                  <h2 className="text-3xl sm:text-4xl md:text-[25px] font-extrabold text-orange-500 leading-none">
                     <AnimatedCount
                       value={summary.produkTerjual}
                       duration={1500}
