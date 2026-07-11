@@ -1,17 +1,21 @@
 import DropDownFilter from "../components/DropDownFilter";
 import DateRangePicker from "../components/DateRangePicker";
+import DetailTransaksiTable from "../components/DetailTransaksiTable";
 import Card from "../components/Card";
 import Modal from "../components/Modal";
 import { useEffect, useState } from "react";
 import {
   getSummaryLaporanPenjualan,
   getSummaryLaporanPenjualanByPeriode,
+  getDetailLaporanPenjualan,
 } from "../api/laporanPenjualanApi";
 import dayjs from "dayjs";
 
 function LaporanPenjualan() {
   const [periode, setPeriode] = useState("HARIAN");
   const [openDetail, setOpenDetail] = useState(false);
+  const [detailPenjualan, setDetailPenjualan] = useState([]);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split("T")[0],
@@ -94,6 +98,24 @@ function LaporanPenjualan() {
     if (value === "TAHUNAN") {
       setStartDate(`${today.getFullYear()}-01-01`);
       setEndDate(`${today.getFullYear()}-12-31`);
+    }
+  };
+
+  const handleLihatDetail = async () => {
+    try {
+      setLoadingDetail(true);
+
+      const data = await getDetailLaporanPenjualan(
+        `${startDate}T00:00:00`,
+        `${endDate}T23:59:59`,
+      );
+
+      setDetailPenjualan(data);
+      setOpenDetail(true);
+    } catch (error) {
+      console.error("Gagal mengambil detail penjualan:", error);
+    } finally {
+      setLoadingDetail(false);
     }
   };
 
@@ -201,19 +223,9 @@ function LaporanPenjualan() {
               </div>
 
               <button
-                onClick={() => setOpenDetail(true)}
-                className="
-        mt-4
-        w-full
-        py-2
-        rounded-lg
-        bg-orange-500
-        hover:bg-orange-600
-        text-white
-        text-sm
-        font-medium
-        transition
-      "
+                onClick={handleLihatDetail}
+                className="mt-4 w-full py-2 rounded-lg bg-orange-500 hover:bg-orange-600
+                text-white text-sm font-medium transition"
               >
                 Lihat Detail
               </button>
@@ -226,7 +238,11 @@ function LaporanPenjualan() {
               title="Detail Penjualan"
               maxWidth="max-w-6xl"
             >
-              {/* <TabelDetailPenjualan /> */}
+              {loadingDetail ? (
+                <div className="py-8 text-center">Memuat data...</div>
+              ) : (
+                <DetailTransaksiTable data={detailPenjualan} />
+              )}
             </Modal>
 
             {/* RATA RATA + PRODUK TERJUAL */}
@@ -238,12 +254,8 @@ function LaporanPenjualan() {
 
                 <div className="mt-2">
                   <h2
-                    className="
-      text-lg sm:text-xl xl:text-2xl
-      font-bold text-orange-500
-      break-words
-      leading-tight
-      "
+                    className="text-lg sm:text-xl xl:text-2xl font-bold text-orange-500
+                    break-words leading-tight"
                   >
                     {formatRupiah(summary.rataRataPembelian)}
                   </h2>

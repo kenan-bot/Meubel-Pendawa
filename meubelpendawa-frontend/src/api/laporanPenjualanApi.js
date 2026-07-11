@@ -26,3 +26,14 @@ export const getSummaryLaporanPenjualanByPeriode = async (
 
     return response.data;
 };
+
+export const getDetailLaporanPenjualan = async (startDate, endDate) => {
+    const response = await axiosClient.get(`${BASE_URL}/detail`, {
+        params: {
+            startDate,
+            endDate,
+        },
+    });
+
+    return response.data;
+};
