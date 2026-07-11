@@ -26,7 +26,7 @@ export default function DetailTransaksiTable({ data = [] }) {
   return (
     <div className="overflow-auto max-h-[500px] border border-gray-200 rounded-xl">
       <table className="min-w-full text-sm">
-        <thead className="sticky top-0 bg-[#5F04E8] text-white z-10">
+        <thead className="sticky top-0 bg-orange-500 text-white z-10">
           <tr>
             <th className="px-4 py-3 text-center">No</th>
             <th className="px-4 py-3 text-left">Tanggal</th>

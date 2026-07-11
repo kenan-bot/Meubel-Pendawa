@@ -1,6 +1,8 @@
 import DropDownFilter from "../components/DropDownFilter";
 import DateRangePicker from "../components/DateRangePicker";
 import DetailTransaksiTable from "../components/DetailTransaksiTable";
+import AnimatedCount from "../components/AnimatedCount";
+import AnimatedProgressBar from "../components/AnimatedProgressBar";
 import Card from "../components/Card";
 import MiniChart from "../components/MiniChart";
 import { LuDownload } from "react-icons/lu";
@@ -206,7 +208,11 @@ function LaporanPenjualan() {
               </p>
 
               <h2 className="text-orange-500 text-3xl font-extrabold mt-2">
-                {formatRupiah(summary.totalOmzet)}
+                <AnimatedCount
+                  value={summary.totalOmzet}
+                  formatter={formatRupiah}
+                  duration={1500}
+                />
               </h2>
 
               <div className="mt-5">
@@ -225,16 +231,19 @@ function LaporanPenjualan() {
             {/* TOTAL TRANSAKSI */}
             <Card className="shadow-md p-4 flex flex-col justify-between">
               <div>
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-sm md:text-lg text-gray-500 font-medium">
                   Total Transaksi
                 </p>
 
                 <div className="flex justify-between items-end mt-2">
                   <h2 className="text-2xl sm:text-6xl font-bold text-orange-500">
-                    {summary.totalTransaksi}
+                    <AnimatedCount
+                      value={summary.totalTransaksi}
+                      duration={1500}
+                    />
                   </h2>
 
-                  <span className="text-xs text-gray-400">pesanan</span>
+                  <span className="text-base text-gray-400">pesanan</span>
                 </div>
               </div>
 
@@ -264,7 +273,7 @@ function LaporanPenjualan() {
             {/* RATA RATA + PRODUK TERJUAL */}
             <div className="flex flex-col gap-4">
               <Card className="shadow-md p-4">
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-sm md:text-lg text-gray-500 font-medium">
                   Rata-rata Pembelian
                 </p>
 
@@ -273,24 +282,37 @@ function LaporanPenjualan() {
                     className="text-lg sm:text-xl xl:text-2xl font-bold text-orange-500
                     break-words leading-tight"
                   >
-                    {formatRupiah(summary.rataRataPembelian)}
+                    <AnimatedCount
+                      value={summary.rataRataPembelian}
+                      formatter={formatRupiah}
+                      duration={1500}
+                    />
                   </h2>
 
-                  <span className="text-xs text-gray-400">/ transaksi</span>
+                  <div className="flex justify-end">
+                    <span className="text-base text-gray-400 mt-1">
+                      /transaksi
+                    </span>
+                  </div>
                 </div>
               </Card>
 
               <Card className="shadow-md p-4">
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-sm md:text-lg text-gray-500 font-medium">
                   Produk Terjual
                 </p>
 
-                <div className="flex justify-between items-end mt-2">
+                <div className="mt-2">
                   <h2 className="text-xl sm:text-2xl font-bold text-orange-500">
-                    {summary.produkTerjual}
+                    <AnimatedCount
+                      value={summary.produkTerjual}
+                      duration={1500}
+                    />
                   </h2>
 
-                  <span className="text-xs text-gray-400">unit</span>
+                  <span className="block text-right text-base text-gray-400 mt-1">
+                    unit
+                  </span>
                 </div>
               </Card>
             </div>
@@ -305,15 +327,21 @@ function LaporanPenjualan() {
               <div className="mb-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span>Cash</span>
-                  <span className="font-medium">{persenCash.toFixed(0)}%</span>
+                  <span className="font-medium">
+                    <AnimatedCount
+                      value={persenCash}
+                      duration={1500}
+                      formatter={(value) => `${Math.round(value)}%`}
+                    />
+                  </span>
                 </div>
 
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-green-500 rounded-full transition-all duration-500"
-                    style={{ width: `${persenCash}%` }}
-                  />
-                </div>
+                <AnimatedProgressBar
+                  value={summary.cash}
+                  max={summary.cash + summary.cashless}
+                  color="bg-green-500"
+                  duration={1200}
+                />
 
                 <p className="text-xs text-gray-400 mt-1">
                   {formatRupiah(summary.cash)}
@@ -325,16 +353,20 @@ function LaporanPenjualan() {
                 <div className="flex justify-between text-sm mb-1">
                   <span>Cashless</span>
                   <span className="font-medium">
-                    {persenCashless.toFixed(0)}%
+                    <AnimatedCount
+                      value={persenCashless}
+                      duration={1.5}
+                      formatter={(value) => `${Math.round(value)}%`}
+                    />
                   </span>
                 </div>
 
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#5F04E8] rounded-full transition-all duration-500"
-                    style={{ width: `${persenCashless}%` }}
-                  />
-                </div>
+                <AnimatedProgressBar
+                  value={summary.cashless}
+                  max={summary.cash + summary.cashless}
+                  color="bg-[#5F04E8]"
+                  duration={1200}
+                />
 
                 <p className="text-xs text-gray-400 mt-1">
                   {formatRupiah(summary.cashless)}
@@ -344,7 +376,7 @@ function LaporanPenjualan() {
               {/* TOTAL */}
               <div className="mt-2 pt-4 border-t border-gray-200 flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-600">
-                  Total Pembayaran
+                  Total:
                 </span>
 
                 <span className="text-base font-bold text-orange-500">
