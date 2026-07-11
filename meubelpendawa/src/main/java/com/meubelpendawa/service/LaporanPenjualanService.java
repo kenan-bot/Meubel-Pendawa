@@ -38,29 +38,24 @@ public class LaporanPenjualanService {
                 this.detailRepository = detailRepository;
         }
 
+        private Double hitungGrowth(Double current, Double previous) {
+
+                current = current == null ? 0.0 : current;
+                previous = previous == null ? 0.0 : previous;
+
+                if (previous == 0) {
+                        return current == 0 ? 0.0 : 100.0;
+                }
+
+                return ((current - previous) / previous) * 100;
+        }
+
         public LaporanPenjualanSummaryResponse getSummary() {
 
-                LaporanPenjualanSummaryResponse response = new LaporanPenjualanSummaryResponse();
+                LocalDateTime endDate = LocalDateTime.now();
+                LocalDateTime startDate = endDate.minusDays(29);
 
-                response.setTotalOmzet(
-                                transaksiRepository.getTotalOmzet());
-
-                response.setTotalTransaksi(
-                                transaksiRepository.getTotalTransaksi());
-
-                response.setRataRataPembelian(
-                                transaksiRepository.getRataRataPembelian());
-
-                response.setProdukTerjual(
-                                detailRepository.getTotalProdukTerjual());
-
-                response.setCash(
-                                transaksiRepository.getTotalCash());
-
-                response.setCashless(
-                                transaksiRepository.getTotalCashless());
-
-                return response;
+                return getSummary(startDate, endDate);
         }
 
         public LaporanPenjualanSummaryResponse getSummary(
@@ -69,71 +64,85 @@ public class LaporanPenjualanService {
 
                 LaporanPenjualanSummaryResponse response = new LaporanPenjualanSummaryResponse();
 
-                response.setTotalOmzet(
-                                transaksiRepository.getTotalOmzetByPeriode(
-                                                startDate, endDate));
+                // PERIODE SEKARANG
 
-                response.setTotalTransaksi(
-                                transaksiRepository.getTotalTransaksiByPeriode(
-                                                startDate, endDate));
+                Double totalOmzet = transaksiRepository.getTotalOmzetByPeriode(
+                                startDate, endDate);
 
-                response.setRataRataPembelian(
-                                transaksiRepository.getRataRataPembelianByPeriode(
-                                                startDate, endDate));
+                Long totalTransaksi = transaksiRepository.getTotalTransaksiByPeriode(
+                                startDate, endDate);
 
-                response.setProdukTerjual(
-                                detailRepository.getTotalProdukTerjualByPeriode(
-                                                startDate, endDate));
+                Double rataRata = transaksiRepository.getRataRataPembelianByPeriode(
+                                startDate, endDate);
 
-                response.setCash(
-                                transaksiRepository.getTotalCashByPeriode(
-                                                startDate, endDate));
+                Long produkTerjual = detailRepository.getTotalProdukTerjualByPeriode(
+                                startDate, endDate);
 
-                response.setCashless(
-                                transaksiRepository.getTotalCashlessByPeriode(
-                                                startDate, endDate));
+                Double cash = transaksiRepository.getTotalCashByPeriode(
+                                startDate, endDate);
 
-                // Hitung growth dibanding periode sebelumnya
+                Double cashless = transaksiRepository.getTotalCashlessByPeriode(
+                                startDate, endDate);
 
-                // Lama periode yang dipilih
+                response.setTotalOmzet(totalOmzet);
+                response.setTotalTransaksi(totalTransaksi);
+                response.setRataRataPembelian(rataRata);
+                response.setProdukTerjual(produkTerjual);
+                response.setCash(cash);
+                response.setCashless(cashless);
+
+                // PERIODE SEBELUMNYA
+
                 long jumlahHari = ChronoUnit.DAYS.between(
                                 startDate.toLocalDate(),
                                 endDate.toLocalDate()) + 1;
 
-                // Periode sebelumnya
                 LocalDateTime previousStart = startDate.minusDays(jumlahHari);
-
                 LocalDateTime previousEnd = endDate.minusDays(jumlahHari);
 
-                // Omzet sekarang
-                Double currentOmzet = response.getTotalOmzet();
-
-                // Omzet periode sebelumnya
                 Double previousOmzet = transaksiRepository.getTotalOmzetByPeriode(
                                 previousStart,
                                 previousEnd);
 
-                // Hitung growth %
-                double growth = 0;
+                Long previousTransaksi = transaksiRepository.getTotalTransaksiByPeriode(
+                                previousStart,
+                                previousEnd);
 
-                if (previousOmzet != null && previousOmzet > 0) {
+                Double previousRataRata = transaksiRepository.getRataRataPembelianByPeriode(
+                                previousStart,
+                                previousEnd);
 
-                        growth = ((currentOmzet - previousOmzet)
-                                        / previousOmzet) * 100;
+                Long previousProduk = detailRepository.getTotalProdukTerjualByPeriode(
+                                previousStart,
+                                previousEnd);
 
-                }
+                // GROWTH
 
-                response.setGrowthPercentage(growth);
+                response.setOmzetGrowth(
+                                hitungGrowth(totalOmzet, previousOmzet));
+
+                response.setTransaksiGrowth(
+                                hitungGrowth(
+                                                totalTransaksi == null ? 0.0 : totalTransaksi.doubleValue(),
+                                                previousTransaksi == null ? 0.0 : previousTransaksi.doubleValue()));
+
+                response.setRataRataGrowth(
+                                hitungGrowth(rataRata, previousRataRata));
+
+                response.setProdukGrowth(
+                                hitungGrowth(
+                                                produkTerjual == null ? 0.0 : produkTerjual.doubleValue(),
+                                                previousProduk == null ? 0.0 : previousProduk.doubleValue()));
+
+                // LABEL
 
                 if (jumlahHari == 1) {
-
                         response.setComparisonLabel("dibanding kemarin");
-
                 } else {
-
                         response.setComparisonLabel("dibanding periode sebelumnya");
-
                 }
+
+                // MINI CHART
 
                 response.setTrend(
                                 getTrenPenjualan(startDate, endDate));

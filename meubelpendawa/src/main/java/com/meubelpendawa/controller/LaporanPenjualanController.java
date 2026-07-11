@@ -3,7 +3,6 @@ package com.meubelpendawa.controller;
 import com.meubelpendawa.dto.LaporanPenjualanSummaryResponse;
 import com.meubelpendawa.dto.LaporanPenjualanTrenResponse;
 import com.meubelpendawa.service.LaporanPenjualanService;
-import com.meubelpendawa.dto.LaporanPenjualanTrenResponse;
 
 import java.time.LocalDateTime;
 

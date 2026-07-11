@@ -1,27 +1,50 @@
-import { LineChart, Line, ResponsiveContainer } from "recharts";
+import { ResponsiveContainer, LineChart, Line, Tooltip, XAxis } from "recharts";
 
-const data = [
-  { value: 12 },
-  { value: 18 },
-  { value: 15 },
-  { value: 22 },
-  { value: 20 },
-  { value: 25 },
-  { value: 28 },
-];
+function formatRupiah(value) {
+  return "Rp" + Number(value).toLocaleString("id-ID");
+}
 
-export default function MiniChart() {
+export default function MiniChart({ data = [] }) {
   return (
-    <ResponsiveContainer width="100%" height={80}>
-      <LineChart data={data}>
-        <Line
-          type="monotone"
-          dataKey="value"
-          stroke="#F97316"
-          strokeWidth={3}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="w-full h-16 sm:h-20 md:h-24">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={data}
+          margin={{
+            top: 2,
+            right: 2,
+            left: -18,
+            bottom: 0,
+          }}
+        >
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+            dy={6}
+          />
+
+          <Tooltip
+            formatter={(value) => [formatRupiah(value), "Omzet"]}
+            labelFormatter={(label) => `Periode : ${label}`}
+          />
+
+          <Line
+            type="monotone"
+            dataKey="omzet"
+            stroke="#F97316"
+            strokeWidth={2.5}
+            dot={{
+              r: 3,
+              fill: "#F97316",
+            }}
+            activeDot={{
+              r: 5,
+            }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

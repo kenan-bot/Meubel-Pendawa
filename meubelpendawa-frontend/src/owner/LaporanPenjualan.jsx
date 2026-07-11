@@ -236,14 +236,14 @@ function LaporanPenjualan() {
       ) : (
         <>
           {/* KPI CARD */}
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-6">
+          <div className="grid gap-4 xl:grid-cols-[1.1fr_1.2fr_1.7fr_2.2fr_2fr_0fr] gap-4 mb-6 items-start">
             {/* OMZET */}
-            <Card className="xl:col-span-2 shadow-lg py-4 px-5">
-              <p className="text-sm md:text-lg text-gray-500 font-medium">
+            <Card className="xl:col-span-2 shadow-lg px-5 py-3">
+              <p className="text-sm md:text-lg text-gray-500 font-medium leading-none">
                 Total Penjualan
               </p>
 
-              <h2 className="text-orange-500 text-3xl font-extrabold mt-2">
+              <h2 className="mt-1 text-2xl md:text-3xl font-extrabold text-orange-500 leading-none">
                 <AnimatedCount
                   value={summary.totalOmzet}
                   formatter={formatRupiah}
@@ -251,42 +251,82 @@ function LaporanPenjualan() {
                 />
               </h2>
 
-              <div className="mt-5">
-                <MiniChart />
+              <div className="mt-1">
+                <MiniChart data={summary.trend ?? []} />
               </div>
 
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-green-500 font-bold text-sm">▲ +12%</span>
+              <div className="flex items-center gap-2 mt-1">
+                <span
+                  className={`font-bold text-sm md:text-base ${
+                    summary.omzetGrowth > 0
+                      ? "text-green-500"
+                      : summary.omzetGrowth < 0
+                        ? "text-red-500"
+                        : "text-gray-500"
+                  }`}
+                >
+                  {summary.omzetGrowth > 0
+                    ? "▲"
+                    : summary.omzetGrowth < 0
+                      ? "▼"
+                      : "•"}{" "}
+                  {Math.abs(summary.omzetGrowth ?? 0).toFixed(1)}%
+                </span>
 
-                <span className="text-gray-400 text-sm">
-                  dibanding bulan lalu
+                <span className="text-xs md:text-sm text-gray-400">
+                  {summary.comparisonLabel}
                 </span>
               </div>
             </Card>
 
             {/* TOTAL TRANSAKSI */}
-            <Card className="shadow-md p-4 flex flex-col justify-between">
+            <Card className="xl:col-span- shadow-md px-5 py-3 flex flex-col justify-between min-h-[180px] md:min-h-[220px]">
               <div>
-                <p className="text-sm md:text-lg text-gray-500 font-medium">
+                <p className="text-sm md:text-lg text-gray-500 font-medium leading-none">
                   Total Transaksi
                 </p>
 
-                <div className="flex justify-between items-end mt-2">
-                  <h2 className="text-2xl sm:text-6xl font-bold text-orange-500">
+                <div className="flex items-end gap-2 mt-2">
+                  <h2 className="text-4xl md:text-5xl font-extrabold text-orange-500 leading-none">
                     <AnimatedCount
                       value={summary.totalTransaksi}
                       duration={1500}
                     />
                   </h2>
 
-                  <span className="text-base text-gray-400">pesanan</span>
+                  <span className="text-sm md:text-base text-gray-400 mb-1">
+                    pesanan
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
+                  <span
+                    className={`font-bold text-sm md:text-base ${
+                      summary.transaksiGrowth > 0
+                        ? "text-green-500"
+                        : summary.transaksiGrowth < 0
+                          ? "text-red-500"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {summary.transaksiGrowth > 0
+                      ? "▲"
+                      : summary.transaksiGrowth < 0
+                        ? "▼"
+                        : "•"}{" "}
+                    {Math.abs(summary.transaksiGrowth ?? 0).toFixed(1)}%
+                  </span>
+
+                  <span className="text-xs md:text-sm text-gray-400">
+                    {summary.comparisonLabel}
+                  </span>
                 </div>
               </div>
 
               <button
                 onClick={handleLihatDetail}
-                className="mt-4 w-full py-2 rounded-lg bg-orange-500 hover:bg-orange-600
-                text-white text-sm font-medium transition"
+                className="mt-3 py-2 rounded-lg bg-orange-500 hover:bg-orange-600
+                text-sm md:text-base text-white font-medium transition"
               >
                 Lihat Detail
               </button>
@@ -307,63 +347,108 @@ function LaporanPenjualan() {
             </Modal>
 
             {/* RATA RATA + PRODUK TERJUAL */}
-            <div className="flex flex-col gap-4">
-              <Card className="shadow-md p-4">
-                <p className="text-sm md:text-lg text-gray-500 font-medium">
+            <div className="flex flex-col gap-1">
+              <Card className="shadow-md px-4 py-2">
+                <p className="text-xs sm:text-sm md:text-[15px] text-gray-500 font-medium leading-none">
                   Rata-rata Pembelian
                 </p>
 
-                <div className="mt-2">
-                  <h2
-                    className="text-lg sm:text-xl xl:text-2xl font-bold text-orange-500
-                    break-words leading-tight"
-                  >
-                    <AnimatedCount
-                      value={summary.rataRataPembelian}
-                      formatter={formatRupiah}
-                      duration={1500}
-                    />
-                  </h2>
+                <h2
+                  className="mt-1 text-lg sm:text-xl md:text-[20px] font-extrabold text-orange-500
+                  leading-none break-all"
+                >
+                  <AnimatedCount
+                    value={summary.rataRataPembelian}
+                    formatter={formatRupiah}
+                    duration={1500}
+                  />
+                </h2>
 
-                  <div className="flex justify-end">
-                    <span className="text-base text-gray-400 mt-1">
-                      /transaksi
-                    </span>
-                  </div>
+                <p className="text-[10px] sm:text-sm text-gray-400 leading-none mt-0 text-right">
+                  / transaksi
+                </p>
+
+                <div className="flex items-center gap-1 mt-1">
+                  <span
+                    className={`font-bold text-xs sm:text-sm ${
+                      summary.rataRataGrowth > 0
+                        ? "text-green-500"
+                        : summary.rataRataGrowth < 0
+                          ? "text-red-500"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {summary.rataRataGrowth > 0
+                      ? "▲"
+                      : summary.rataRataGrowth < 0
+                        ? "▼"
+                        : "•"}{" "}
+                    {Math.abs(summary.rataRataGrowth ?? 0).toFixed(1)}%
+                  </span>
+
+                  <span className="text-[10px] sm:text-xs text-gray-400 leading-none">
+                    {summary.comparisonLabel}
+                  </span>
                 </div>
               </Card>
 
-              <Card className="shadow-md p-4">
-                <p className="text-sm md:text-lg text-gray-500 font-medium">
+              <Card className="shadow-md px-4 py-2">
+                <p className="text-xs sm:text-sm md:text-[15px] text-gray-500 font-medium leading-none">
                   Produk Terjual
                 </p>
 
-                <div className="mt-2">
-                  <h2 className="text-xl sm:text-2xl font-bold text-orange-500">
+                <div className="flex items-end gap-1 -mt-1">
+                  <h2
+                    className="text-3xl sm:text-4xl md:text-[25px] font-extrabold text-orange-500 leading-none"
+                  >
                     <AnimatedCount
                       value={summary.produkTerjual}
                       duration={1500}
                     />
                   </h2>
 
-                  <span className="block text-right text-base text-gray-400 mt-1">
+                  <span className="text-[10px] sm:text-sm text-gray-400 mb-1">
                     unit
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1 mt-1">
+                  <span
+                    className={`font-bold text-xs sm:text-sm ${
+                      summary.produkGrowth > 0
+                        ? "text-green-500"
+                        : summary.produkGrowth < 0
+                          ? "text-red-500"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {summary.produkGrowth > 0
+                      ? "▲"
+                      : summary.produkGrowth < 0
+                        ? "▼"
+                        : "•"}{" "}
+                    {Math.abs(summary.produkGrowth ?? 0).toFixed(1)}%
+                  </span>
+
+                  <span className="text-[10px] sm:text-xs text-gray-400 leading-none">
+                    {summary.comparisonLabel}
                   </span>
                 </div>
               </Card>
             </div>
 
             {/* METODE PEMBAYARAN */}
-            <Card className="shadow-md p-4 flex flex-col justify-center">
-              <p className="text-xs sm:text-sm text-gray-500 mb-5">
+            <Card className="shadow-md px-4 py-3 flex flex-col">
+              <p className="text-sm md:text-base text-gray-500 font-medium mb-3">
                 Metode Pembayaran
               </p>
 
               {/* CASH */}
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-1">
+              <div className="mb-3">
+                <div className="flex justify-between items-center text-sm mb-0.5">
                   <span>Cash</span>
-                  <span className="font-medium">
+
+                  <span className="font-semibold">
                     <AnimatedCount
                       value={persenCash}
                       duration={1500}
@@ -372,50 +457,55 @@ function LaporanPenjualan() {
                   </span>
                 </div>
 
-                <AnimatedProgressBar
-                  value={summary.cash}
-                  max={summary.cash + summary.cashless}
-                  color="bg-green-500"
-                  duration={1200}
-                />
+                <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                  <AnimatedProgressBar
+                    value={summary.cash}
+                    max={summary.cash + summary.cashless}
+                    color="bg-green-500"
+                    duration={1200}
+                  />
+                </div>
 
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-[11px] text-gray-400 mt-0.5">
                   {formatRupiah(summary.cash)}
                 </p>
               </div>
 
               {/* CASHLESS */}
               <div>
-                <div className="flex justify-between text-sm mb-1">
+                <div className="flex justify-between items-center text-sm mb-0.5">
                   <span>Cashless</span>
-                  <span className="font-medium">
+
+                  <span className="font-semibold">
                     <AnimatedCount
                       value={persenCashless}
-                      duration={1.5}
+                      duration={1500}
                       formatter={(value) => `${Math.round(value)}%`}
                     />
                   </span>
                 </div>
 
-                <AnimatedProgressBar
-                  value={summary.cashless}
-                  max={summary.cash + summary.cashless}
-                  color="bg-[#5F04E8]"
-                  duration={1200}
-                />
+                <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                  <AnimatedProgressBar
+                    value={summary.cashless}
+                    max={summary.cash + summary.cashless}
+                    color="bg-[#5F04E8]"
+                    duration={1200}
+                  />
+                </div>
 
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-[11px] text-gray-400 mt-0.5">
                   {formatRupiah(summary.cashless)}
                 </p>
               </div>
 
               {/* TOTAL */}
-              <div className="mt-2 pt-4 border-t border-gray-200 flex justify-between items-center">
+              <div className="mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-600">
                   Total:
                 </span>
 
-                <span className="text-base font-bold text-orange-500">
+                <span className="text-lg font-bold text-orange-500">
                   <AnimatedCount
                     value={totalPembayaran}
                     formatter={formatRupiah}
@@ -484,13 +574,14 @@ function LaporanPenjualan() {
                         </span>
                       </div>
 
-                      <AnimatedProgressBar
-                        value={item.persentase}
-                        max={100}
-                        color="bg-[#5F04E8]"
-                        height="h-3"
-                        duration={1200}
-                      />
+                      <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <AnimatedProgressBar
+                          value={item.persentase}
+                          max={100}
+                          color="bg-[#5F04E8]"
+                          duration={1200}
+                        />
+                      </div>
 
                       <p className="text-xs text-gray-400 mt-1">
                         <AnimatedCount
