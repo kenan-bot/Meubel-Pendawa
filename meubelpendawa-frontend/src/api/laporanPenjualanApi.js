@@ -37,3 +37,34 @@ export const getDetailLaporanPenjualan = async (startDate, endDate) => {
 
     return response.data;
 };
+
+export const getKontribusiProduk = async (
+    startDate,
+    endDate
+) => {
+    const response = await axiosClient.get(
+        `/api/laporan-penjualan/kontribusi-produk`,
+        {
+            params: {
+                startDate,
+                endDate,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+export const getTrenPenjualan = async (startDate, endDate) => {
+    const response = await axiosClient.get(
+        `/api/laporan-penjualan/tren`,
+        {
+            params: {
+                startDate,
+                endDate,
+            },
+        },
+    );
+
+    return response.data;
+};

@@ -1,5 +1,7 @@
 package com.meubelpendawa.dto;
 
+import java.util.List;
+
 public class LaporanPenjualanSummaryResponse {
 
     private Double totalOmzet;
@@ -8,6 +10,11 @@ public class LaporanPenjualanSummaryResponse {
     private Double rataRataPembelian;
     private Double cash;
     private Double cashless;
+
+    // Tambahan
+    private Double growthPercentage;
+    private String comparisonLabel;
+    private List<LaporanPenjualanTrenResponse> trend;
 
     public LaporanPenjualanSummaryResponse() {
     }
@@ -58,5 +65,31 @@ public class LaporanPenjualanSummaryResponse {
 
     public void setCashless(Double cashless) {
         this.cashless = cashless;
+    }
+
+    // ===== Tambahan =====
+
+    public Double getGrowthPercentage() {
+        return growthPercentage;
+    }
+
+    public void setGrowthPercentage(Double growthPercentage) {
+        this.growthPercentage = growthPercentage;
+    }
+
+    public String getComparisonLabel() {
+        return comparisonLabel;
+    }
+
+    public void setComparisonLabel(String comparisonLabel) {
+        this.comparisonLabel = comparisonLabel;
+    }
+
+    public List<LaporanPenjualanTrenResponse> getTrend() {
+        return trend;
+    }
+
+    public void setTrend(List<LaporanPenjualanTrenResponse> trend) {
+        this.trend = trend;
     }
 }

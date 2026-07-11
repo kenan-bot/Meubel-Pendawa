@@ -2,9 +2,11 @@ import DropDownFilter from "../components/DropDownFilter";
 import DateRangePicker from "../components/DateRangePicker";
 import DetailTransaksiTable from "../components/DetailTransaksiTable";
 import AnimatedCount from "../components/AnimatedCount";
+import { MdDateRange } from "react-icons/md";
 import AnimatedProgressBar from "../components/AnimatedProgressBar";
 import Card from "../components/Card";
 import MiniChart from "../components/MiniChart";
+import LineChartCard from "../components/LineChartCard";
 import { LuDownload } from "react-icons/lu";
 import Modal from "../components/Modal";
 import { useEffect, useState } from "react";
@@ -12,6 +14,8 @@ import {
   getSummaryLaporanPenjualan,
   getSummaryLaporanPenjualanByPeriode,
   getDetailLaporanPenjualan,
+  getKontribusiProduk,
+  getTrenPenjualan,
 } from "../api/laporanPenjualanApi";
 import dayjs from "dayjs";
 
@@ -20,6 +24,8 @@ function LaporanPenjualan() {
   const [openDetail, setOpenDetail] = useState(false);
   const [detailPenjualan, setDetailPenjualan] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [kontribusiProduk, setKontribusiProduk] = useState([]);
+  const [trenPenjualan, setTrenPenjualan] = useState([]);
 
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split("T")[0],
@@ -71,10 +77,29 @@ function LaporanPenjualan() {
         `${startDate}T00:00:00`,
         `${endDate}T23:59:59`,
       );
+      const produk = await getKontribusiProduk(
+        `${startDate}T00:00:00`,
+        `${endDate}T23:59:59`,
+      );
+
+      setKontribusiProduk(produk);
 
       setSummary(data);
     } catch (error) {
       console.error("Gagal mengambil laporan berdasarkan periode:", error);
+    }
+  };
+
+  const loadTrenPenjualan = async () => {
+    try {
+      const data = await getTrenPenjualan(
+        `${startDate}T00:00:00`,
+        `${endDate}T23:59:59`,
+      );
+
+      setTrenPenjualan(data);
+    } catch (error) {
+      console.error("Gagal mengambil tren penjualan:", error);
     }
   };
 
@@ -125,7 +150,14 @@ function LaporanPenjualan() {
 
   useEffect(() => {
     loadSummaryByPeriode();
+    loadTrenPenjualan();
   }, [startDate, endDate]);
+
+  const chartData = trenPenjualan.map((item) => ({
+    label: item.label,
+    omzet: item.omzet,
+    transaksi: item.transaksi,
+  }));
 
   return (
     <div className="px-3 py-5 md:p-5">
@@ -135,10 +167,14 @@ function LaporanPenjualan() {
           Laporan Penjualan
         </h1>
 
-        <p className="text-sm md:text-base text-gray-500 mt-1">
-          Periode {formatTanggal(new Date(startDate))} -{" "}
-          {formatTanggal(new Date(endDate))}
-        </p>
+        <div className="flex items-center gap-2 text-sm md:text-base text-gray-500 mt-1">
+          <MdDateRange className="text-orange-500 text-lg" />
+
+          <span>
+            Periode {formatTanggal(new Date(startDate))} -{" "}
+            {formatTanggal(new Date(endDate))}
+          </span>
+        </div>
       </div>
 
       {/* Filter */}
@@ -380,7 +416,11 @@ function LaporanPenjualan() {
                 </span>
 
                 <span className="text-base font-bold text-orange-500">
-                  {formatRupiah(totalPembayaran)}
+                  <AnimatedCount
+                    value={totalPembayaran}
+                    formatter={formatRupiah}
+                    duration={1500}
+                  />
                 </span>
               </div>
             </Card>
@@ -390,19 +430,28 @@ function LaporanPenjualan() {
           {/* // */}
           {/* // */}
 
-          {/* Grafik + Pie Chart */}
+          {/* Grafik + Progress Bar */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
             <Card className="xl:col-span-2 shadow-md">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold text-lg">Tren Penjualan</h2>
 
-                <span className="text-sm text-gray-500">
-                  Berdasarkan periode terpilih
-                </span>
+                <div className="flex items-center gap-2 text-sm md:text-base text-gray-500 mt-1">
+                  <MdDateRange className="text-orange-500 text-lg" />
+
+                  <span>
+                    Periode {formatTanggal(new Date(startDate))} -{" "}
+                    {formatTanggal(new Date(endDate))}
+                  </span>
+                </div>
               </div>
 
-              <div className="h-[400px] rounded-xl border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-                Grafik Penjualan
+              <div
+                className="h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px]
+                rounded-xl border border-dashed border-orange-500
+                overflow-hidden p-2"
+              >
+                <LineChartCard data={chartData} />
               </div>
             </Card>
 
@@ -410,79 +459,49 @@ function LaporanPenjualan() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold text-lg">Kontribusi Produk</h2>
 
-                <span className="text-sm text-gray-500">Top 5 Produk</span>
+                <span className="text-sm text-gray-500">
+                  Top {kontribusiProduk.length} Produk
+                </span>
               </div>
 
-              <div className="h-[400px] rounded-xl border border-dashed border-gray-300 p-5 flex flex-col justify-center gap-6">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Lemari 3 Pintu</span>
-                    <span>35%</span>
+              <div className="rounded-xl border border-dashed border-gray-300 p-5 flex flex-col gap-6">
+                {kontribusiProduk.length === 0 ? (
+                  <div className="flex flex-1 items-center justify-center text-gray-400 text-sm">
+                    Tidak ada data produk
                   </div>
+                ) : (
+                  kontribusiProduk.map((item) => (
+                    <div key={item.namaProduk}>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="truncate mr-2">{item.namaProduk}</span>
 
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#5F04E8] rounded-full"
-                      style={{ width: "35%" }}
-                    />
-                  </div>
-                </div>
+                        <span className="font-medium">
+                          <AnimatedCount
+                            value={item.persentase}
+                            duration={1500}
+                            formatter={(value) => `${Math.round(value)}%`}
+                          />
+                        </span>
+                      </div>
 
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Meja Kerja</span>
-                    <span>25%</span>
-                  </div>
+                      <AnimatedProgressBar
+                        value={item.persentase}
+                        max={100}
+                        color="bg-[#5F04E8]"
+                        height="h-3"
+                        duration={1200}
+                      />
 
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#5F04E8] rounded-full"
-                      style={{ width: "25%" }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Kursi Makan</span>
-                    <span>18%</span>
-                  </div>
-
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#5F04E8] rounded-full"
-                      style={{ width: "18%" }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Lemari TV</span>
-                    <span>12%</span>
-                  </div>
-
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#5F04E8] rounded-full"
-                      style={{ width: "12%" }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Meja Rias</span>
-                    <span>10%</span>
-                  </div>
-
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#5F04E8] rounded-full"
-                      style={{ width: "10%" }}
-                    />
-                  </div>
-                </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        <AnimatedCount
+                          value={item.totalTerjual}
+                          duration={1500}
+                        />{" "}
+                        unit
+                      </p>
+                    </div>
+                  ))
+                )}
               </div>
             </Card>
           </div>
