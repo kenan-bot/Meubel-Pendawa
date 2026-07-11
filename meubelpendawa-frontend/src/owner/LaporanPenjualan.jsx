@@ -2,6 +2,7 @@ import DropDownFilter from "../components/DropDownFilter";
 import DateRangePicker from "../components/DateRangePicker";
 import DetailTransaksiTable from "../components/DetailTransaksiTable";
 import Card from "../components/Card";
+import { LuDownload } from "react-icons/lu";
 import Modal from "../components/Modal";
 import { useEffect, useState } from "react";
 import {
@@ -172,10 +173,14 @@ function LaporanPenjualan() {
         />
 
         <button
-          className="md:ml-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2
-        rounded-lg font-medium transition"
+          type="button"
+          className="flex w-full md:w-auto md:ml-auto items-center justify-center gap-2
+             rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white
+             transition-all duration-300 hover:bg-orange-600 hover:scale-105
+             disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Export Laporan
+          <LuDownload size={18} />
+          Ekspor Laporan
         </button>
       </div>
 
