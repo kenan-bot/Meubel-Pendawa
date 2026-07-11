@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -50,10 +51,13 @@ public class EmailServiceImpl implements EmailService {
 
                         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-                        restTemplate.postForEntity(
+                        ResponseEntity<String> response = restTemplate.postForEntity(
                                         "https://api.brevo.com/v3/smtp/email",
                                         request,
                                         String.class);
+
+                        System.out.println(response.getStatusCode());
+                        System.out.println(response.getBody());
 
                 } catch (Exception e) {
 
@@ -106,12 +110,13 @@ public class EmailServiceImpl implements EmailService {
                                         request,
                                         String.class);
 
-                } catch (Exception e) {
+                } catch (HttpStatusCodeException e) {
+
+                        System.out.println(e.getResponseBodyAsString());
 
                         throw new RuntimeException(
-                                        "Gagal mengirim email (lampiran) ke " + to,
+                                        "Brevo Error : " + e.getResponseBodyAsString(),
                                         e);
-
                 }
         }
 }
