@@ -1,13 +1,429 @@
-function LaporanPenjualan() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold">
-        Lihat laporan Penjualan
-      </h1>
+import DropDownFilter from "../components/DropDownFilter";
+import DateRangePicker from "../components/DateRangePicker";
+import Card from "../components/Card";
+import Modal from "../components/Modal";
+import { useEffect, useState } from "react";
+import {
+  getSummaryLaporanPenjualan,
+  getSummaryLaporanPenjualanByPeriode,
+} from "../api/laporanPenjualanApi";
+import dayjs from "dayjs";
 
-      <p className="text-gray-500 mt-2">
-        Halaman untuk melihat laporan penjualan
-      </p>
+function LaporanPenjualan() {
+  const [periode, setPeriode] = useState("HARIAN");
+  const [openDetail, setOpenDetail] = useState(false);
+
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+
+  const [summary, setSummary] = useState({
+    totalOmzet: 0,
+    totalTransaksi: 0,
+    produkTerjual: 0,
+    rataRataPembelian: 0,
+    cash: 0,
+    cashless: 0,
+  });
+
+  const formatTanggal = (tanggal) => {
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(tanggal);
+  };
+
+  const formatRupiah = (nominal) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(nominal || 0);
+  };
+
+  // Derived State
+  const tidakAdaData = summary.totalTransaksi === 0;
+
+  const totalPembayaran = (summary.cash || 0) + (summary.cashless || 0);
+
+  const persenCash =
+    totalPembayaran > 0 ? (summary.cash / totalPembayaran) * 100 : 0;
+
+  const persenCashless =
+    totalPembayaran > 0 ? (summary.cashless / totalPembayaran) * 100 : 0;
+
+  const loadSummaryByPeriode = async () => {
+    try {
+      const data = await getSummaryLaporanPenjualanByPeriode(
+        `${startDate}T00:00:00`,
+        `${endDate}T23:59:59`,
+      );
+
+      setSummary(data);
+    } catch (error) {
+      console.error("Gagal mengambil laporan berdasarkan periode:", error);
+    }
+  };
+
+  const handlePeriodeChange = (value) => {
+    setPeriode(value);
+
+    const today = new Date();
+
+    if (value === "HARIAN") {
+      const date = today.toISOString().split("T")[0];
+
+      setStartDate(date);
+      setEndDate(date);
+    }
+
+    if (value === "BULANAN") {
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+      setStartDate(firstDay.toISOString().split("T")[0]);
+      setEndDate(lastDay.toISOString().split("T")[0]);
+    }
+
+    if (value === "TAHUNAN") {
+      setStartDate(`${today.getFullYear()}-01-01`);
+      setEndDate(`${today.getFullYear()}-12-31`);
+    }
+  };
+
+  useEffect(() => {
+    loadSummaryByPeriode();
+  }, [startDate, endDate]);
+
+  return (
+    <div className="px-3 py-5 md:p-5">
+      {/* Header */}
+      <div className="md:-mt-7 mb-6">
+        <h1 className="font-extrabold text-2xl md:text-3xl">
+          Laporan Penjualan
+        </h1>
+
+        <p className="text-sm md:text-base text-gray-500 mt-1">
+          Periode {formatTanggal(new Date(startDate))} -{" "}
+          {formatTanggal(new Date(endDate))}
+        </p>
+      </div>
+
+      {/* Filter */}
+      <div className="flex flex-col mb-3 md:flex-row gap-3 md:items-center">
+        <DateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onReset={() => {
+            const today = new Date().toISOString().split("T")[0];
+
+            setStartDate(today);
+            setEndDate(today);
+          }}
+        />
+
+        <DropDownFilter
+          title="Periode"
+          value={{
+            label:
+              periode === "HARIAN"
+                ? "Harian"
+                : periode === "BULANAN"
+                  ? "Bulanan"
+                  : "Tahunan",
+            value: periode,
+          }}
+          items={[
+            { label: "Harian", value: "HARIAN" },
+            { label: "Bulanan", value: "BULANAN" },
+            { label: "Tahunan", value: "TAHUNAN" },
+          ]}
+          onSelect={(item) => handlePeriodeChange(item.value)}
+        />
+
+        <button
+          className="md:ml-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2
+        rounded-lg font-medium transition"
+        >
+          Export Laporan
+        </button>
+      </div>
+
+      {tidakAdaData ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-20">
+          <h3 className="font-semibold text-lg text-center">
+            Tidak ada data penjualan
+          </h3>
+
+          <p className="text-gray-500 text-sm mt-2 text-center">
+            Tidak ditemukan transaksi pada periode yang dipilih.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* KPI CARD */}
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-6">
+            {/* OMZET */}
+            <Card className="xl:col-span-2 shadow-lg py-4">
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                Total Omzet
+              </p>
+
+              <h2 className="text-orange-500 text-2xl sm:text-3xl xl:text-4xl font-extrabold mt-2 break-words">
+                {formatRupiah(summary.totalOmzet)}
+              </h2>
+
+              <p className="text-xs text-gray-400 mt-2">Periode terpilih</p>
+            </Card>
+
+            {/* TOTAL TRANSAKSI */}
+            <Card className="shadow-md p-4 flex flex-col justify-between">
+              <div>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Total Transaksi
+                </p>
+
+                <div className="flex justify-between items-end mt-2">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-orange-500">
+                    {summary.totalTransaksi}
+                  </h2>
+
+                  <span className="text-xs text-gray-400">pesanan</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setOpenDetail(true)}
+                className="
+        mt-4
+        w-full
+        py-2
+        rounded-lg
+        bg-orange-500
+        hover:bg-orange-600
+        text-white
+        text-sm
+        font-medium
+        transition
+      "
+              >
+                Lihat Detail
+              </button>
+            </Card>
+
+            {/* MODAL */}
+            <Modal
+              isOpen={openDetail}
+              onClose={() => setOpenDetail(false)}
+              title="Detail Penjualan"
+              maxWidth="max-w-6xl"
+            >
+              {/* <TabelDetailPenjualan /> */}
+            </Modal>
+
+            {/* RATA RATA + PRODUK TERJUAL */}
+            <div className="flex flex-col gap-4">
+              <Card className="shadow-md p-4">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Rata-rata Pembelian
+                </p>
+
+                <div className="mt-2">
+                  <h2
+                    className="
+      text-lg sm:text-xl xl:text-2xl
+      font-bold text-orange-500
+      break-words
+      leading-tight
+      "
+                  >
+                    {formatRupiah(summary.rataRataPembelian)}
+                  </h2>
+
+                  <span className="text-xs text-gray-400">/ transaksi</span>
+                </div>
+              </Card>
+
+              <Card className="shadow-md p-4">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Produk Terjual
+                </p>
+
+                <div className="flex justify-between items-end mt-2">
+                  <h2 className="text-xl sm:text-2xl font-bold text-orange-500">
+                    {summary.produkTerjual}
+                  </h2>
+
+                  <span className="text-xs text-gray-400">unit</span>
+                </div>
+              </Card>
+            </div>
+
+            {/* METODE PEMBAYARAN */}
+            <Card className="shadow-md p-4 flex flex-col justify-center">
+              <div className="flex justify-between items-start gap-2 mb-5">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Metode Pembayaran
+                </p>
+
+                <span className="text-[10px] sm:text-xs text-gray-400 text-right">
+                  {formatRupiah(totalPembayaran)}
+                </span>
+              </div>
+
+              {/* CASH */}
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Cash</span>
+                  <span className="font-medium">{persenCash.toFixed(0)}%</span>
+                </div>
+
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full transition-all duration-500"
+                    style={{ width: `${persenCash}%` }}
+                  />
+                </div>
+
+                <p className="text-xs text-gray-400 mt-1 break-words">
+                  {formatRupiah(summary.cash)}
+                </p>
+              </div>
+
+              {/* CASHLESS */}
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Cashless</span>
+
+                  <span className="font-medium">
+                    {persenCashless.toFixed(0)}%
+                  </span>
+                </div>
+
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#5F04E8] rounded-full transition-all duration-500"
+                    style={{ width: `${persenCashless}%` }}
+                  />
+                </div>
+
+                <p className="text-xs text-gray-400 mt-1 break-words">
+                  {formatRupiah(summary.cashless)}
+                </p>
+              </div>
+            </Card>
+          </div>
+
+          {/* // */}
+          {/* // */}
+          {/* // */}
+
+          {/* Grafik + Pie Chart */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+            <Card className="xl:col-span-2 shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-bold text-lg">Tren Penjualan</h2>
+
+                <span className="text-sm text-gray-500">
+                  Berdasarkan periode terpilih
+                </span>
+              </div>
+
+              <div className="h-[400px] rounded-xl border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                Grafik Penjualan
+              </div>
+            </Card>
+
+            <Card className="shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-bold text-lg">Kontribusi Produk</h2>
+
+                <span className="text-sm text-gray-500">Top 5 Produk</span>
+              </div>
+
+              <div className="h-[400px] rounded-xl border border-dashed border-gray-300 p-5 flex flex-col justify-center gap-6">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Lemari 3 Pintu</span>
+                    <span>35%</span>
+                  </div>
+
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#5F04E8] rounded-full"
+                      style={{ width: "35%" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Meja Kerja</span>
+                    <span>25%</span>
+                  </div>
+
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#5F04E8] rounded-full"
+                      style={{ width: "25%" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Kursi Makan</span>
+                    <span>18%</span>
+                  </div>
+
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#5F04E8] rounded-full"
+                      style={{ width: "18%" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Lemari TV</span>
+                    <span>12%</span>
+                  </div>
+
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#5F04E8] rounded-full"
+                      style={{ width: "12%" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Meja Rias</span>
+                    <span>10%</span>
+                  </div>
+
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#5F04E8] rounded-full"
+                      style={{ width: "10%" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }
