@@ -14,6 +14,14 @@ export default function Sidebar({ menus }) {
 
   const navigate = useNavigate();
   const namaKaryawan = localStorage.getItem("namaKaryawan");
+  const role = localStorage.getItem("role");
+
+  const roleTitle = {
+    OWNER: "Menu Owner",
+    CASHIER_SALES: "Menu Kasir",
+    DRIVER: "Menu Driver",
+  };
+
   const handleLogout = async () => {
     try {
       const idKaryawan = localStorage.getItem("idKaryawan");
@@ -38,19 +46,42 @@ export default function Sidebar({ menus }) {
           text-white ${open ? "w-40 sm:w-48 md:w-60" : "w-14 sm:w-16"}`}
       >
         {/* Header */}
-        <div className="px-2 md:px-3 py-2 h-16 md:h-20 flex justify-between items-center">
-          <img
-            src={logo}
-            alt="Logo"
-            className={`${open ? "w-8 md:w-10" : "w-0"} rounded-md`}
-          />
-          <div>
-            <MdMenuOpen
-              size={34}
-              className={`hover:bg-orange-700 rounded-md duration-500 cursor-pointer ${!open && " rotate-180"}`}
-              onClick={() => setOpen(!open)}
+        <div className="px-2 md:px-3 py-2 h-16 md:h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
+            <img
+              src={logo}
+              alt="Logo"
+              className={`rounded-md duration-300 ${
+                open ? "w-8 md:w-10" : "w-0"
+              }`}
             />
+
+            <div
+              className={`overflow-hidden whitespace-nowrap duration-300 ${
+                open ? "opacity-100 ml-1" : "opacity-0 w-0 ml-0"
+              }`}
+            >
+              <h2 className="text-sm md:text-base font-bold leading-tight">
+                {roleTitle[role] || "Menu"}
+              </h2>
+
+              <p className="text-[10px] md:text-xs text-orange-100">
+                Meubel Pendawa
+              </p>
+
+              <p className="text-[10px] md:text-xs text-orange-100 -mt-1">
+                Management
+              </p>
+            </div>
           </div>
+
+          <MdMenuOpen
+            size={34}
+            className={`flex-shrink-0 hover:bg-orange-700 rounded-md duration-500 cursor-pointer ${
+              !open && "rotate-180"
+            }`}
+            onClick={() => setOpen(!open)}
+          />
         </div>
 
         {/* Body */}
