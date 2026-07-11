@@ -2,6 +2,7 @@ import DropDownFilter from "../components/DropDownFilter";
 import DateRangePicker from "../components/DateRangePicker";
 import DetailTransaksiTable from "../components/DetailTransaksiTable";
 import Card from "../components/Card";
+import MiniChart from "../components/MiniChart";
 import { LuDownload } from "react-icons/lu";
 import Modal from "../components/Modal";
 import { useEffect, useState } from "react";
@@ -199,16 +200,26 @@ function LaporanPenjualan() {
           {/* KPI CARD */}
           <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 mb-6">
             {/* OMZET */}
-            <Card className="xl:col-span-2 shadow-lg py-4">
-              <p className="text-xs sm:text-sm text-gray-500 font-medium">
-                Total Omzet
+            <Card className="xl:col-span-2 shadow-lg py-4 px-5">
+              <p className="text-sm md:text-lg text-gray-500 font-medium">
+                Total Penjualan
               </p>
 
-              <h2 className="text-orange-500 text-2xl sm:text-3xl xl:text-4xl font-extrabold mt-2 break-words">
+              <h2 className="text-orange-500 text-3xl font-extrabold mt-2">
                 {formatRupiah(summary.totalOmzet)}
               </h2>
 
-              <p className="text-xs text-gray-400 mt-2">Periode terpilih</p>
+              <div className="mt-5">
+                <MiniChart />
+              </div>
+
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-green-500 font-bold text-sm">▲ +12%</span>
+
+                <span className="text-gray-400 text-sm">
+                  dibanding bulan lalu
+                </span>
+              </div>
             </Card>
 
             {/* TOTAL TRANSAKSI */}
@@ -219,7 +230,7 @@ function LaporanPenjualan() {
                 </p>
 
                 <div className="flex justify-between items-end mt-2">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-orange-500">
+                  <h2 className="text-2xl sm:text-6xl font-bold text-orange-500">
                     {summary.totalTransaksi}
                   </h2>
 
@@ -286,15 +297,9 @@ function LaporanPenjualan() {
 
             {/* METODE PEMBAYARAN */}
             <Card className="shadow-md p-4 flex flex-col justify-center">
-              <div className="flex justify-between items-start gap-2 mb-5">
-                <p className="text-xs sm:text-sm text-gray-500">
-                  Metode Pembayaran
-                </p>
-
-                <span className="text-[10px] sm:text-xs text-gray-400 text-right">
-                  {formatRupiah(totalPembayaran)}
-                </span>
-              </div>
+              <p className="text-xs sm:text-sm text-gray-500 mb-5">
+                Metode Pembayaran
+              </p>
 
               {/* CASH */}
               <div className="mb-4">
@@ -310,7 +315,7 @@ function LaporanPenjualan() {
                   />
                 </div>
 
-                <p className="text-xs text-gray-400 mt-1 break-words">
+                <p className="text-xs text-gray-400 mt-1">
                   {formatRupiah(summary.cash)}
                 </p>
               </div>
@@ -319,7 +324,6 @@ function LaporanPenjualan() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Cashless</span>
-
                   <span className="font-medium">
                     {persenCashless.toFixed(0)}%
                   </span>
@@ -332,9 +336,20 @@ function LaporanPenjualan() {
                   />
                 </div>
 
-                <p className="text-xs text-gray-400 mt-1 break-words">
+                <p className="text-xs text-gray-400 mt-1">
                   {formatRupiah(summary.cashless)}
                 </p>
+              </div>
+
+              {/* TOTAL */}
+              <div className="mt-2 pt-4 border-t border-gray-200 flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">
+                  Total Pembayaran
+                </span>
+
+                <span className="text-base font-bold text-orange-500">
+                  {formatRupiah(totalPembayaran)}
+                </span>
               </div>
             </Card>
           </div>
