@@ -255,26 +255,15 @@ public class LaporanPenjualanPdfGeneratorImpl
                                 }
                         }
 
-                        JFreeChart chart = ChartFactory.createLineChart(
-                                        "Tren Penjualan",
-                                        "Periode",
-                                        "Omzet",
-                                        dataset);
+                        JFreeChart chart = ChartFactory.createLineChart("Tren Penjualan","Periode","Omzet",dataset);
 
-                        BufferedImage image = chart.createBufferedImage(
-                                        800,
-                                        350);
+                        BufferedImage image = chart.createBufferedImage(800,350);
 
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                        ImageIO.write(
-                                        image,
-                                        "png",
-                                        baos);
+                        ImageIO.write(image,"png",baos);
 
-                        Image chartImage = new Image(
-                                        ImageDataFactory.create(
-                                                        baos.toByteArray()));
+                        Image chartImage = new Image(ImageDataFactory.create(baos.toByteArray()));
 
                         chartImage.scaleToFit(500, 250);
 

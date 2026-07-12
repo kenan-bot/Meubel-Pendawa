@@ -2,17 +2,13 @@ package com.meubelpendawa.controller;
 
 import com.meubelpendawa.dto.LaporanPenjualanSummaryResponse;
 import com.meubelpendawa.dto.LaporanPenjualanTrenResponse;
-import com.meubelpendawa.service.LaporanPenjualanPdfGenerator;
-import org.springframework.http.MediaType;
+import com.meubelpendawa.service.LaporanPenjualanEmailService;
 import com.meubelpendawa.service.LaporanPenjualanService;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import com.meubelpendawa.dto.LaporanPenjualanPdfData;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,14 +24,14 @@ public class LaporanPenjualanController {
 
         private final LaporanPenjualanService laporanPenjualanService;
 
-        private final LaporanPenjualanPdfGenerator pdfGenerator;
+        private final LaporanPenjualanEmailService laporanEmailService;
 
         public LaporanPenjualanController(
                         LaporanPenjualanService laporanPenjualanService,
-                        LaporanPenjualanPdfGenerator pdfGenerator) {
+                        LaporanPenjualanEmailService laporanEmailService) {
 
                 this.laporanPenjualanService = laporanPenjualanService;
-                this.pdfGenerator = pdfGenerator;
+                this.laporanEmailService = laporanEmailService;
         }
 
         @GetMapping("/summary")
@@ -65,59 +61,18 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        @GetMapping("/export-pdf")
-        public ResponseEntity<byte[]> exportPdf(
+        @PostMapping("/kirim-email")
+        public ResponseEntity<String> kirimEmail(
+                        @RequestParam String email,
                         @RequestParam String startDate,
                         @RequestParam String endDate) {
 
-                LocalDateTime start = LocalDateTime.parse(startDate);
-                LocalDateTime end = LocalDateTime.parse(endDate);
+                laporanEmailService.kirimLaporan(
+                                email,
+                                LocalDateTime.parse(startDate),
+                                LocalDateTime.parse(endDate));
 
-                LaporanPenjualanPdfData data = new LaporanPenjualanPdfData();
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", new Locale("id", "ID"));
-
-                data.setPeriode(
-                                start.format(formatter)
-                                                + " s/d "
-                                                + end.format(formatter));
-
-                DateTimeFormatter cetakFormatter = DateTimeFormatter.ofPattern(
-                                "dd MMMM yyyy HH:mm",
-                                Locale.forLanguageTag("id-ID"));
-
-                data.setTanggalCetak(
-                                LocalDateTime.now()
-                                                .format(cetakFormatter));
-
-                data.setSummary(
-                                laporanPenjualanService.getSummary(
-                                                start,
-                                                end));
-
-                data.setTopProduk(
-                                laporanPenjualanService.getKontribusiProduk(
-                                                start,
-                                                end));
-
-                data.setTrenPenjualan(
-                                laporanPenjualanService.getTrenPenjualan(
-                                                start,
-                                                end));
-
-                data.setDetailPenjualan(
-                                laporanPenjualanService.getDetailPenjualan(
-                                                start,
-                                                end));
-
-                byte[] pdf = pdfGenerator.generate(data);
-
-                return ResponseEntity.ok()
-                                .header(
-                                                "Content-Disposition",
-                                                "attachment; filename=laporan-penjualan.pdf")
-                                .contentType(MediaType.APPLICATION_PDF)
-                                .body(pdf);
+                return ResponseEntity.ok("Laporan berhasil dikirim.");
         }
 
         @GetMapping("/kontribusi-produk")

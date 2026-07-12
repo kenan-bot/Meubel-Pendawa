@@ -291,28 +291,9 @@ function RiwayatHarian() {
           type="button"
           onClick={handleClickExport}
           disabled={exportLoading}
-          className="
-          flex
-          w-full
-          items-center
-          justify-center
-          gap-2
-          rounded-lg
-          bg-orange-500
-          px-4
-          py-2
-          text-sm
-          font-medium
-          text-white
-          transition-all
-          duration-300
-          hover:scale-105
-          hover:bg-orange-600
-          disabled:cursor-not-allowed
-          disabled:opacity-60
-          md:ml-auto
-          md:w-auto
-        "
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2
+          text-sm font-medium text-white transition-all duration-300 hover:scale-105 hover:bg-orange-600
+          disabled:cursor-not-allowed disabled:opacity-60 md:ml-auto md:w-auto"
         >
           <LuDownload size={18} />
 

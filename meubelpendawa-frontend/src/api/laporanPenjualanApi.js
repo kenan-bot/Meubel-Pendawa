@@ -69,15 +69,20 @@ export const getTrenPenjualan = async (startDate, endDate) => {
     return response.data;
 };
 
-export const exportLaporanPenjualanPdf = async (startDate, endDate) => {
-    const response = await axiosClient.get(
-        `${BASE_URL}/export-pdf`,
+export const kirimLaporanPenjualanEmail = async (
+    email,
+    startDate,
+    endDate
+) => {
+    const response = await axiosClient.post(
+        `${BASE_URL}/kirim-email`,
+        null,
         {
             params: {
+                email,
                 startDate,
                 endDate,
             },
-            responseType: "blob",
         }
     );
 

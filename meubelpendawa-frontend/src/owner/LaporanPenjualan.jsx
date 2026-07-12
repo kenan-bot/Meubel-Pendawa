@@ -39,6 +39,30 @@ function LaporanPenjualan() {
   const [startDate, setStartDate] = useState(getLocalDate());
   const [endDate, setEndDate] = useState(getLocalDate());
 
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const [showConfirmExport, setShowConfirmExport] = useState(false);
+
+  const [toast, setToast] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
+
+  useEffect(() => {
+    if (!toast.show) return;
+
+    const timer = setTimeout(() => {
+      setToast({
+        show: false,
+        type: "",
+        message: "",
+      });
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [toast.show]);
+
   const [summary, setSummary] = useState({
     totalOmzet: 0,
     totalTransaksi: 0,
@@ -158,27 +182,51 @@ function LaporanPenjualan() {
     }
   };
 
-  const handleExportPdf = async () => {
+  const handleConfirmExport = async () => {
     try {
-      const pdf = await exportLaporanPenjualanPdf(
+      setExportLoading(true);
+
+      await kirimLaporanPenjualanEmail(
+        "owner@gmail.com", // nanti bisa ambil dari login/session
         `${startDate}T00:00:00`,
         `${endDate}T23:59:59`,
       );
 
-      const url = window.URL.createObjectURL(pdf);
-
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `Laporan-Penjualan-${startDate}-${endDate}.pdf`;
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
+      setToast({
+        show: true,
+        type: "success",
+        message:
+          "Laporan penjualan berhasil dibuat dan dikirim ke email perusahaan.",
+      });
     } catch (error) {
-      console.error("Gagal export PDF", error);
+      console.error(error);
+
+      setToast({
+        show: true,
+        type: "error",
+        message: "Gagal mengirim laporan penjualan.",
+      });
+    } finally {
+      setExportLoading(false);
+      setShowConfirmExport(false);
+    }
+  };
+
+  const handleKirimLaporan = async () => {
+    try {
+      const result = await kirimLaporanPenjualanEmail(
+        email,
+        `${startDate}T00:00:00`,
+        `${endDate}T23:59:59`,
+      );
+
+      toast.success(result);
+
+      setOpenConfirm(false);
+    } catch (error) {
+      console.error(error);
+
+      toast.error(error.response?.data ?? "Gagal mengirim laporan penjualan.");
     }
   };
 
@@ -247,13 +295,16 @@ function LaporanPenjualan() {
         />
 
         <button
-          onClick={handleExportPdf}
+          onClick={() => setShowConfirmExport(true)}
+          disabled={exportLoading}
           type="button"
           className="flex w-full md:w-auto md:ml-auto items-center justify-center gap-2
              rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white
              transition-all duration-300 hover:bg-orange-600 hover:scale-105
              disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {" "}
+          {exportLoading ? "Mengirim..." : "Export Laporan"}
           <LuDownload size={18} />
           Ekspor Laporan
         </button>
@@ -632,6 +683,17 @@ function LaporanPenjualan() {
           </div>
         </>
       )}
+      <ConfirmModal
+        isOpen={showConfirmExport}
+        title="Kirim Laporan Penjualan?"
+        message={`Laporan periode ${startDate} sampai ${endDate} akan dibuat dalam bentuk PDF kemudian dikirim ke email perusahaan.`}
+        confirmText="Kirim"
+        cancelText="Batal"
+        onConfirm={handleConfirmExport}
+        onClose={() => setShowConfirmExport(false)}
+      />
+
+      {toast.show && <Toast type={toast.type} message={toast.message} />}
     </div>
   );
 }
