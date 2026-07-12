@@ -16,7 +16,7 @@ import {
   getDetailLaporanPenjualan,
   getKontribusiProduk,
   getTrenPenjualan,
-  exportLaporanPenjualanPdf,
+  kirimLaporanPenjualanEmail,
 } from "../api/laporanPenjualanApi";
 import dayjs from "dayjs";
 
