@@ -1,14 +1,12 @@
 function Dashboard() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold">
-        Dashboard Owner
-      </h1>
+    <div className="md:-mt-7 mb-6">
+        <h1 className="font-extrabold text-2xl md:text-3xl">Dashboard Owner</h1>
 
-      <p className="mt-2 text-gray-600">
-        Halaman Dashboard Owner
-      </p>
-    </div>
+        <p className="text-sm md:text-base text-gray-500">
+          Monitoring cepat dashboard pintar
+        </p>
+      </div>
   );
 }
 
