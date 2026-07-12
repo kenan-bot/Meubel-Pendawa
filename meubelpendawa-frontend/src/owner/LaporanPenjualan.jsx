@@ -246,7 +246,7 @@ function LaporanPenjualan() {
       ) : (
         <>
           {/* KPI CARD */}
-          <div className="grid gap-4 xl:grid-cols-[1.1fr_1.2fr_1.7fr_2.2fr_2fr_0fr] gap-4 mb-6 items-start">
+          <div className="grid xl:grid-cols-[1.1fr_1.2fr_1.7fr_2.2fr_2fr_0fr] gap-4 mb-6 items-start">
             {/* OMZET */}
             <Card className="xl:col-span-2 shadow-lg px-5 py-3">
               <p className="text-sm md:text-lg text-gray-500 font-medium leading-none">
