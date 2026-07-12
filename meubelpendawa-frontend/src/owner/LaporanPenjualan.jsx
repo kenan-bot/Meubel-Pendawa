@@ -16,6 +16,7 @@ import {
   getDetailLaporanPenjualan,
   getKontribusiProduk,
   getTrenPenjualan,
+  exportLaporanPenjualanPdf,
 } from "../api/laporanPenjualanApi";
 import dayjs from "dayjs";
 
@@ -157,6 +158,30 @@ function LaporanPenjualan() {
     }
   };
 
+  const handleExportPdf = async () => {
+    try {
+      const pdf = await exportLaporanPenjualanPdf(
+        `${startDate}T00:00:00`,
+        `${endDate}T23:59:59`,
+      );
+
+      const url = window.URL.createObjectURL(pdf);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `Laporan-Penjualan-${startDate}-${endDate}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Gagal export PDF", error);
+    }
+  };
+
   useEffect(() => {
     loadSummaryByPeriode();
     loadTrenPenjualan();
@@ -222,6 +247,7 @@ function LaporanPenjualan() {
         />
 
         <button
+          onClick={handleExportPdf}
           type="button"
           className="flex w-full md:w-auto md:ml-auto items-center justify-center gap-2
              rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white

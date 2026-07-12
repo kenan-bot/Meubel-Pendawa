@@ -68,3 +68,18 @@ export const getTrenPenjualan = async (startDate, endDate) => {
 
     return response.data;
 };
+
+export const exportLaporanPenjualanPdf = async (startDate, endDate) => {
+    const response = await axiosClient.get(
+        `${BASE_URL}/export-pdf`,
+        {
+            params: {
+                startDate,
+                endDate,
+            },
+            responseType: "blob",
+        }
+    );
+
+    return response.data;
+};
