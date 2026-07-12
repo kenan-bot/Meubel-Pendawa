@@ -9,6 +9,8 @@ import MiniChart from "../components/MiniChart";
 import LineChartCard from "../components/LineChartCard";
 import { LuDownload } from "react-icons/lu";
 import Modal from "../components/Modal";
+import ConfirmModal from "../components/ConfirmModal";
+import Toast from "../components/Toast";
 import { useEffect, useState } from "react";
 import {
   getSummaryLaporanPenjualan,
@@ -303,10 +305,8 @@ function LaporanPenjualan() {
              transition-all duration-300 hover:bg-orange-600 hover:scale-105
              disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {" "}
-          {exportLoading ? "Mengirim..." : "Export Laporan"}
           <LuDownload size={18} />
-          Ekspor Laporan
+          {exportLoading ? "Mengirim Laporan..." : "Ekspor Laporan"}
         </button>
       </div>
 
