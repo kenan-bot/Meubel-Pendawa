@@ -1,22 +1,21 @@
 package com.meubelpendawa.controller;
 
-import com.meubelpendawa.dto.LaporanPenjualanSummaryResponse;
-import com.meubelpendawa.dto.LaporanPenjualanTrenResponse;
-import com.meubelpendawa.service.LaporanPenjualanEmailService;
-import com.meubelpendawa.service.LaporanPenjualanService;
-
 import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
-import java.util.Locale;
 
 import com.meubelpendawa.dto.KontribusiProdukResponse;
 import com.meubelpendawa.dto.LaporanPenjualanDetailResponse;
+import com.meubelpendawa.dto.LaporanPenjualanSummaryResponse;
+import com.meubelpendawa.dto.LaporanPenjualanTrenResponse;
+import com.meubelpendawa.service.LaporanPenjualanPdfService;
+import com.meubelpendawa.service.LaporanPenjualanService;
 
 @RestController
 @RequestMapping("/api/laporan-penjualan")
@@ -24,15 +23,18 @@ public class LaporanPenjualanController {
 
         private final LaporanPenjualanService laporanPenjualanService;
 
-        private final LaporanPenjualanEmailService laporanEmailService;
+        private final LaporanPenjualanPdfService laporanPenjualanPdfService;
 
         public LaporanPenjualanController(
                         LaporanPenjualanService laporanPenjualanService,
-                        LaporanPenjualanEmailService laporanEmailService) {
+                        LaporanPenjualanPdfService laporanPenjualanPdfService) {
 
                 this.laporanPenjualanService = laporanPenjualanService;
-                this.laporanEmailService = laporanEmailService;
+                this.laporanPenjualanPdfService = laporanPenjualanPdfService;
         }
+
+        
+        // SUMMARY
 
         @GetMapping("/summary")
         public ResponseEntity<LaporanPenjualanSummaryResponse> getSummary(
@@ -40,6 +42,7 @@ public class LaporanPenjualanController {
                         @RequestParam(required = false) String endDate) {
 
                 if (startDate == null || endDate == null) {
+
                         return ResponseEntity.ok(
                                         laporanPenjualanService.getSummary());
                 }
@@ -49,6 +52,8 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(startDate),
                                                 LocalDateTime.parse(endDate)));
         }
+
+        // DETAIL PENJUALAN
 
         @GetMapping("/detail")
         public ResponseEntity<List<LaporanPenjualanDetailResponse>> getDetailPenjualan(
@@ -61,51 +66,7 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        @PostMapping("/export")
-        public ResponseEntity<?> exportLaporanPenjualan(
-                        @RequestParam String startDate,
-                        @RequestParam String endDate) {
-
-                try {
-
-                        laporanEmailService.kirimLaporan(
-                                        LocalDateTime.parse(startDate),
-                                        LocalDateTime.parse(endDate));
-
-                        return ResponseEntity.ok(
-                                        new ApiResponse(
-                                                        true,
-                                                        "Laporan penjualan berhasil dikirim ke email perusahaan."));
-
-                } catch (Exception e) {
-
-                        return ResponseEntity
-                                        .internalServerError()
-                                        .body(
-                                                        new ApiResponse(
-                                                                        false,
-                                                                        e.getMessage()));
-                }
-        }
-
-        static class ApiResponse {
-
-                private boolean success;
-                private String message;
-
-                public ApiResponse(boolean success, String message) {
-                        this.success = success;
-                        this.message = message;
-                }
-
-                public boolean isSuccess() {
-                        return success;
-                }
-
-                public String getMessage() {
-                        return message;
-                }
-        }
+        // KONTRIBUSI PRODUK
 
         @GetMapping("/kontribusi-produk")
         public ResponseEntity<List<KontribusiProdukResponse>> getKontribusiProduk(
@@ -118,6 +79,8 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
+        // TREN PENJUALAN
+
         @GetMapping("/tren")
         public ResponseEntity<List<LaporanPenjualanTrenResponse>> getTrenPenjualan(
                         @RequestParam String startDate,
@@ -127,6 +90,60 @@ public class LaporanPenjualanController {
                                 laporanPenjualanService.getTrenPenjualan(
                                                 LocalDateTime.parse(startDate),
                                                 LocalDateTime.parse(endDate)));
+        }
+
+        // EXPORT PDF & EMAIL
+
+        @PostMapping("/export")
+        public ResponseEntity<ApiResponse> exportLaporanPenjualan(
+                        @RequestParam String startDate,
+                        @RequestParam String endDate) {
+
+                try {
+
+                        laporanPenjualanPdfService.exportLaporanPenjualan(
+                                        LocalDateTime.parse(startDate),
+                                        LocalDateTime.parse(endDate));
+
+                        return ResponseEntity.ok(
+                                        new ApiResponse(
+                                                        true,
+                                                        "Laporan penjualan berhasil dikirim ke email perusahaan."));
+
+                } catch (Exception e) {
+
+                        return ResponseEntity
+                                        .internalServerError()
+                                        .body(new ApiResponse(
+                                                        false,
+                                                        e.getMessage()));
+                }
+        }
+
+
+        // API RESPONSE
+
+        static class ApiResponse {
+
+                private final boolean success;
+
+                private final String message;
+
+                public ApiResponse(
+                                boolean success,
+                                String message) {
+
+                        this.success = success;
+                        this.message = message;
+                }
+
+                public boolean isSuccess() {
+                        return success;
+                }
+
+                public String getMessage() {
+                        return message;
+                }
         }
 
 }

@@ -24,7 +24,6 @@ public class LaporanHarianServiceImpl implements LaporanHarianService {
 
         private final EmailService emailService;
         private final TransaksiRepository transaksiRepository;
-        private final LaporanHarianBuilder laporanBuilder;
         private final LaporanHarianPdfGenerator pdfGenerator;
 
         @Value("${laporan.email.tujuan}")
@@ -33,12 +32,10 @@ public class LaporanHarianServiceImpl implements LaporanHarianService {
         public LaporanHarianServiceImpl(
                         EmailService emailService,
                         TransaksiRepository transaksiRepository,
-                        LaporanHarianBuilder laporanBuilder,
                         LaporanHarianPdfGenerator pdfGenerator) {
 
                 this.emailService = emailService;
                 this.transaksiRepository = transaksiRepository;
-                this.laporanBuilder = laporanBuilder;
                 this.pdfGenerator = pdfGenerator;
         }
 

@@ -16,15 +16,12 @@ import com.itextpdf.layout.element.Image;
 
 import com.meubelpendawa.dto.LaporanPenjualanTrenResponse;
 
-import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.meubelpendawa.service.PdfFooterHandler;
-import com.itextpdf.kernel.events.PdfDocumentEvent;
 
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
