@@ -3,6 +3,7 @@ package com.meubelpendawa.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,9 @@ public class LaporanPenjualanEmailServiceImpl
     private final LaporanPenjualanPdfGenerator pdfGenerator;
     private final EmailService emailService;
 
+    @Value("${laporan.email.tujuan}")
+    private String emailTujuan;
+
     public LaporanPenjualanEmailServiceImpl(
             LaporanPenjualanService laporanService,
             LaporanPenjualanPdfGenerator pdfGenerator,
@@ -28,7 +32,6 @@ public class LaporanPenjualanEmailServiceImpl
 
     @Override
     public void kirimLaporan(
-            String emailTujuan,
             LocalDateTime startDate,
             LocalDateTime endDate) {
 
@@ -68,7 +71,7 @@ public class LaporanPenjualanEmailServiceImpl
                 <p>Halo,</p>
 
                 <p>
-                Laporan penjualan yang Anda minta telah berhasil dibuat.
+                Laporan penjualan telah berhasil dibuat.
                 Silakan lihat file PDF yang terlampir pada email ini.
                 </p>
 
@@ -89,9 +92,7 @@ public class LaporanPenjualanEmailServiceImpl
 
                 <br>
 
-                <p>
-                Email ini dikirim secara otomatis oleh Sistem Meubel Pendawa.
-                </p>
+                <p>Email ini dikirim secara otomatis oleh Sistem Meubel Pendawa.</p>
                 """
                 .formatted(
                         data.getPeriode(),

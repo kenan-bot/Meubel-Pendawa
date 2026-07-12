@@ -61,18 +61,50 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        @PostMapping("/kirim-email")
-        public ResponseEntity<String> kirimEmail(
-                        @RequestParam String email,
+        @PostMapping("/export")
+        public ResponseEntity<?> exportLaporanPenjualan(
                         @RequestParam String startDate,
                         @RequestParam String endDate) {
 
-                laporanEmailService.kirimLaporan(
-                                email,
-                                LocalDateTime.parse(startDate),
-                                LocalDateTime.parse(endDate));
+                try {
 
-                return ResponseEntity.ok("Laporan berhasil dikirim.");
+                        laporanEmailService.kirimLaporan(
+                                        LocalDateTime.parse(startDate),
+                                        LocalDateTime.parse(endDate));
+
+                        return ResponseEntity.ok(
+                                        new ApiResponse(
+                                                        true,
+                                                        "Laporan penjualan berhasil dikirim ke email perusahaan."));
+
+                } catch (Exception e) {
+
+                        return ResponseEntity
+                                        .internalServerError()
+                                        .body(
+                                                        new ApiResponse(
+                                                                        false,
+                                                                        e.getMessage()));
+                }
+        }
+
+        static class ApiResponse {
+
+                private boolean success;
+                private String message;
+
+                public ApiResponse(boolean success, String message) {
+                        this.success = success;
+                        this.message = message;
+                }
+
+                public boolean isSuccess() {
+                        return success;
+                }
+
+                public String getMessage() {
+                        return message;
+                }
         }
 
         @GetMapping("/kontribusi-produk")

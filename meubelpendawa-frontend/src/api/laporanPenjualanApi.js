@@ -70,16 +70,14 @@ export const getTrenPenjualan = async (startDate, endDate) => {
 };
 
 export const kirimLaporanPenjualanEmail = async (
-    email,
     startDate,
     endDate
 ) => {
     const response = await axiosClient.post(
-        `${BASE_URL}/kirim-email`,
+        `${BASE_URL}/export`,
         null,
         {
             params: {
-                email,
                 startDate,
                 endDate,
             },
