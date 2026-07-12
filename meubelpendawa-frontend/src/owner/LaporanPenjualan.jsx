@@ -281,12 +281,16 @@ function LaporanPenjualan() {
 
         <button
           onClick={() => setShowConfirmExport(true)}
-          disabled={exportLoading}
+          disabled={exportLoading || tidakAdaData}
+          title={tidakAdaData ? "Tidak ada data penjualan untuk diekspor." : ""}
           type="button"
-          className="flex w-full md:w-auto md:ml-auto items-center justify-center gap-2
-             rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white
-             transition-all duration-300 hover:bg-orange-600 hover:scale-105
-             disabled:cursor-not-allowed disabled:opacity-60"
+          className={`flex w-full md:w-auto md:ml-auto items-center justify-center gap-2
+          rounded-lg px-4 py-2 text-sm font-medium text-white transition-all duration-300
+          ${
+            exportLoading || tidakAdaData
+              ? "bg-gray-400 cursor-not-allowed opacity-60"
+              : "bg-orange-500 hover:bg-orange-600 hover:scale-105"
+          }`}
         >
           <LuDownload size={18} />
           {exportLoading ? "Mengirim Laporan..." : "Ekspor Laporan"}
