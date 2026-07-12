@@ -2,6 +2,8 @@ import axiosClient from "./axiosClient";
 
 const BASE_URL = "/api/laporan-penjualan";
 
+// SUMMARY
+
 export const getSummaryLaporanPenjualan = async () => {
     const response = await axiosClient.get(
         `${BASE_URL}/summary`
@@ -27,23 +29,14 @@ export const getSummaryLaporanPenjualanByPeriode = async (
     return response.data;
 };
 
-export const getDetailLaporanPenjualan = async (startDate, endDate) => {
-    const response = await axiosClient.get(`${BASE_URL}/detail`, {
-        params: {
-            startDate,
-            endDate,
-        },
-    });
+// DETAIL PENJUALAN
 
-    return response.data;
-};
-
-export const getKontribusiProduk = async (
+export const getDetailLaporanPenjualan = async (
     startDate,
     endDate
 ) => {
     const response = await axiosClient.get(
-        `/api/laporan-penjualan/kontribusi-produk`,
+        `${BASE_URL}/detail`,
         {
             params: {
                 startDate,
@@ -55,19 +48,45 @@ export const getKontribusiProduk = async (
     return response.data;
 };
 
-export const getTrenPenjualan = async (startDate, endDate) => {
+// KONTRIBUSI PRODUK
+
+export const getKontribusiProduk = async (
+    startDate,
+    endDate
+) => {
     const response = await axiosClient.get(
-        `/api/laporan-penjualan/tren`,
+        `${BASE_URL}/kontribusi-produk`,
         {
             params: {
                 startDate,
                 endDate,
             },
-        },
+        }
     );
 
     return response.data;
 };
+
+// TREN PENJUALAN
+
+export const getTrenPenjualan = async (
+    startDate,
+    endDate
+) => {
+    const response = await axiosClient.get(
+        `${BASE_URL}/tren`,
+        {
+            params: {
+                startDate,
+                endDate,
+            },
+        }
+    );
+
+    return response.data;
+};
+
+// EXPORT PDF & EMAIL
 
 export const kirimLaporanPenjualanEmail = async (
     startDate,

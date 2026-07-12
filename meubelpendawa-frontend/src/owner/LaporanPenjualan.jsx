@@ -188,8 +188,7 @@ function LaporanPenjualan() {
     try {
       setExportLoading(true);
 
-      await kirimLaporanPenjualanEmail(
-        "owner@gmail.com", // nanti bisa ambil dari login/session
+      const result = await kirimLaporanPenjualanEmail(
         `${startDate}T00:00:00`,
         `${endDate}T23:59:59`,
       );
@@ -198,37 +197,21 @@ function LaporanPenjualan() {
         show: true,
         type: "success",
         message:
+          result.message ??
           "Laporan penjualan berhasil dibuat dan dikirim ke email perusahaan.",
       });
     } catch (error) {
-      console.error(error);
+      console.error("Gagal mengirim laporan:", error);
 
       setToast({
         show: true,
         type: "error",
-        message: "Gagal mengirim laporan penjualan.",
+        message:
+          error.response?.data?.message ?? "Gagal mengirim laporan penjualan.",
       });
     } finally {
       setExportLoading(false);
       setShowConfirmExport(false);
-    }
-  };
-
-  const handleKirimLaporan = async () => {
-    try {
-      const result = await kirimLaporanPenjualanEmail(
-        email,
-        `${startDate}T00:00:00`,
-        `${endDate}T23:59:59`,
-      );
-
-      toast.success(result);
-
-      setOpenConfirm(false);
-    } catch (error) {
-      console.error(error);
-
-      toast.error(error.response?.data ?? "Gagal mengirim laporan penjualan.");
     }
   };
 
