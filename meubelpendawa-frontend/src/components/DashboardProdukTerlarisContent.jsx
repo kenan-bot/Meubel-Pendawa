@@ -1,4 +1,5 @@
 import { FaCrown } from "react-icons/fa";
+import AnimatedSection from "./AnimatedSection";
 
 function formatRupiah(value) {
   return new Intl.NumberFormat("id-ID", {
@@ -12,115 +13,122 @@ function DashboardProdukTerlarisContent({ produk = [] }) {
   const styles = [
     {
       bg: "bg-orange-500 text-white",
-      height: "h-24",
-      omzet: "text-xl",
-      nama: "text-lg",
-    },
-    {
-      bg: "bg-orange-100",
-      height: "h-20",
-      omzet: "text-lg text-orange-600",
-      nama: "text-base",
-    },
-    {
-      bg: "bg-orange-50",
       height: "h-16",
-      omzet: "text-base text-orange-600",
-      nama: "text-sm",
+      nama: "text-lg sm:text-xl",
     },
     {
-      bg: "bg-gray-50",
+      bg: "bg-orange-100 text-gray-800",
       height: "h-14",
-      omzet: "text-sm text-orange-600",
-      nama: "text-sm",
+      nama: "text-base sm:text-lg",
     },
     {
-      bg: "bg-gray-50",
-      height: "h-14",
-      omzet: "text-sm text-orange-600",
-      nama: "text-sm",
+      bg: "bg-orange-50 text-gray-700",
+      height: "h-13",
+      nama: "text-sm sm:text-base",
+    },
+    {
+      bg: "bg-gray-50 text-gray-500",
+      height: "h-9",
+      nama: "text-xs sm:text-sm",
     },
   ];
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-visible">
       <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="font-bold text-xl text-gray-800">Produk Terlaris</h3>
+        <div className="min-w-0">
+          <h3 className="font-bold text-base sm:text-xl text-gray-800 truncate">
+            Produk Terlaris
+          </h3>
 
-          <p className="text-gray-500">Bulan Ini</p>
+          <p className="text-xs sm:text-sm text-gray-500">Berdasar Item terjual</p>
         </div>
 
-        <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center">
-          <FaCrown className="text-orange-500 text-xl" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+          <FaCrown className="text-orange-500 text-lg sm:text-xl" />
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto">
-        {produk.slice(0, 5).map((item, index) => {
+      <div className="flex-1 space-y-3 overflow-visible">
+        {produk.slice(0, 4).map((item, index) => {
           const style = styles[index];
 
           return (
-            <div
+            <AnimatedSection
               key={item.namaProduk}
-              className={`
-                ${style.bg}
-                ${style.height}
-                rounded-2xl
-                px-4
-                flex
-                items-center
-                justify-between
-                transition-all
-                duration-300
-                hover:scale-[1.02]
-                hover:font-bold
-                hover:shadow-[0_0_25px_rgba(249,115,22,0.35)]
-                cursor-pointer
-              `}
+              delay={index * 0.12}
+              y={20}
+              scale={0.95}
             >
-              <div className="min-w-0">
-                <div
-                  className={`
-                    font-extrabold
-                    ${index === 0 ? "text-3xl" : "text-2xl"}
-                  `}
-                >
-                  #{index + 1}
-                </div>
-
-                <div
-                  className={`
-                    ${style.nama}
-                    font-bold
-                    truncate
-                    max-w-[160px]
-                  `}
-                >
-                  {item.namaProduk}
-                </div>
-
-                {index < 3 && (
-                  <div
-                    className={`
-                      text-xs
-                      ${index === 0 ? "text-orange-100" : "text-gray-500"}
-                    `}
-                  >
-                    {item.totalTerjual} terjual
-                  </div>
-                )}
-              </div>
-
               <div
                 className={`
-                  font-extrabold
-                  ${style.omzet}
+                  ${style.bg}
+                  ${style.height}
+                  rounded-md
+                  px-3 sm:px-4
+                  flex
+                  items-center
+                  gap-3 sm:gap-4
+                  relative
+                  transition-all
+                  duration-300
+                  hover:scale-125
+                  hover:z-20
+                  hover:shadow-sm
+                  cursor-pointer
                 `}
               >
-                {formatRupiah(item.totalOmzet)}
+                {/* Ranking */}
+                <div
+                  className={`
+                    font-black
+                    flex-shrink-0
+                    leading-none
+                    ${
+                      index === 0
+                        ? "text-4xl sm:text-5xl"
+                        : index === 1
+                          ? "text-3xl sm:text-4xl"
+                          : "text-2xl sm:text-3xl"
+                    }
+                  `}
+                >
+                  {index + 1}
+                </div>
+
+                {/* Informasi Produk */}
+                <div className="flex-1 min-w-0">
+                  <div
+                    className={`
+                      ${style.nama}
+                      font-bold
+                      truncate
+                    `}
+                  >
+                    {item.namaProduk}
+                  </div>
+
+                  <div
+                    className={`
+                      flex
+                      items-center
+                      justify-between
+                      gap-2
+                      text-xs sm:text-sm
+                      ${index === 0 ? "text-orange-100" : "text-gray-600"}
+                    `}
+                  >
+                    <span className="truncate">
+                      {item.totalTerjual} terjual
+                    </span>
+
+                    <span className="font-bold truncate text-right">
+                      {formatRupiah(item.totalOmzet)}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
+            </AnimatedSection>
           );
         })}
       </div>

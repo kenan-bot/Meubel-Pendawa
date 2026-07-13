@@ -1,4 +1,5 @@
 import { FaShippingFast } from "react-icons/fa";
+import AnimatedCount from "../components/AnimatedCount";
 
 function PengirimanBelumSelesaiContent({
   totalAktif,
@@ -21,9 +22,11 @@ function PengirimanBelumSelesaiContent({
 
       {/* SUMMARY */}
       <div className="mt-4">
-        <div className="text-4xl md:text-5xl font-extrabold text-orange-500">
-          {totalAktif}
-        </div>
+        <AnimatedCount
+          value={totalAktif}
+          duration={1500}
+          className="text-4xl md:text-5xl font-extrabold text-orange-500"
+        />
 
         <p className="text-sm md:text-base text-gray-500 font-medium">
           Pengiriman Aktif
@@ -40,7 +43,7 @@ function PengirimanBelumSelesaiContent({
 
       {/* DRIVER LIST */}
       <div className="mt-6 flex-1 flex flex-col min-h-0">
-        <div className="flex justify-between text-xs font-bold uppercase text-gray-400 border-b border-orange-200 pb-2">
+        <div className="flex justify-between text-sm font-medium text-gray-400 border-b border-orange-200 pb-2">
           <span>Driver</span>
           <span>Belum Dikirim</span>
         </div>

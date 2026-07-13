@@ -73,9 +73,9 @@ public interface DetailTransaksiRepository extends JpaRepository<DetailTransaksi
                             JOIN d.produk p
                             JOIN d.transaksi t
                             WHERE
-                                FUNCTION('YEAR', t.tanggalTransaksi) = :tahun
-                                AND FUNCTION('MONTH', t.tanggalTransaksi) = :bulan
-                                AND t.statusPembayaran = 'SUCCESS'
+                                t.statusPembayaran = 'SUCCESS'
+                                AND YEAR(t.tanggalTransaksi) = :tahun
+                                AND MONTH(t.tanggalTransaksi) = :bulan
                                 AND p.merek IS NOT NULL
                             GROUP BY p.merek.namaMerek
                             ORDER BY SUM(d.qty) DESC

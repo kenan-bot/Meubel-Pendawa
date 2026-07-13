@@ -4,6 +4,7 @@ import {
   getPengirimanBelumSelesai,
   getTransaksiTerbesarHariIni,
   getProdukTerlarisBulanIni,
+  getTopMerekPopuler,
 } from "../api/dashboardApi";
 
 import AnimatedCount from "../components/AnimatedCount";
@@ -11,6 +12,7 @@ import AnimatedCount from "../components/AnimatedCount";
 import PengirimanBelumSelesaiContent from "../components/DashboardPengirimanContent";
 import DashboardTransaksiContent from "../components/DashboardTransaksiContent";
 import DashboardProdukTerlarisContent from "../components/DashboardProdukTerlarisContent";
+import DashboardMerekPopulerContent from "../components/DashboardMerekPopuler";
 
 function Dashboard() {
   //card pengiriman
@@ -33,7 +35,7 @@ function Dashboard() {
 
       setTransaksiTerbesar(response);
     } catch (error) {
-      console.error(error);
+      console.error("Gagal memuat data transaksi terbesar", error);
     }
   };
 
@@ -45,7 +47,19 @@ function Dashboard() {
 
       setProdukTerlaris(response);
     } catch (error) {
-      console.error(error);
+      console.error("Gagal memuat data produk terlaris", error);
+    }
+  };
+
+  // card merek populer
+  const [topMerekPopuler, setTopMerekPopuler] = useState([]);
+  const loadTopMerekPopuler = async () => {
+    try {
+      const data = await getTopMerekPopuler();
+
+      setTopMerekPopuler(data);
+    } catch (error) {
+      console.error("Gagal memuat data merek populer", error);
     }
   };
 
@@ -53,15 +67,18 @@ function Dashboard() {
     loadPengiriman();
     loadTransaksiTerbesar();
     loadProdukTerlaris();
+    loadTopMerekPopuler();
   }, []);
 
   return (
     <div className="px-3 py-5 md:p-5">
       {/* HEADER */}
       <div className="md:-mt-7 mb-6">
-        <h1 className="font-extrabold text-2xl md:text-3xl">Dashboard Owner</h1>
+        <h1 className="font-extrabold text-2xl md:text-3xl">
+          Dashboard Pintar
+        </h1>
         <p className="text-sm md:text-base text-gray-500">
-          Monitoring cepat dashboard pintar
+          Monitoring cepat performa bisnis dalam satu ruang
         </p>
       </div>
 
@@ -88,7 +105,13 @@ function Dashboard() {
 
         <div className="col-span-1 row-span-1">
           <Card dashboard className="h-[170px]">
-            <p className="font-bold text-center">Top 3 Merek Populer</p>
+            {topMerekPopuler.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-gray-400">Memuat merek populer...</span>
+              </div>
+            ) : (
+              <DashboardMerekPopulerContent merek={topMerekPopuler} />
+            )}
           </Card>
         </div>
 
