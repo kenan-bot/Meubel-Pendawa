@@ -5,6 +5,7 @@ const Card = ({
   className = "",
   variant = "default",
   hover = true,
+  dashboard = false,
   padding = "normal",
   onClick,
 }) => {
@@ -18,8 +19,15 @@ const Card = ({
     orange: "bg-orange-500",
   };
 
-  const hoverStyles = hover
-    ? "hover:shadow-[0_12px_30px_rgba(0,0,0,0.35)] hover:-translate-y-2"
+  // Hover biasa
+  const hoverStyles =
+    hover && !dashboard
+      ? "hover:shadow-[0_12px_30px_rgba(0,0,0,0.35)] hover:-translate-y-2"
+      : "";
+
+  // Hover khusus dashboard
+  const dashboardHoverStyles = dashboard
+    ? "hover:scale-[1.01] hover:ring-2 hover:ring-orange-500"
     : "";
 
   const paddingStyles = {
@@ -32,7 +40,14 @@ const Card = ({
   return (
     <div
       onClick={onClick}
-      className={`${baseStyles} ${variants[variant]} ${hoverStyles} ${paddingStyles[padding]} ${className}`}
+      className={`
+        ${baseStyles}
+        ${variants[variant]}
+        ${hoverStyles}
+        ${dashboardHoverStyles}
+        ${paddingStyles[padding]}
+        ${className}
+      `}
     >
       {children}
     </div>
