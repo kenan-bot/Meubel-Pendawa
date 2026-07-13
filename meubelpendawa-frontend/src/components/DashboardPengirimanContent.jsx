@@ -1,6 +1,6 @@
 import { FaShippingFast } from "react-icons/fa";
 
-function PengirimanBelumSelesaiCard({
+function PengirimanBelumSelesaiContent({
   totalAktif,
   totalTerlambat,
   drivers = [],
@@ -91,4 +91,4 @@ function PengirimanBelumSelesaiCard({
   );
 }
 
-export default PengirimanBelumSelesaiCard;
+export default PengirimanBelumSelesaiContent;

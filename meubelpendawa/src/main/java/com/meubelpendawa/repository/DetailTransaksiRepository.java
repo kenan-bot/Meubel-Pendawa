@@ -12,41 +12,75 @@ import java.util.List;
 
 public interface DetailTransaksiRepository extends JpaRepository<DetailTransaksi, String> {
 
-    List<DetailTransaksi> findByTransaksi_OrderId(String orderId);
+        List<DetailTransaksi> findByTransaksi_OrderId(String orderId);
 
-    List<DetailTransaksi> findByTransaksiIn(List<Transaksi> transaksi);
+        List<DetailTransaksi> findByTransaksiIn(List<Transaksi> transaksi);
 
-    DetailTransaksi findFirstByOrderByIdDetailTransaksiDesc();
+        DetailTransaksi findFirstByOrderByIdDetailTransaksiDesc();
 
-    // KPI LAPORAN PENJUALAN
+        // KPI LAPORAN PENJUALAN
 
-    @Query("""
-            SELECT COALESCE(SUM(d.qty), 0)
-            FROM DetailTransaksi d
-            WHERE d.transaksi.statusPembayaran = 'SUCCESS'
-            """)
-    Long getTotalProdukTerjual();
+        @Query("""
+                        SELECT COALESCE(SUM(d.qty), 0)
+                        FROM DetailTransaksi d
+                        WHERE d.transaksi.statusPembayaran = 'SUCCESS'
+                        """)
+        Long getTotalProdukTerjual();
 
-    @Query("""
-            SELECT COALESCE(SUM(d.qty), 0)
-            FROM DetailTransaksi d
-            WHERE d.transaksi.statusPembayaran = 'SUCCESS'
-            AND d.transaksi.tanggalTransaksi BETWEEN :startDate AND :endDate
-            """)
-    Long getTotalProdukTerjualByPeriode(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("""
+                        SELECT COALESCE(SUM(d.qty), 0)
+                        FROM DetailTransaksi d
+                        WHERE d.transaksi.statusPembayaran = 'SUCCESS'
+                        AND d.transaksi.tanggalTransaksi BETWEEN :startDate AND :endDate
+                        """)
+        Long getTotalProdukTerjualByPeriode(
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 
-    @Query("""
-            SELECT d.namaProduk,
-                   SUM(d.qty)
-            FROM DetailTransaksi d
-            WHERE d.transaksi.statusPembayaran = 'SUCCESS'
-            AND d.transaksi.tanggalTransaksi BETWEEN :startDate AND :endDate
-            GROUP BY d.namaProduk
-            ORDER BY SUM(d.qty) DESC
-            """)
-    List<Object[]> getKontribusiProduk(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("""
+                        SELECT d.namaProduk,
+                               SUM(d.qty)
+                        FROM DetailTransaksi d
+                        WHERE d.transaksi.statusPembayaran = 'SUCCESS'
+                        AND d.transaksi.tanggalTransaksi BETWEEN :startDate AND :endDate
+                        GROUP BY d.namaProduk
+                        ORDER BY SUM(d.qty) DESC
+                        """)
+        List<Object[]> getKontribusiProduk(
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
+
+        @Query("""
+                        SELECT d.namaProduk,
+                               SUM(d.qty),
+                               SUM(d.subtotal)
+                        FROM DetailTransaksi d
+                        WHERE d.transaksi.statusPembayaran = 'SUCCESS'
+                        AND YEAR(d.transaksi.tanggalTransaksi) = :tahun
+                        AND MONTH(d.transaksi.tanggalTransaksi) = :bulan
+                        GROUP BY d.namaProduk
+                        ORDER BY SUM(d.qty) DESC
+                        """)
+        List<Object[]> getProdukTerlarisBulanIni(
+                        @Param("tahun") int tahun,
+                        @Param("bulan") int bulan);
+
+        @Query("""
+                            SELECT
+                                p.merek.namaMerek,
+                                SUM(d.qty)
+                            FROM DetailTransaksi d
+                            JOIN d.produk p
+                            JOIN d.transaksi t
+                            WHERE
+                                FUNCTION('YEAR', t.tanggalTransaksi) = :tahun
+                                AND FUNCTION('MONTH', t.tanggalTransaksi) = :bulan
+                                AND t.statusPembayaran = 'SUCCESS'
+                                AND p.merek IS NOT NULL
+                            GROUP BY p.merek.namaMerek
+                            ORDER BY SUM(d.qty) DESC
+                        """)
+        List<Object[]> getMerekPopulerBulanIni(
+                        @Param("tahun") int tahun,
+                        @Param("bulan") int bulan);
 }

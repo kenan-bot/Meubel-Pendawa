@@ -35,6 +35,7 @@ const Card = ({
     small: "p-4",
     normal: "p-6",
     large: "p-8",
+    dashboard: "p-3 md:p-4", // baru
   };
 
   return (
