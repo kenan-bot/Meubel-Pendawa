@@ -133,7 +133,7 @@ public class StrukService {
             table.addCell(headerCell("Subtotal", fontLabel));
 
             for (DetailTransaksi d : items) {
-                table.addCell(dataCell(d.getProduk() != null ? d.getProduk().getNamaProduk() : "-", fontNormal, Element.ALIGN_LEFT));
+                table.addCell(dataCell(d.getNamaProduk(), fontNormal, Element.ALIGN_LEFT));
                 table.addCell(dataCell(String.valueOf(d.getQty()), fontNormal, Element.ALIGN_CENTER));
                 table.addCell(dataCell(rupiah(d.getHargaJual()), fontNormal, Element.ALIGN_RIGHT));
                 table.addCell(dataCell(rupiah(d.getSubtotal()), fontNormal, Element.ALIGN_RIGHT));

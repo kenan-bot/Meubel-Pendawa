@@ -38,12 +38,12 @@ public interface DetailTransaksiRepository extends JpaRepository<DetailTransaksi
             @Param("endDate") LocalDateTime endDate);
 
     @Query("""
-            SELECT d.produk.namaProduk,
+            SELECT d.namaProduk,
                    SUM(d.qty)
             FROM DetailTransaksi d
             WHERE d.transaksi.statusPembayaran = 'SUCCESS'
             AND d.transaksi.tanggalTransaksi BETWEEN :startDate AND :endDate
-            GROUP BY d.produk.namaProduk
+            GROUP BY d.namaProduk
             ORDER BY SUM(d.qty) DESC
             """)
     List<Object[]> getKontribusiProduk(

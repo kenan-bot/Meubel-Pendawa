@@ -17,6 +17,8 @@ public class DetailTransaksi {
 
     private Double hargaJual;
 
+    private String namaProduk;
+
     private Double subtotal;
 
     @ManyToOne
@@ -60,6 +62,14 @@ public class DetailTransaksi {
 
     public void setHargaJual(Double hargaJual) {
         this.hargaJual = hargaJual;
+    }
+
+    public String getNamaProduk() {
+        return namaProduk;
+    }
+
+    public void setNamaProduk(String namaProduk) {
+        this.namaProduk = namaProduk;
     }
 
     public Double getSubtotal() {

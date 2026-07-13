@@ -161,9 +161,9 @@ const TransaksiCard = ({
                 >
                   <span
                     className="text-sm text-gray-700 break-words leading-none"
-                    title={d.produk?.namaProduk}
+                    title={d.namaProduk}
                   >
-                    {d.produk?.namaProduk}
+                    {d.namaProduk}
                   </span>
 
                   <span className="text-center text-sm font-medium text-gray-700">

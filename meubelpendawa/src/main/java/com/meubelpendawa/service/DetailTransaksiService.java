@@ -34,6 +34,8 @@ public class DetailTransaksiService {
         Produk produk = produkRepository.findById(detailTransaksi.getProduk().getIdProduk())
                 .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan"));
 
+        detailTransaksi.setNamaProduk(produk.getNamaProduk());
+
         if (produk.getStok() < detailTransaksi.getQty()) {
             throw new RuntimeException("Stok tidak mencukupi");
         }

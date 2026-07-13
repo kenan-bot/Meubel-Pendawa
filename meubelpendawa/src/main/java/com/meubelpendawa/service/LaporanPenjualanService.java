@@ -170,7 +170,7 @@ public class LaporanPenjualanService {
                         String produk = detailList.stream()
                                         .map(detail -> detail.getQty()
                                                         + " "
-                                                        + detail.getProduk().getNamaProduk())
+                                                        + detail.getNamaProduk())
                                         .collect(Collectors.joining(", "));
 
                         LaporanPenjualanDetailResponse item = new LaporanPenjualanDetailResponse();
