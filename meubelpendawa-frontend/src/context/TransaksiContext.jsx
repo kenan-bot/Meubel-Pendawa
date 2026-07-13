@@ -16,7 +16,7 @@ import {
 const TransaksiContext = createContext(null);
 
 export function TransaksiProvider({ children }) {
-  const { produk, loading, updateProdukState, reloadProduk } = useProduk();
+  const { produk, loading, reloadProduk } = useProduk();
 
   // ----- form pemesan -----
   const [namaPemesan, setNamaPemesan] = useState("");
@@ -262,10 +262,6 @@ export function TransaksiProvider({ children }) {
         });
         // Backend sudah decrement stok di titik ini (lihat DetailTransaksiService), jadi
         // sinkronkan juga stok di ProdukContext biar grid produk ikut update tanpa refresh manual.
-        updateProdukState({
-          ...item.produk,
-          stok: item.produk.stok - item.qty,
-        });
       }
 
       if (isCashless) {
@@ -306,17 +302,16 @@ export function TransaksiProvider({ children }) {
   // Dipanggil saat popup QRIS ditutup/error tanpa selesai bayar. Order dihapus di backend
   // (kecuali ternyata sudah terlanjur SUCCESS -- lihat batalkanTransaksi di TransaksiService),
   // lalu daftar produk di-reload supaya stok yang dikembalikan backend ikut kesinkron di UI.
-  const batalkanOrderQris = (orderId) => {
-    batalkanTransaksi(orderId)
-      .then(() => reloadProduk())
-      .catch((err) => {
-        // Kalau ternyata order sudah SUCCESS (race condition), backend menolak hapus --
-        // itu bukan error yang perlu ditampilkan sebagai kegagalan, cukup dicatat di console.
-        console.error(
-          `Gagal membatalkan order ${orderId}:`,
-          err?.response?.data?.error || err.message,
-        );
-      });
+  const batalkanOrderQris = async (orderId) => {
+    try {
+      await batalkanTransaksi(orderId);
+      await reloadProduk();
+    } catch (err) {
+      console.error(
+        `Gagal membatalkan order ${orderId}:`,
+        err?.response?.data?.error || err.message,
+      );
+    }
   };
 
   // Ambil Snap Token dari backend lalu buka popup pembayaran Midtrans.
@@ -336,13 +331,12 @@ export function TransaksiProvider({ children }) {
       window.snap.pay(token, {
         onSuccess: () => {
           tampilkanPesan(`Pembayaran ${orderId} berhasil.`, "success");
+
           if (buatSnapshotStruk) setStrukData(buatSnapshotStruk());
-          // Gantiin peran webhook: minta backend cek ulang status ASLI ke Midtrans & simpan
-          // ke database. Tanpa ini, statusPembayaran/jumlahBayar di DB tetap nyangkut PENDING/0
-          // walau popup Snap sudah bilang sukses -- soalnya webhook butuh URL publik (ngrok dkk).
-          cekStatusPembayaran(orderId).catch((err) =>
-            console.error("Gagal sinkronkan status:", err),
-          );
+
+          cekStatusPembayaran(orderId)
+            .then(() => reloadProduk())
+            .catch((err) => console.error("Gagal sinkronkan status:", err));
         },
         onPending: () => {
           tampilkanPesan(
@@ -353,16 +347,26 @@ export function TransaksiProvider({ children }) {
             console.error("Gagal sinkronkan status:", err),
           );
         },
-        onError: () => {
+        onError: async () => {
+          try {
+            await batalkanOrderQris(orderId);
+          } catch (e) {
+            console.error(e);
+          }
+
           tampilkanPesan(
             `Pembayaran ${orderId} gagal, silakan coba lagi.`,
             "error",
           );
-          batalkanOrderQris(orderId);
         },
-        onClose: () => {
+        onClose: async () => {
+          try {
+            await batalkanOrderQris(orderId);
+          } catch (e) {
+            console.error(e);
+          }
+
           tampilkanPesan(`Pembayaran ${orderId} dibatalkan.`, "error");
-          batalkanOrderQris(orderId);
         },
       });
       return true;
