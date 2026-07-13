@@ -1,4 +1,5 @@
 import Card from "../components/Card";
+import PengirimanBelumSelesaiCard from "../components/DashboardPengirimanContent";
 
 function Dashboard() {
   return (
@@ -28,7 +29,15 @@ function Dashboard() {
 
         <div className="col-span-1 row-span-2">
           <Card dashboard className="h-[380px]">
-            <p className="font-bold text-center">Pengiriman Belum Selesai</p>
+            <PengirimanBelumSelesaiCard
+              totalAktif={8}
+              totalTerlambat={2}
+              drivers={[
+                { nama: "Budi Santoso", total: 4 },
+                { nama: "Andi Saputra", total: 3 },
+                { nama: "Rudi Hartono", total: 1 },
+              ]}
+            />
           </Card>
         </div>
 
