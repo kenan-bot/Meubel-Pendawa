@@ -15,11 +15,11 @@ export const getPengirimanBelumSelesai = async () => {
 // PRODUK TERLARIS BULAN INI
 
 export const getProdukTerlarisBulanIni = async () => {
-  const response = await axiosClient.get(
-    `${BASE_URL}/produk-terlaris`
-  );
+    const response = await axiosClient.get(
+        `${BASE_URL}/produk-terlaris`
+    );
 
-  return response.data;
+    return response.data;
 };
 
 // TOP 3 MEREK TERPOPULER
@@ -66,7 +66,7 @@ export const getCashVsCashless = async () => {
 
 export const getTopWilayahPelanggan = async () => {
     const response = await axiosClient.get(
-        `${BASE_URL}/top-wilayah`
+        `${BASE_URL}/wilayah-pelanggan`
     );
 
     return response.data;

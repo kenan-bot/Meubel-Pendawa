@@ -5,6 +5,8 @@ import {
   getTransaksiTerbesarHariIni,
   getProdukTerlarisBulanIni,
   getTopMerekPopuler,
+  getTransaksiTerbaru,
+  getTopWilayahPelanggan,
 } from "../api/dashboardApi";
 
 import AnimatedCount from "../components/AnimatedCount";
@@ -13,6 +15,8 @@ import PengirimanBelumSelesaiContent from "../components/DashboardPengirimanCont
 import DashboardTransaksiContent from "../components/DashboardTransaksiContent";
 import DashboardProdukTerlarisContent from "../components/DashboardProdukTerlarisContent";
 import DashboardMerekPopulerContent from "../components/DashboardMerekPopuler";
+import DashboardTransaksiTerbaruContent from "../components/DashboardTransaksiTerbaruContent";
+import DashboardWilayahPelangganContent from "../components/DashboardWilayahPelangganContent";
 
 function Dashboard() {
   //card pengiriman
@@ -63,11 +67,37 @@ function Dashboard() {
     }
   };
 
+  // card transaksi terbaru
+  const [transaksiTerbaru, setTransaksiTerbaru] = useState([]);
+  const loadTransaksiTerbaru = async () => {
+    try {
+      const response = await getTransaksiTerbaru();
+
+      setTransaksiTerbaru(response);
+    } catch (error) {
+      console.error("Gagal memuat data transaksi terbaru", error);
+    }
+  };
+
+  // card top wilayah pelanggan
+  const [topWilayahPelanggan, setTopWilayahPelanggan] = useState([]);
+  const loadTopWilayahPelanggan = async () => {
+    try {
+      const response = await getTopWilayahPelanggan();
+
+      setTopWilayahPelanggan(response);
+    } catch (error) {
+      console.error("Gagal memuat data wilayah pelanggan", error);
+    }
+  };
+
   useEffect(() => {
     loadPengiriman();
     loadTransaksiTerbesar();
     loadProdukTerlaris();
     loadTopMerekPopuler();
+    loadTransaksiTerbaru();
+    loadTopWilayahPelanggan();
   }, []);
 
   return (
@@ -165,13 +195,29 @@ function Dashboard() {
         {/* Row 4 */}
         <div className="col-span-2 row-span-1">
           <Card dashboard className="h-[300px]">
-            <p className="font-bold text-center">Top Wilayah Pelanggan</p>
+            {topWilayahPelanggan.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-gray-400">
+                  Memuat wilayah pelanggan...
+                </span>
+              </div>
+            ) : (
+              <DashboardWilayahPelangganContent wilayah={topWilayahPelanggan} />
+            )}
           </Card>
         </div>
 
         <div className="col-span-2 row-span-1">
           <Card dashboard className="h-[300px]">
-            <p className="font-bold text-center">Transaksi Terbaru</p>
+            {transaksiTerbaru.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-gray-400">
+                  Memuat transaksi terbaru...
+                </span>
+              </div>
+            ) : (
+              <DashboardTransaksiTerbaruContent transaksi={transaksiTerbaru} />
+            )}
           </Card>
         </div>
       </div>

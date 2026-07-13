@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
+import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbaruResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbesarResponse;
+import com.meubelpendawa.dto.dashboard.DashboardWilayahPelangganResponse;
 import com.meubelpendawa.service.DashboardService;
 
 @RestController
@@ -48,5 +50,18 @@ public class DashboardController {
 
         return dashboardService
                 .getMerekPopulerBulanIni();
+    }
+
+    @GetMapping("/transaksi-terbaru")
+    public List<DashboardTransaksiTerbaruResponse> getTransaksiTerbaru() {
+
+        return dashboardService
+                .getTransaksiTerbaru();
+    }
+
+    @GetMapping("/wilayah-pelanggan")
+    public List<DashboardWilayahPelangganResponse> getTopWilayahPelanggan() {
+
+        return dashboardService.getTopWilayahPelanggan();
     }
 }
