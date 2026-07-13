@@ -153,7 +153,7 @@ function TransaksiContent() {
       {/* ===== KANAN: KERANJANG =====
           [RESPONSIVE] mobile: full-width, di bawah panel produk (bukan sidebar tetap).
           Tombol "Proses Pesanan" dibuat sticky di bawah layar supaya tetap mudah dijangkau saat scroll. */}
-      <div className="relative w-full lg:w-[300px] bg-white rounded-2xl shadow-sm flex flex-col lg:min-h-0">
+      <div className="relative w-full lg:w-[300px] bg-white rounded-2xl shadow-sm flex flex-col lg:min-h-0 lg:-mt-2">
         {t.pesan && <Toast message={t.pesan} type={t.pesanType} />}
 
         <div className="p-4 pb-3 flex-shrink-0">
