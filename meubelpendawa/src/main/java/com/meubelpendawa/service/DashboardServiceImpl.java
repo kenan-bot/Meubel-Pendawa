@@ -279,33 +279,37 @@ public class DashboardServiceImpl implements DashboardService {
         @Override
         public DashboardDeliveryResponse getDeliveryVsPickup() {
 
-                Long totalDelivery = transaksiRepository.countByMetodePengirimanIgnoreCase("DELIVERY");
+                long totalDelivery = transaksiRepository.countByMetodePengirimanAndStatusPembayaran(
+                                "DELIVERY",
+                                "SUCCESS");
 
-                Long totalPickup = transaksiRepository.countByMetodePengirimanIgnoreCase("PICKUP");
+                long totalPickup = transaksiRepository.countByMetodePengirimanAndStatusPembayaran(
+                                "PICKUP",
+                                "SUCCESS");
 
-                Long totalPesanan = totalDelivery + totalPickup;
+                long totalPesanan = totalDelivery + totalPickup;
 
                 double persentaseDelivery = 0;
                 double persentasePickup = 0;
 
                 if (totalPesanan > 0) {
-                        persentaseDelivery = (totalDelivery.doubleValue() / totalPesanan) * 100;
+                        persentaseDelivery = (double) totalDelivery / totalPesanan * 100;
 
-                        persentasePickup = (totalPickup.doubleValue() / totalPesanan) * 100;
+                        persentasePickup = (double) totalPickup / totalPesanan * 100;
                 }
 
                 String insight;
 
-                if (persentaseDelivery > persentasePickup) {
-                        insight = String.format(
-                                        "%.0f dari 100 pelanggan memilih Delivery",
-                                        persentaseDelivery);
-                } else if (persentasePickup > persentaseDelivery) {
-                        insight = String.format(
-                                        "%.0f dari 100 pelanggan memilih Pickup",
-                                        persentasePickup);
+                if (totalDelivery > totalPickup) {
+                        insight = totalDelivery + " dari "
+                                        + totalPesanan
+                                        + " pelanggan memilih Delivery";
+                } else if (totalPickup > totalDelivery) {
+                        insight = totalPickup + " dari "
+                                        + totalPesanan
+                                        + " pelanggan memilih Pickup";
                 } else {
-                        insight = "Delivery dan Pickup digunakan secara seimbang";
+                        insight = "Pickup dan Delivery seimbang";
                 }
 
                 return new DashboardDeliveryResponse(

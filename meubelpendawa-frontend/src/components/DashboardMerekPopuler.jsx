@@ -7,22 +7,22 @@ function DashboardMerekPopulerContent({ merek = [] }) {
     merek.length > 0 ? Math.max(...merek.map((item) => item.totalTerjual)) : 1;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-start mb-5">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <h3 className="font-bold text-xl text-gray-800">Merek Populer</h3>
+          <h3 className="font-bold text-base text-gray-800">Merek Populer</h3>
 
-          <p className="text-gray-500">Top 3 Bulan Ini</p>
+          <p className="text-xs text-gray-500">Top 3 Bulan Ini</p>
         </div>
 
-        <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center">
-          <FaMedal className="text-orange-500 text-xl" />
+        <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+          <FaMedal className="text-orange-500 text-base" />
         </div>
       </div>
 
       {/* Content */}
-      <div className="space-y-5">
+      <div className="space-y-3">
         {merek.map((item, index) => (
           <AnimatedSection
             key={item.namaMerek}
@@ -37,7 +37,7 @@ function DashboardMerekPopulerContent({ merek = [] }) {
                     {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
                   </span>
 
-                  <span className="font-semibold text-gray-700">
+                  <span className="font-semibold text-gray-700 truncate max-w-[90px]">
                     {item.namaMerek}
                   </span>
                 </div>
@@ -47,7 +47,7 @@ function DashboardMerekPopulerContent({ merek = [] }) {
                 </span>
               </div>
 
-              <div className="h-3 rounded-full bg-orange-100 overflow-hidden">
+              <div className="h-1 rounded-full bg-orange-100 overflow-hidden">
                 <AnimatedProgressBar
                   value={item.totalTerjual}
                   max={maxTerjual}

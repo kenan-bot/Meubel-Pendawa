@@ -61,6 +61,7 @@ export function ProdukProvider({ children }) {
   const [selectedMerek, setSelectedMerek] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedStok, setSelectedStok] = useState(null);
 
   const filteredProduk = produk.filter((item) => {
     const kategoriMatch =
@@ -75,7 +76,14 @@ export function ProdukProvider({ children }) {
       !searchTerm ||
       item.namaProduk?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return kategoriMatch && merekMatch && statusMatch && searchMatch;
+    const stokMatch =
+      selectedStok === null ||
+      (selectedStok === "TERSEDIA" && item.stok > 0) ||
+      (selectedStok === "HABIS" && item.stok === 0);
+
+    return (
+      kategoriMatch && merekMatch && statusMatch && stokMatch && searchMatch
+    );
   });
 
   return (
@@ -103,6 +111,9 @@ export function ProdukProvider({ children }) {
 
         selectedStatus,
         setSelectedStatus,
+
+        selectedStok,
+        setSelectedStok,
       }}
     >
       {children}

@@ -32,6 +32,8 @@ export default function Produk() {
     nonaktifProduk,
     aktifProduk,
     setSelectedStatus,
+    selectedStok,
+    setSelectedStok,
   } = useProduk();
 
   const handleEdit = (item) => {
@@ -103,6 +105,17 @@ export default function Produk() {
     },
   ];
 
+  const stokItems = [
+    {
+      value: "TERSEDIA",
+      label: "Tersedia",
+    },
+    {
+      value: "HABIS",
+      label: "Habis",
+    },
+  ];
+
   return (
     <>
       <div className="px-3 py-5 md:p-5">
@@ -141,6 +154,22 @@ export default function Produk() {
               theme="orange"
               onSelect={(item) =>
                 setSelectedStatus(item.value === "__ALL__" ? null : item.value)
+              }
+            />
+
+            <DropDownFilter
+              title="Stok"
+              items={stokItems}
+              value={
+                selectedStok
+                  ? {
+                      value: selectedStok,
+                      label: selectedStok === "TERSEDIA" ? "Tersedia" : "Habis",
+                    }
+                  : null
+              }
+              onSelect={(item) =>
+                setSelectedStok(item.value === "__ALL__" ? null : item.value)
               }
             />
           </div>

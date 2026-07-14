@@ -99,8 +99,6 @@ function Dashboard() {
     try {
       const response = await getDeliveryVsPickup();
 
-      console.log("DELIVERY VS PICKUP", response);
-
       setDeliveryPickup(response);
     } catch (error) {
       console.error("Gagal memuat data delivery vs pickup", error);
@@ -197,7 +195,7 @@ function Dashboard() {
         </div>
 
         <div className="col-span-1 row-span-1">
-          <Card dashboard padding="small" className="h-[260px]">
+          <Card dashboard padding="small" className="h-[270px]">
             {!deliveryPickup ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-gray-400">Memuat data...</span>
