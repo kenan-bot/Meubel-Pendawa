@@ -14,19 +14,17 @@ const KeranjangItem = ({ item }) => {
   const [hargaInput, setHargaInput] = useState(item.hargaJual);
   const idProduk = item.produk.idProduk;
 
+  //batas harga
   const hargaDefault = Number(item.produk.hargaDefault);
   const hargaMinimum = hargaDefault * 0.9;
   const dibawahMinimum = Number(hargaInput) < hargaMinimum;
 
+  //sinkron harga
   useEffect(() => {
     setHargaInput(item.hargaJual);
   }, [item.hargaJual]);
 
-  // [BARU] update langsung tiap kali diketik -- tidak perlu Enter / tombol Selesai lagi.
-  // "Qty: x harga" (yang baca item.hargaJual dari context) otomatis ikut berubah live,
-  // TAPI hanya kalau nilainya valid (>= harga minimum 90% dari harga default).
-  // Kalau di bawah minimum, nilai lokal tetap tampil di input (biar user lihat apa yang diketik),
-  // namun belum diterapkan ke keranjang sampai nilainya valid lagi -- tanpa alert/toast yang mengganggu ketikan.
+  //ubah harga
   const handleChangeHarga = (nilaiBaru) => {
     setHargaInput(nilaiBaru);
 
@@ -52,6 +50,8 @@ const KeranjangItem = ({ item }) => {
           <p className="font-semibold text-xs text-gray-800 truncate">
             {item.produk.namaProduk}
           </p>
+
+          {/* hapus item */}
           <button
             onClick={() => hapusItem(idProduk)}
             className="text-red-500 hover:text-red-700 flex-shrink-0"
@@ -60,7 +60,7 @@ const KeranjangItem = ({ item }) => {
           </button>
         </div>
 
-        {/* Baris qty: menampilkan hargaJual -- otomatis berubah live saat harga diatur */}
+        {/* info qty */}
         <p className="text-[10px] text-gray-400">
           Qty: {item.qty} x {formatRupiah(item.hargaJual)}
         </p>
@@ -82,7 +82,7 @@ const KeranjangItem = ({ item }) => {
             </button>
           </div>
 
-          {/* Harga bold ungu: selalu pakai hargaDefault, tidak pernah berubah */}
+          {/* total harga */}
           <span className="font-bold text-[#5F04E8] text-xs">
             {formatRupiah(item.qty * hargaDefault)}
           </span>
@@ -92,12 +92,14 @@ const KeranjangItem = ({ item }) => {
           <div className="mt-1.5 [&_label]:hidden [&_input]:text-[11px] [&_input]:py-1 [&_input]:px-1.5 [&_input]:border-orange-300">
             <RupiahInput value={hargaInput} onChange={handleChangeHarga} />
 
+            {/* validasi harga */}
             {dibawahMinimum && (
               <p className="mt-1 text-[10px] text-red-500">
                 Harga minimal {formatRupiah(hargaMinimum)}
               </p>
             )}
 
+            {/* tutup input */}
             <button
               type="button"
               onClick={() => setShowInput(false)}

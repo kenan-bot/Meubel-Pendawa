@@ -117,9 +117,9 @@ export default function AtributProduk() {
           </p>
         </div>
 
-        {/* Grid */}
+        {/* grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* KATEGORI */}
+          {/* kategori */}
           <div className="bg-white rounded-2xl p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-lg">Kategori</h2>
@@ -158,7 +158,7 @@ export default function AtributProduk() {
             </div>
           </div>
 
-          {/* MEREK */}
+          {/* merek */}
           <div className="bg-white rounded-2xl p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-lg">Merek</h2>
@@ -199,7 +199,7 @@ export default function AtributProduk() {
         </div>
       </div>
 
-      {/* TAMBAH KATEGORI */}
+      {/* tambah kategori */}
       <Modal
         isOpen={openTambahKategori}
         onClose={() => setOpenTambahKategori(false)}
@@ -223,7 +223,7 @@ export default function AtributProduk() {
         />
       </Modal>
 
-      {/* TAMBAH MEREK */}
+      {/* tambah merek */}
       <Modal
         isOpen={openTambahMerek}
         onClose={() => setOpenTambahMerek(false)}
@@ -247,7 +247,7 @@ export default function AtributProduk() {
         />
       </Modal>
 
-      {/* EDIT KATEGORI */}
+      {/* edit kategori */}
       <Modal
         isOpen={openEditKategori}
         onClose={() => {
@@ -276,7 +276,7 @@ export default function AtributProduk() {
         />
       </Modal>
 
-      {/* EDIT MEREK */}
+      {/* edit merek */}
       <Modal
         isOpen={openEditMerek}
         onClose={() => {
@@ -305,7 +305,7 @@ export default function AtributProduk() {
         />
       </Modal>
 
-      {/* CONFIRM KATEGORI */}
+      {/* Cconfirm kategori */}
       <ConfirmModal
         isOpen={openKategoriConfirm}
         title="Kategori sedang digunakan"
@@ -323,7 +323,7 @@ export default function AtributProduk() {
         }}
       />
 
-      {/* CONFIRM MEREK */}
+      {/* confirm merek */}
       <ConfirmModal
         isOpen={openMerekConfirm}
         title="Merek sedang digunakan"

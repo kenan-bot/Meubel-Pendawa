@@ -2,8 +2,7 @@ import FormInput from "./FormInput";
 import FormSelect from "./FormSelect";
 import { useTransaksi } from "../context/TransaksiContext";
 
-// Override ukuran default FormInput/FormSelect (px-3 py-2, text normal) jadi lebih compact,
-// dengan teknik arbitrary-selector yang sama seperti dipakai di RupiahInput.
+//style agar ukuran formInput dan formSelect lebih compact
 const compact = "[&_label]:text-[11px] [&_label]:mb-0.5 [&_input]:px-2 [&_input]:py-1.5 [&_input]:text-xs [&_select]:px-2 [&_select]:py-1.5 [&_select]:text-xs";
 
 const FormPemesan = () => {
@@ -16,6 +15,7 @@ const FormPemesan = () => {
 
   return (
     <div className={compact}>
+      {/* data pemesan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
         <FormInput label="Nama" value={namaPemesan} onChange={(e) => setNamaPemesan(e.target.value)}
           placeholder="Nama Pemesan" required />
@@ -23,6 +23,7 @@ const FormPemesan = () => {
           placeholder="085XXXXXXXXX" required />
       </div>
 
+      {/* opsi transaksi */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
         <FormSelect label="Pengiriman" value={metodePengiriman} onChange={(e) => setMetodePengiriman(e.target.value)}>
           <option value="DELIVERY">Delivery</option>
@@ -34,6 +35,7 @@ const FormPemesan = () => {
         </FormSelect>
       </div>
 
+      {/* form delivery */}
       {isDelivery && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
           <FormInput label="Alamat Lengkap" value={alamatPengiriman} onChange={(e) => setAlamatPengiriman(e.target.value)}

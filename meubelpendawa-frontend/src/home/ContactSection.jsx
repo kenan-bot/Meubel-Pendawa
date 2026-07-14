@@ -5,7 +5,7 @@ import Card from "../components/Card";
 const ContactSection = () => {
   return (
     <section id="contact" className="scroll-mt-32">
-      {/* Bagian Ungu - Teks Ajakan */}
+      {/* bagian ungu - teks ajakan */}
       <AnimatedSection>
         <div className="bg-[#5F04E8] py-16 px-4 text-center">
           <h2 className="text-white text-3xl md:text-4xl font-bold">
@@ -19,7 +19,7 @@ const ContactSection = () => {
         </div>
       </AnimatedSection>
 
-      {/* Bagian Orange - Kartu Kontak */}
+      {/* bagian orange - kartu kontak */}
       <AnimatedSection>
         <div className="bg-[#FF6B00] py-14 px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -47,7 +47,7 @@ const ContactSection = () => {
               </div>
             </Card>
 
-            {/* Kartu WhatsApp */}
+            {/* kartu whatsApp */}
             <Card className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
               <div className="bg-[#FF6B00] rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="text-white w-7 h-7" />
@@ -67,7 +67,7 @@ const ContactSection = () => {
               </div>
             </Card>
 
-            {/* Kartu Jam Operasional */}
+            {/* kartu jam operasional */}
             <Card className="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-md">
               <div className="bg-[#FF6B00] rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
                 <Clock className="text-white w-7 h-7" />

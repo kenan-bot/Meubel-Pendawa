@@ -145,7 +145,7 @@ const ProductForm = ({ mode = "create", produk = null }) => {
       return;
     }
 
-    // VALIDASI DUPLIKAT NAMA PRODUK
+    // Validasi duplikasi nama produk
     const namaBaru = normalizeNamaProduk(namaProduk);
 
     const sudahAda = produkList.some((item) => {

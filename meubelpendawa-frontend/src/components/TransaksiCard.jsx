@@ -55,7 +55,7 @@ const TransaksiCard = ({
   return (
     <AnimatedSection>
       <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-1 items-center gap-3 min-w-0">
@@ -100,7 +100,7 @@ const TransaksiCard = ({
           </div>
         </div>
 
-        {/* ================= INFO ================= */}
+        {/* INFO */}
 
         {variant === "pengiriman" ? (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-gray-50 px-3 py-2">
@@ -141,7 +141,7 @@ const TransaksiCard = ({
           </div>
         )}
 
-        {/* ================= ITEM ================= */}
+        {/* ITEM */}
 
         <div className="mt-5">
           <div className="grid grid-cols-[1fr_48px_110px] gap-3 border-b border-gray-200 pb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
@@ -182,7 +182,7 @@ const TransaksiCard = ({
             )}
           </div>
         </div>
-        {/* ================= FOOTER ================= */}
+        {/* FOOTER */}
 
         {variant === "pengiriman" ? (
           <>
