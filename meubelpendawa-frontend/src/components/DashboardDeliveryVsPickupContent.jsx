@@ -1,5 +1,6 @@
 import React from "react";
 import AnimatedProgressBar from "./AnimatedProgressBar";
+import AnimatedCount from "./AnimatedCount";
 import { useState, useEffect } from "react";
 
 function DashboardDeliveryVsPickupContent({
@@ -37,9 +38,11 @@ function DashboardDeliveryVsPickupContent({
         </div>
 
         <div className="text-right">
-          <div className="text-3xl md:text-4xl font-extrabold text-orange-500 leading-none">
-            {totalPesanan}
-          </div>
+          <AnimatedCount
+            value={totalPesanan}
+            duration={1500}
+            className="text-3xl md:text-4xl font-extrabold text-orange-500 leading-none"
+          />
 
           <div className="text-sm font-medium text-gray-400">Total Pesanan</div>
         </div>
