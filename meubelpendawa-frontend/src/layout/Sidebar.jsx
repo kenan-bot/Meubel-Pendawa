@@ -13,8 +13,8 @@ export default function Sidebar({ menus }) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const navigate = useNavigate();
-  const namaKaryawan = localStorage.getItem("namaKaryawan");
-  const role = localStorage.getItem("role");
+  const namaKaryawan = sessionStorage.getItem("namaKaryawan");
+  const role = sessionStorage.getItem("role");
 
   const roleTitle = {
     OWNER: "Menu Owner",
@@ -24,16 +24,13 @@ export default function Sidebar({ menus }) {
 
   const handleLogout = async () => {
     try {
-      const idKaryawan = localStorage.getItem("idKaryawan");
+      const idKaryawan = sessionStorage.getItem("idKaryawan");
 
       await axiosClient.post(`/auth/logout/${idKaryawan}`);
     } catch (error) {
       console.error("Logout Error:", error);
     } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("idKaryawan");
-      localStorage.removeItem("namaKaryawan");
+      sessionStorage.clear();
 
       navigate("/login");
     }

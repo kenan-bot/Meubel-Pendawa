@@ -24,8 +24,8 @@ export const PengirimanProvider = ({ children }) => {
 
   const loadPengiriman = async () => {
     try {
-      const role = localStorage.getItem("role");
-      const idKaryawan = localStorage.getItem("idKaryawan");
+      const role = sessionStorage.getItem("role");
+      const idKaryawan = sessionStorage.getItem("idKaryawan");
 
       let data = [];
 

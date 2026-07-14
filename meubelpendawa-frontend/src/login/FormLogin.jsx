@@ -39,10 +39,10 @@ export default function FormLogin() {
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("idKaryawan", data.idKaryawan);
-      localStorage.setItem("namaKaryawan", data.namaKaryawan);
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("role", data.role);
+      sessionStorage.setItem("idKaryawan", data.idKaryawan);
+      sessionStorage.setItem("namaKaryawan", data.namaKaryawan);
 
       if (data.role === "OWNER") {
         navigate("/owner");
