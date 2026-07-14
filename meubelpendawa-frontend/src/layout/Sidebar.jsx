@@ -32,7 +32,7 @@ export default function Sidebar({ menus }) {
     } finally {
       sessionStorage.clear();
 
-      navigate("/login");
+      navigate("/");
     }
   };
 
