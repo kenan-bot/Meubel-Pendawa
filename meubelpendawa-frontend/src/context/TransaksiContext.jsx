@@ -340,7 +340,7 @@ export function TransaksiProvider({ children }) {
         },
         onPending: () => {
           tampilkanPesan(
-            `Pembayaran ${orderId} tertunda, menunggu konfirmasi.`,
+            `Pembayaran ${orderId} dibatalkan. Silakan coba lagi.`,
             "warning",
           );
           cekStatusPembayaran(orderId).catch((err) =>
