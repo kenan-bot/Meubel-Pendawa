@@ -11,140 +11,142 @@ import org.springframework.data.repository.query.Param;
 
 public interface TransaksiRepository extends JpaRepository<Transaksi, String> {
 
-        Optional<Transaksi> findTopByOrderByOrderIdDesc();
+    Optional<Transaksi> findTopByOrderByOrderIdDesc();
 
-        List<Transaksi> findTop5ByStatusPembayaranOrderByTanggalTransaksiDesc(
-                        String statusPembayaran);
+    List<Transaksi> findTop5ByStatusPembayaranOrderByTanggalTransaksiDesc(
+            String statusPembayaran);
 
-        List<Transaksi> findByStatusPembayaran(String statusPembayaran);
+    long countByMetodePengirimanIgnoreCase(String metodePengiriman);
 
-        List<Transaksi> findByNamaPemesanContainingIgnoreCaseOrOrderIdContainingIgnoreCase(
-                        String namaPemesan,
-                        String orderId);
+    List<Transaksi> findByStatusPembayaran(String statusPembayaran);
 
-        long countByOrderIdStartingWith(String prefix);
+    List<Transaksi> findByNamaPemesanContainingIgnoreCaseOrOrderIdContainingIgnoreCase(
+            String namaPemesan,
+            String orderId);
 
-        List<Transaksi> findByTanggalTransaksiBetweenAndStatusPembayaran(
-                        LocalDateTime awal,
-                        LocalDateTime akhir,
-                        String statusPembayaran);
+    long countByOrderIdStartingWith(String prefix);
 
-        Transaksi findFirstByOrderIdStartingWithOrderByOrderIdDesc(String prefix);
+    List<Transaksi> findByTanggalTransaksiBetweenAndStatusPembayaran(
+            LocalDateTime awal,
+            LocalDateTime akhir,
+            String statusPembayaran);
 
-        // KPI LAPORAN PENJUALAN
+    Transaksi findFirstByOrderIdStartingWithOrderByOrderIdDesc(String prefix);
 
-        @Query("""
-                        SELECT COALESCE(SUM(t.totalPesanan), 0)
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        """)
-        Double getTotalOmzet();
+    // KPI LAPORAN PENJUALAN
 
-        @Query("""
-                        SELECT COUNT(t)
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        """)
-        Long getTotalTransaksi();
+    @Query("""
+            SELECT COALESCE(SUM(t.totalPesanan), 0)
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            """)
+    Double getTotalOmzet();
 
-        @Query("""
-                        SELECT COALESCE(AVG(t.totalPesanan), 0)
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        """)
-        Double getRataRataPembelian();
+    @Query("""
+            SELECT COUNT(t)
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            """)
+    Long getTotalTransaksi();
 
-        // FILTER TANGGAL
+    @Query("""
+            SELECT COALESCE(AVG(t.totalPesanan), 0)
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            """)
+    Double getRataRataPembelian();
 
-        @Query("""
-                        SELECT COALESCE(SUM(t.totalPesanan), 0)
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        """)
-        Double getTotalOmzetByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    // FILTER TANGGAL
 
-        @Query("""
-                        SELECT COUNT(t)
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        """)
-        Long getTotalTransaksiByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    @Query("""
+            SELECT COALESCE(SUM(t.totalPesanan), 0)
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            """)
+    Double getTotalOmzetByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
-        @Query("""
-                        SELECT COALESCE(AVG(t.totalPesanan), 0)
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        """)
-        Double getRataRataPembelianByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    @Query("""
+            SELECT COUNT(t)
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            """)
+    Long getTotalTransaksiByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
-        // METODE PEMBAYARAN
+    @Query("""
+            SELECT COALESCE(AVG(t.totalPesanan), 0)
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            """)
+    Double getRataRataPembelianByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
-        @Query("""
-                            SELECT COALESCE(SUM(t.totalPesanan),0)
-                            FROM Transaksi t
-                            WHERE t.statusPembayaran='SUCCESS'
-                            AND UPPER(t.metodePembayaran)='CASH'
-                        """)
-        Double getTotalCash();
+    // METODE PEMBAYARAN
 
-        @Query("""
-                            SELECT COALESCE(SUM(t.totalPesanan),0)
-                            FROM Transaksi t
-                            WHERE t.statusPembayaran='SUCCESS'
-                            AND UPPER(t.metodePembayaran) <> 'CASH'
-                        """)
-        Double getTotalCashless();
+    @Query("""
+                SELECT COALESCE(SUM(t.totalPesanan),0)
+                FROM Transaksi t
+                WHERE t.statusPembayaran='SUCCESS'
+                AND UPPER(t.metodePembayaran)='CASH'
+            """)
+    Double getTotalCash();
 
-        @Query("""
-                            SELECT COALESCE(SUM(t.totalPesanan),0)
-                            FROM Transaksi t
-                            WHERE t.statusPembayaran='SUCCESS'
-                            AND UPPER(t.metodePembayaran)='CASH'
-                            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        """)
-        Double getTotalCashByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    @Query("""
+                SELECT COALESCE(SUM(t.totalPesanan),0)
+                FROM Transaksi t
+                WHERE t.statusPembayaran='SUCCESS'
+                AND UPPER(t.metodePembayaran) <> 'CASH'
+            """)
+    Double getTotalCashless();
 
-        @Query("""
-                            SELECT COALESCE(SUM(t.totalPesanan),0)
-                            FROM Transaksi t
-                            WHERE t.statusPembayaran='SUCCESS'
-                            AND UPPER(t.metodePembayaran) <> 'CASH'
-                            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        """)
-        Double getTotalCashlessByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    @Query("""
+                SELECT COALESCE(SUM(t.totalPesanan),0)
+                FROM Transaksi t
+                WHERE t.statusPembayaran='SUCCESS'
+                AND UPPER(t.metodePembayaran)='CASH'
+                AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            """)
+    Double getTotalCashByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
-        @Query("""
-                        SELECT t
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        ORDER BY t.tanggalTransaksi DESC
-                        """)
-        List<Transaksi> getDetailPenjualanByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    @Query("""
+                SELECT COALESCE(SUM(t.totalPesanan),0)
+                FROM Transaksi t
+                WHERE t.statusPembayaran='SUCCESS'
+                AND UPPER(t.metodePembayaran) <> 'CASH'
+                AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            """)
+    Double getTotalCashlessByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
-        @Query("""
-                        SELECT t
-                        FROM Transaksi t
-                        WHERE t.statusPembayaran = 'SUCCESS'
-                        AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
-                        ORDER BY t.tanggalTransaksi ASC
-                        """)
-        List<Transaksi> getTrenPenjualanByPeriode(
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+    @Query("""
+            SELECT t
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            ORDER BY t.tanggalTransaksi DESC
+            """)
+    List<Transaksi> getDetailPenjualanByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
+    @Query("""
+            SELECT t
+            FROM Transaksi t
+            WHERE t.statusPembayaran = 'SUCCESS'
+            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+            ORDER BY t.tanggalTransaksi ASC
+            """)
+    List<Transaksi> getTrenPenjualanByPeriode(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 }

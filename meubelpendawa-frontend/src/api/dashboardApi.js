@@ -52,11 +52,11 @@ export const getStokMenipis = async () => {
     return response.data;
 };
 
-// CASH VS CASHLESS HARI INI
+// pickup vs delivery
 
-export const getCashVsCashless = async () => {
+export const getDeliveryVsPickup = async () => {
     const response = await axiosClient.get(
-        `${BASE_URL}/cash-vs-cashless`
+        "/api/dashboard/delivery-vs-pickup"
     );
 
     return response.data;

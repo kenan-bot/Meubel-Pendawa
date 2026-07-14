@@ -2,6 +2,7 @@ package com.meubelpendawa.service;
 
 import java.util.List;
 
+import com.meubelpendawa.dto.dashboard.DashboardDeliveryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
@@ -22,4 +23,6 @@ public interface DashboardService {
     List<DashboardTransaksiTerbaruResponse> getTransaksiTerbaru();
 
     List<DashboardWilayahPelangganResponse> getTopWilayahPelanggan();
+
+    DashboardDeliveryResponse getDeliveryVsPickup();
 }

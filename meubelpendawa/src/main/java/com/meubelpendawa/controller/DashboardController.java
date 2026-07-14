@@ -1,10 +1,13 @@
 package com.meubelpendawa.controller;
 
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.meubelpendawa.dto.dashboard.DashboardDeliveryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
@@ -63,5 +66,12 @@ public class DashboardController {
     public List<DashboardWilayahPelangganResponse> getTopWilayahPelanggan() {
 
         return dashboardService.getTopWilayahPelanggan();
+    }
+
+    @GetMapping("/delivery-vs-pickup")
+    public ResponseEntity<DashboardDeliveryResponse> getDeliveryVsPickup() {
+
+        return ResponseEntity.ok(
+                dashboardService.getDeliveryVsPickup());
     }
 }

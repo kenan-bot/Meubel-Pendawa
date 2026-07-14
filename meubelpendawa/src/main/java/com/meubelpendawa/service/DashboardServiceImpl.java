@@ -14,8 +14,9 @@ import com.meubelpendawa.repository.TransaksiRepository;
 import com.meubelpendawa.utils.WilayahUtil;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbesarResponse;
 import com.meubelpendawa.dto.dashboard.DashboardWilayahPelangganResponse;
-import com.meubelpendawa.utils.WilayahUtil;
 import com.meubelpendawa.model.Transaksi;
+import com.meubelpendawa.utils.Koordinat;
+import com.meubelpendawa.utils.WilayahMap;
 
 import java.time.LocalDate;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.meubelpendawa.dto.dashboard.DashboardDeliveryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardDriverResponse;
 import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.model.Pengiriman;
@@ -228,8 +230,7 @@ public class DashboardServiceImpl implements DashboardService {
         @Override
         public List<DashboardWilayahPelangganResponse> getTopWilayahPelanggan() {
 
-                List<Transaksi> transaksiSukses = transaksiRepository
-                                .findByStatusPembayaran("SUCCESS");
+                List<Transaksi> transaksiSukses = transaksiRepository.findByStatusPembayaran("SUCCESS");
 
                 Map<String, Integer> wilayahMap = new HashMap<>();
 
@@ -250,13 +251,69 @@ public class DashboardServiceImpl implements DashboardService {
 
                 return wilayahMap.entrySet()
                                 .stream()
-                                .sorted((a, b) -> b.getValue()
-                                                .compareTo(a.getValue()))
+                                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                                 .limit(5)
-                                .map(entry -> new DashboardWilayahPelangganResponse(
-                                                entry.getKey(),
-                                                entry.getValue()))
+                                .map(entry -> {
+
+                                        Koordinat koordinat = WilayahMap.DATA.get(entry.getKey());
+
+                                        DashboardWilayahPelangganResponse dto = new DashboardWilayahPelangganResponse();
+
+                                        dto.setWilayah(entry.getKey());
+                                        dto.setTotal(entry.getValue());
+
+                                        if (koordinat != null) {
+                                                dto.setLatitude(
+                                                                koordinat.getLatitude());
+
+                                                dto.setLongitude(
+                                                                koordinat.getLongitude());
+                                        }
+
+                                        return dto;
+                                })
                                 .toList();
         }
 
+        // delivery vs pickup
+        @Override
+        public DashboardDeliveryResponse getDeliveryVsPickup() {
+
+                Long totalDelivery = transaksiRepository.countByMetodePengirimanIgnoreCase("DELIVERY");
+
+                Long totalPickup = transaksiRepository.countByMetodePengirimanIgnoreCase("PICKUP");
+
+                Long totalPesanan = totalDelivery + totalPickup;
+
+                double persentaseDelivery = 0;
+                double persentasePickup = 0;
+
+                if (totalPesanan > 0) {
+                        persentaseDelivery = (totalDelivery.doubleValue() / totalPesanan) * 100;
+
+                        persentasePickup = (totalPickup.doubleValue() / totalPesanan) * 100;
+                }
+
+                String insight;
+
+                if (persentaseDelivery > persentasePickup) {
+                        insight = String.format(
+                                        "%.0f dari 100 pelanggan memilih Delivery",
+                                        persentaseDelivery);
+                } else if (persentasePickup > persentaseDelivery) {
+                        insight = String.format(
+                                        "%.0f dari 100 pelanggan memilih Pickup",
+                                        persentasePickup);
+                } else {
+                        insight = "Delivery dan Pickup digunakan secara seimbang";
+                }
+
+                return new DashboardDeliveryResponse(
+                                totalDelivery,
+                                totalPickup,
+                                totalPesanan,
+                                persentaseDelivery,
+                                persentasePickup,
+                                insight);
+        }
 }

@@ -7,6 +7,7 @@ import {
   getTopMerekPopuler,
   getTransaksiTerbaru,
   getTopWilayahPelanggan,
+  getDeliveryVsPickup,
 } from "../api/dashboardApi";
 
 import AnimatedCount from "../components/AnimatedCount";
@@ -17,6 +18,7 @@ import DashboardProdukTerlarisContent from "../components/DashboardProdukTerlari
 import DashboardMerekPopulerContent from "../components/DashboardMerekPopuler";
 import DashboardTransaksiTerbaruContent from "../components/DashboardTransaksiTerbaruContent";
 import DashboardWilayahPelangganContent from "../components/DashboardWilayahPelangganContent";
+import DashboardDeliveryVsPickupContent from "../components/DashboardDeliveryVsPickupContent";
 
 function Dashboard() {
   //card pengiriman
@@ -91,6 +93,19 @@ function Dashboard() {
     }
   };
 
+  // card delivery vs pickup
+  const [deliveryPickup, setDeliveryPickup] = useState(null);
+  const loadDeliveryPickup = async () => {
+    try {
+      const response = await getDeliveryVsPickup();
+
+      console.log("DELIVERY VS PICKUP", response);
+
+      setDeliveryPickup(response);
+    } catch (error) {
+      console.error("Gagal memuat data delivery vs pickup", error);
+    }
+  };
   useEffect(() => {
     loadPengiriman();
     loadTransaksiTerbesar();
@@ -98,6 +113,7 @@ function Dashboard() {
     loadTopMerekPopuler();
     loadTransaksiTerbaru();
     loadTopWilayahPelanggan();
+    loadDeliveryPickup();
   }, []);
 
   return (
@@ -181,8 +197,20 @@ function Dashboard() {
         </div>
 
         <div className="col-span-1 row-span-1">
-          <Card dashboard className="h-[270px]">
-            <p className="font-bold text-center">Cash / Cashless</p>
+          <Card dashboard padding="small" className="h-[260px]">
+            {!deliveryPickup ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-gray-400">Memuat data...</span>
+              </div>
+            ) : (
+              <DashboardDeliveryVsPickupContent
+                totalPesanan={deliveryPickup.totalPesanan}
+                totalPickup={deliveryPickup.totalPickup}
+                totalDelivery={deliveryPickup.totalDelivery}
+                persenPickup={deliveryPickup.persentasePickup}
+                persenDelivery={deliveryPickup.persentaseDelivery}
+              />
+            )}
           </Card>
         </div>
 
@@ -194,12 +222,10 @@ function Dashboard() {
 
         {/* Row 4 */}
         <div className="col-span-2 row-span-1">
-          <Card dashboard className="h-[300px]">
+          <Card dashboard className="h-[430px] overflow-hidden">
             {topWilayahPelanggan.length === 0 ? (
               <div className="h-full flex items-center justify-center">
-                <span className="text-gray-400">
-                  Memuat wilayah pelanggan...
-                </span>
+                <span className="text-gray-400">Memuat peta...</span>
               </div>
             ) : (
               <DashboardWilayahPelangganContent wilayah={topWilayahPelanggan} />
@@ -208,7 +234,7 @@ function Dashboard() {
         </div>
 
         <div className="col-span-2 row-span-1">
-          <Card dashboard className="h-[300px]">
+          <Card dashboard className="h-[450px]">
             {transaksiTerbaru.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-gray-400">
