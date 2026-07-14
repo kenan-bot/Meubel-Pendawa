@@ -63,9 +63,6 @@ public class DetailTransaksiService {
         detailTransaksi.setSubtotal(detailTransaksi.getQty() * detailTransaksi.getHargaJual());
 
         DetailTransaksi hasil = detailTransaksiRepository.save(detailTransaksi);
-        produk.setStok(produk.getStok() - detailTransaksi.getQty());
-
-        produkRepository.save(produk);
 
         String orderId = hasil.getTransaksi().getOrderId();
 

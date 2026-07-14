@@ -120,6 +120,22 @@ public class TransaksiService {
         transaksi.setKembalian(jumlahBayar - transaksi.getTotalPesanan());
         transaksi.setStatusPembayaran("SUCCESS"); // CASH: uang sudah di tangan kasir, langsung final
 
+        List<DetailTransaksi> items = detailTransaksiRepository.findByTransaksi_OrderId(orderId);
+
+        for (DetailTransaksi item : items) {
+
+            Produk produk = item.getProduk();
+
+            if (produk.getStok() < item.getQty()) {
+                throw new RuntimeException(
+                        "Stok " + produk.getNamaProduk() + " tidak mencukupi");
+            }
+
+            produk.setStok(produk.getStok() - item.getQty());
+
+            produkRepository.save(produk);
+        }
+
         Transaksi tersimpan = transaksiRepository.save(transaksi);
 
         buatPengirimanJikaBelumAda(tersimpan);
@@ -182,6 +198,22 @@ public class TransaksiService {
                 transaksi.setStatusPembayaran("SUCCESS");
                 transaksi.setJumlahBayar(transaksi.getTotalPesanan());
                 transaksi.setKembalian(0.0);
+
+                List<DetailTransaksi> items = detailTransaksiRepository.findByTransaksi_OrderId(orderId);
+
+                for (DetailTransaksi item : items) {
+
+                    Produk produk = item.getProduk();
+
+                    if (produk.getStok() < item.getQty()) {
+                        throw new RuntimeException(
+                                "Stok " + produk.getNamaProduk() + " tidak mencukupi");
+                    }
+
+                    produk.setStok(produk.getStok() - item.getQty());
+
+                    produkRepository.save(produk);
+                }
             }
         } else if ("cancel".equals(transactionStatus) || "deny".equals(transactionStatus)
                 || "expire".equals(transactionStatus)) {
@@ -234,13 +266,7 @@ public class TransaksiService {
         }
 
         List<DetailTransaksi> items = detailTransaksiRepository.findByTransaksi_OrderId(orderId);
-        for (DetailTransaksi item : items) {
-            Produk produk = item.getProduk();
-            if (produk != null) {
-                produk.setStok(produk.getStok() + item.getQty());
-                produkRepository.save(produk);
-            }
-        }
+        
         detailTransaksiRepository.deleteAll(items);
 
         if (pengirimanRepository.existsByTransaksi_OrderId(orderId)) {
