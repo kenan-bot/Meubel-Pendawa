@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "recharts";
 
+import { FaRupiahSign } from "react-icons/fa6";
 import { motion } from "framer-motion";
 
 import {
@@ -71,55 +72,89 @@ const CustomTooltip = ({ active, payload, label }) => {
       className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl shadow-2xl px-5
       py-4 min-w-[220px]"
     >
-      <div className="font-bold text-gray-800 mb-3">{label}</div>
+      <div className="font-bold text-gray-800 mb-3">{item.hari}</div>
+      <div className="text-sm text-gray-500 mb-4">{item.intervalJam}</div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-gray-500">
-            <FiDollarSign size={15} />
-            <span>Omzet</span>
-          </div>
-
-          <span className="font-bold text-orange-500">
-            {formatRupiah(item.totalOmzet)}
-          </span>
-        </div>
-
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-500">
             <FiShoppingBag size={15} />
             <span>Transaksi</span>
           </div>
 
-          <span className="font-bold">{item.totalTransaksi ?? 0}</span>
+          <span className="font-bold text-xl text-orange-500">{item.totalTransaksi ?? 0}</span>
         </div>
 
+        
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-500">
-            <FiClock size={15} />
-            <span>Jam Ramai</span>
+            <FaRupiahSign size={15} />
+            <span>Omzet</span>
           </div>
 
-          <span className="font-semibold">{item.intervalJam || "-"}</span>
+          <span className="font-bold">
+            {formatRupiah(item.totalOmzet)}
+          </span>
         </div>
+
+        <div className="border-t border-gray-100 pt-3 mt-3 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Cash</span>
+
+            <span className="font-semibold">
+              {formatRupiah(item.totalCash)}
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Cashless</span>
+
+            <span className="font-semibold">
+              {formatRupiah(item.totalCashless)}
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Rata-rata</span>
+
+            <span className="font-semibold">
+              {formatRupiah(item.rataRataTransaksi)}
+            </span>
+          </div>
+        </div>
+        {item.transaksiTerakhir && (
+          <div className="border-t border-gray-100 pt-3 mt-3">
+            <div className="text-xs text-gray-400">Transaksi terakhir</div>
+
+            <div className="font-semibold text-gray-700">
+              {new Date(item.transaksiTerakhir).toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
 };
+
 const renderedDays = new Set();
 
-const formatHariAxis = (value, index, payload) => {
-  if (index === 0) {
-    renderedDays.clear();
-  }
+const formatXAxis = (value) => {
+  const date = new Date(value);
 
-  if (renderedDays.has(value)) {
+  const hari = date.toLocaleDateString("id-ID", {
+    weekday: "short",
+  });
+
+  if (renderedDays.has(hari)) {
     return "";
   }
 
-  renderedDays.add(value);
+  renderedDays.add(hari);
 
-  return value;
+  return hari;
 };
 
 function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
@@ -132,6 +167,17 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
     peakTransaksi: 0,
     peakOmzet: 0,
   };
+
+  const chartData = chart.map((item, index) => ({
+    ...item,
+
+    hariLabel:
+      index === 0 || chart[index - 1].hari !== item.hari ? item.hari : "",
+
+    isPeak:
+      item.hari === statistik.peakHari &&
+      item.intervalJam === statistik.peakInterval,
+  }));
 
   return (
     <motion.div
@@ -226,7 +272,7 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
       <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
-            data={chart}
+            data={chartData}
             margin={{
               top: 15,
               right: 20,
@@ -237,8 +283,8 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
             <defs>
               {/* Area */}
               <linearGradient id="trafficGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
-                <stop offset="45%" stopColor="#fb923c" stopOpacity={0.15} />
+                <stop offset="0%" stopColor="#f97316" stopOpacity={0.22} />
+                <stop offset="45%" stopColor="#fb923c" stopOpacity={0.08} />
                 <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
               </linearGradient>
 
@@ -269,12 +315,14 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
             <CartesianGrid
               vertical={false}
               stroke="#f3f4f6"
-              strokeDasharray="4 8"
+              strokeDasharray="3 6"
             />
 
             <XAxis
-              dataKey="hari"
-              tickFormatter={formatHariAxis}
+              dataKey="waktu"
+              tickFormatter={(value, index) => chartData[index].hariLabel}
+              interval={0}
+              minTickGap={18}
               tickLine={false}
               axisLine={false}
               tick={{
@@ -297,10 +345,11 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
 
             <Tooltip
               content={<CustomTooltip />}
+              offset={35}
               cursor={{
                 stroke: "#fb923c",
-                strokeWidth: 1.5,
-                strokeDasharray: "5 5",
+                strokeWidth: 1,
+                strokeDasharray: "4 4",
               }}
             />
 
@@ -320,16 +369,16 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
               type="monotone"
               dataKey="totalTransaksi"
               stroke="url(#lineGradient)"
-              strokeWidth={4}
+              strokeWidth={3}
               filter="url(#lineGlow)"
               dot={false}
               activeDot={{
-                r: 8,
-                fill: "#ffffff",
+                r: 7,
+                fill: "#fff",
                 stroke: "#f97316",
-                strokeWidth: 4,
+                strokeWidth: 3,
               }}
-              animationDuration={1500}
+              animationDuration={900}
               animationEasing="ease-out"
             />
           </ComposedChart>

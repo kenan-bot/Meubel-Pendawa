@@ -28,7 +28,8 @@ public final class WilayahKeyword {
             "Tengaran",
             "Tuntang",
             "Ungaran Barat",
-            "Ungaran Timur"
+            "Ungaran Timur",
+            "Salatiga"
 
     );
 }

@@ -9,7 +9,7 @@ public final class WilayahAlias {
 
     public static final Map<String, String> DATA = Map.ofEntries(
 
-            //ambarawa
+            // ambarawa
             Map.entry("ambarawa", "Ambarawa"),
             Map.entry("kupang", "Ambarawa"),
             Map.entry("lodoyong", "Ambarawa"),
@@ -18,7 +18,7 @@ public final class WilayahAlias {
             Map.entry("tambakboyo", "Ambarawa"),
             Map.entry("ngampin", "Ambarawa"),
 
-            //bawen
+            // bawen
             Map.entry("bawen", "Bawen"),
             Map.entry("harjosari", "Bawen"),
             Map.entry("lemahireng", "Bawen"),
@@ -27,7 +27,7 @@ public final class WilayahAlias {
             Map.entry("doplang", "Bawen"),
             Map.entry("asinan", "Bawen"),
 
-            //bergas
+            // bergas
             Map.entry("bergas", "Bergas"),
             Map.entry("karangjati", "Bergas"),
             Map.entry("jati", "Bergas"),
@@ -35,7 +35,7 @@ public final class WilayahAlias {
             Map.entry("randugunting", "Bergas"),
             Map.entry("wonoyoso", "Bergas"),
 
-            //ungaran barat
+            // ungaran barat
             Map.entry("ungaranbarat", "Ungaran Barat"),
             Map.entry("ungaran barat", "Ungaran Barat"),
             Map.entry("genuk", "Ungaran Barat"),
@@ -44,7 +44,7 @@ public final class WilayahAlias {
             Map.entry("nyatnyono", "Ungaran Barat"),
             Map.entry("lerep", "Ungaran Barat"),
 
-            //ungaran timur
+            // ungaran timur
             Map.entry("ungarantimur", "Ungaran Timur"),
             Map.entry("ungaran timur", "Ungaran Timur"),
             Map.entry("kalongan", "Ungaran Timur"),
@@ -52,7 +52,7 @@ public final class WilayahAlias {
             Map.entry("beji", "Ungaran Timur"),
             Map.entry("sidomulyo", "Ungaran Timur"),
 
-            //bandungan
+            // bandungan
             Map.entry("bandungan", "Bandungan"),
             Map.entry("jetis", "Bandungan"),
             Map.entry("jimbaran", "Bandungan"),
@@ -64,48 +64,54 @@ public final class WilayahAlias {
             Map.entry("tajuk", "Getasan"),
             Map.entry("sumogawe", "Getasan"),
 
-            //tengaran
+            // tengaran
             Map.entry("tengaran", "Tengaran"),
             Map.entry("butuh", "Tengaran"),
             Map.entry("patemon", "Tengaran"),
 
-            //tuntang
+            // tuntang
             Map.entry("tuntang", "Tuntang"),
             Map.entry("delik", "Tuntang"),
             Map.entry("karanganyar", "Tuntang"),
             Map.entry("rowoboni", "Tuntang"),
 
-            //pringapus
+            // pringapus
             Map.entry("pringapus", "Pringapus"),
             Map.entry("klepu", "Pringapus"),
             Map.entry("jatirunggo", "Pringapus"),
 
-            //sumowono
+            // sumowono
             Map.entry("sumowono", "Sumowono"),
 
-            //jambu
+            // jambu
             Map.entry("jambu", "Jambu"),
 
-            //kaliwungu
+            // kaliwungu
             Map.entry("kaliwungu", "Kaliwungu"),
 
-            //pabelan
+            // pabelan
             Map.entry("pabelan", "Pabelan"),
 
-            //banyubiru
+            // banyubiru
             Map.entry("banyubiru", "Banyubiru"),
 
-            //bringin
+            // bringin
             Map.entry("bringin", "Bringin"),
 
-            //bancak
+            // bancak
             Map.entry("bancak", "Bancak"),
 
-            //suruh
+            // suruh
             Map.entry("suruh", "Suruh"),
 
-            //susukan
-            Map.entry("susukan", "Susukan")
+            // susukan
+            Map.entry("susukan", "Susukan"),
+
+            // salatiga
+            Map.entry("argomulyo", "Salatiga"),
+            Map.entry("sidomukti", "Salatiga"),
+            Map.entry("sidorejo", "Salatiga"),
+            Map.entry("tingkir", "Salatiga")
 
     );
 }
