@@ -15,6 +15,8 @@ import com.meubelpendawa.model.Transaksi;
 
 import org.springframework.stereotype.Service;
 
+import com.meubelpendawa.dto.dashboard.DashboardTrafikResponse;
+import com.meubelpendawa.dto.dashboard.DashboardTrafikSummaryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTrafikTransaksiResponse;
 import com.meubelpendawa.model.Transaksi;
 import com.meubelpendawa.repository.TransaksiRepository;
@@ -153,7 +155,7 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
 
     // method
     @Override
-    public List<DashboardTrafikTransaksiResponse> getTrafikTransaksiMingguan() {
+    public DashboardTrafikResponse getTrafikTransaksiMingguan() {
 
         LocalDate hariIni = LocalDate.now();
 
@@ -162,6 +164,14 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
         LocalDateTime startDate = tanggalAwal.atStartOfDay();
 
         LocalDateTime endDate = hariIni.atTime(LocalTime.MAX);
+
+        LocalDate previousStart = tanggalAwal.minusDays(7);
+
+        LocalDate previousEnd = tanggalAwal.minusDays(1);
+
+        LocalDateTime previousStartDate = previousStart.atStartOfDay();
+
+        LocalDateTime previousEndDate = previousEnd.atTime(LocalTime.MAX);
 
         Map<LocalDateTime, DashboardTrafikTransaksiResponse> buckets = buildEmptyBuckets();
 
@@ -243,12 +253,72 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
                             jamSelesai));
         }
 
-        List<DashboardTrafikTransaksiResponse> result = new ArrayList<>(buckets.values());
+        List<DashboardTrafikTransaksiResponse> chart = new ArrayList<>(buckets.values());
 
-        result.sort(
-                Comparator.comparing(
-                        DashboardTrafikTransaksiResponse::getWaktu));
+        DashboardTrafikSummaryResponse summary = new DashboardTrafikSummaryResponse();
 
-        return result;
+        int totalTransaksi = 0;
+        double totalOmzet = 0;
+
+        for (DashboardTrafikTransaksiResponse bucket : chart) {
+
+            totalTransaksi += bucket.getTotalTransaksi();
+
+            totalOmzet += bucket.getTotalOmzet();
+        }
+
+        summary.setTotalTransaksi(totalTransaksi);
+        summary.setTotalOmzet(totalOmzet);
+
+        DashboardTrafikTransaksiResponse peakBucket = null;
+
+        for (DashboardTrafikTransaksiResponse bucket : chart) {
+
+            if (peakBucket == null
+                    || bucket.getTotalTransaksi() > peakBucket.getTotalTransaksi()) {
+
+                peakBucket = bucket;
+            }
+        }
+        if (peakBucket != null) {
+
+            summary.setPeakHari(
+                    peakBucket.getHari());
+
+            summary.setPeakInterval(
+                    peakBucket.getIntervalJam());
+
+            summary.setPeakTransaksi(
+                    peakBucket.getTotalTransaksi());
+
+            summary.setPeakOmzet(
+                    peakBucket.getTotalOmzet());
+        }
+
+        Long previousTotal = transaksiRepository.countTransaksiBerhasil(
+                previousStartDate,
+                previousEndDate);
+
+        double growth;
+
+        if (previousTotal == null || previousTotal == 0) {
+
+            growth = totalTransaksi > 0 ? 100.0 : 0.0;
+
+        } else {
+
+            growth = ((double) (totalTransaksi - previousTotal)
+                    / previousTotal)
+                    * 100.0;
+        }
+
+        summary.setPersentasePertumbuhan(growth);
+
+        DashboardTrafikResponse response = new DashboardTrafikResponse();
+
+        response.setSummary(summary);
+        response.setChart(chart);
+
+        return response;
     }
 }

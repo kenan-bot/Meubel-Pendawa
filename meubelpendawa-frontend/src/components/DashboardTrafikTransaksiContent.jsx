@@ -68,17 +68,8 @@ const CustomTooltip = ({ active, payload, label }) => {
       transition={{
         duration: 0.2,
       }}
-      className="
-        rounded-2xl
-        border
-        border-white/60
-        bg-white/80
-        backdrop-blur-xl
-        shadow-2xl
-        px-5
-        py-4
-        min-w-[220px]
-      "
+      className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl shadow-2xl px-5
+      py-4 min-w-[220px]"
     >
       <div className="font-bold text-gray-800 mb-3">{label}</div>
 
@@ -109,16 +100,39 @@ const CustomTooltip = ({ active, payload, label }) => {
             <span>Jam Ramai</span>
           </div>
 
-          <span className="font-semibold">{item.jamTersibuk || "-"}</span>
+          <span className="font-semibold">{item.intervalJam || "-"}</span>
         </div>
       </div>
     </motion.div>
   );
 };
+const renderedDays = new Set();
 
-function DashboardTrafikTransaksiContent({ data = [] }) {
-  console.log("DATA TRAFIK");
-  console.table(data);
+const formatHariAxis = (value, index, payload) => {
+  if (index === 0) {
+    renderedDays.clear();
+  }
+
+  if (renderedDays.has(value)) {
+    return "";
+  }
+
+  renderedDays.add(value);
+
+  return value;
+};
+
+function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
+  const statistik = summary ?? {
+    totalTransaksi: 0,
+    totalOmzet: 0,
+    persentasePertumbuhan: 0,
+    peakHari: "-",
+    peakInterval: "-",
+    peakTransaksi: 0,
+    peakOmzet: 0,
+  };
+
   return (
     <motion.div
       initial={{
@@ -136,24 +150,74 @@ function DashboardTrafikTransaksiContent({ data = [] }) {
     >
       {/* HEADER */}
 
-      <div className="flex justify-between items-start mb-5">
+      <div className="mb-6 flex items-start justify-between">
+        {/* Judul */}
         <div>
           <h3 className="text-xl font-bold text-gray-800">
             Trafik Transaksi Mingguan
           </h3>
 
-          <p className="text-sm text-gray-500 mt-1">
-            Tren omzet selama 7 hari terakhir
+          <p className="mt-1 text-sm text-gray-500">
+            Aktivitas transaksi selama 7 hari terakhir
           </p>
         </div>
 
+        {/* Growth */}
         <div
-          className="flex items-center gap-2 rounded-xl border border-orange-100 bg-gradient-to-r
-          from-orange-50 to-orange-100 px-3 py-2 shadow-sm"
+          className="
+            flex items-center gap-2
+            rounded-full
+            bg-orange-50
+            px-3 py-2
+        "
         >
           <FiTrendingUp className="text-orange-500" />
 
-          <span className="text-sm font-semibold text-orange-500">Omzet</span>
+          <span className="font-semibold text-orange-500">
+            {statistik.persentasePertumbuhan >= 0 ? "+" : ""}
+            {statistik.persentasePertumbuhan.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+
+      {/* KPI */}
+
+      <div className="mb-5 grid grid-cols-3 gap-3">
+        {/* Total Transaksi */}
+        <div className="rounded-xl border border-orange-500 hover:scale-105 duration-300 bg-orange-50/70 px-5 py-3 flex flex-col justify-center">
+          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+            Total Transaksi
+          </span>
+
+          <span className="mt-1 text-3xl font-bold text-gray-800 leading-none">
+            {statistik.totalTransaksi}
+          </span>
+        </div>
+
+        {/* Peak Hour */}
+        <div className="rounded-xl border border-orange-200 hover:scale-105 duration-300 bg-white px-5 py-3 flex flex-col justify-center">
+          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+            Peak Hour
+          </span>
+
+          <span className="mt-1 text-xl font-bold text-gray-800 leading-none">
+            {statistik.peakHari}
+          </span>
+
+          <span className="mt-1 text-sm text-gray-500 leading-none">
+            {statistik.peakInterval}
+          </span>
+        </div>
+
+        {/* Omzet */}
+        <div className="rounded-xl border border-orange-200 hover:scale-105 duration-300 bg-white px-5 py-3 flex flex-col justify-center">
+          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+            Omzet
+          </span>
+
+          <span className="mt-1 text-2xl font-bold text-gray-800 leading-none">
+            {formatRupiah(statistik.totalOmzet)}
+          </span>
         </div>
       </div>
 
@@ -162,7 +226,7 @@ function DashboardTrafikTransaksiContent({ data = [] }) {
       <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
-            data={data}
+            data={chart}
             margin={{
               top: 15,
               right: 20,
@@ -210,6 +274,7 @@ function DashboardTrafikTransaksiContent({ data = [] }) {
 
             <XAxis
               dataKey="hari"
+              tickFormatter={formatHariAxis}
               tickLine={false}
               axisLine={false}
               tick={{
@@ -243,7 +308,7 @@ function DashboardTrafikTransaksiContent({ data = [] }) {
 
             <Area
               type="monotone"
-              dataKey="totalOmzet"
+              dataKey="totalTransaksi"
               fill="url(#trafficGradient)"
               stroke="none"
               animationDuration={1200}
@@ -253,7 +318,7 @@ function DashboardTrafikTransaksiContent({ data = [] }) {
 
             <Line
               type="monotone"
-              dataKey="totalOmzet"
+              dataKey="totalTransaksi"
               stroke="url(#lineGradient)"
               strokeWidth={4}
               filter="url(#lineGlow)"
@@ -277,16 +342,14 @@ function DashboardTrafikTransaksiContent({ data = [] }) {
         <div className="flex items-center gap-3">
           <div className="w-10 h-1 rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" />
 
-          <span className="text-sm font-medium text-gray-500">
-            Omzet Mingguan
-          </span>
+          <span className="text-sm font-medium text-gray-500">Total Omzet</span>
         </div>
 
         <div className="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1">
           <FiTrendingUp className="text-orange-500 text-sm" />
 
           <span className="text-sm font-bold text-orange-500">
-            {formatRupiah(data.reduce((sum, item) => sum + item.totalOmzet, 0))}
+            {formatRupiah(statistik.totalOmzet)}
           </span>
         </div>
       </div>

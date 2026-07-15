@@ -122,7 +122,7 @@ function Dashboard() {
   };
 
   // card trafik transaksi mingguan
-  const [trafikTransaksi, setTrafikTransaksi] = useState([]);
+  const [trafikTransaksi, setTrafikTransaksi] = useState(null);
   const loadTrafikTransaksi = async () => {
     try {
       const response = await getTrafikTransaksiMingguan();
@@ -220,12 +220,15 @@ function Dashboard() {
         {/* Row 2-3 */}
         <div className="col-span-2 row-span-2">
           <Card dashboard className="h-[480px]">
-            {trafikTransaksi.length === 0 ? (
+            {!trafikTransaksi ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-gray-400">Memuat grafik...</span>
               </div>
             ) : (
-              <DashboardTrafikTransaksiContent data={trafikTransaksi} />
+              <DashboardTrafikTransaksiContent
+                summary={trafikTransaksi.summary}
+                chart={trafikTransaksi.chart}
+              />
             )}
           </Card>
         </div>

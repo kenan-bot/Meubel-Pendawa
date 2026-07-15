@@ -9,6 +9,7 @@ import java.util.List;
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
 import com.meubelpendawa.dto.dashboard.DashboardStokMenipisResponse;
+import com.meubelpendawa.dto.dashboard.DashboardTrafikResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbaruResponse;
 import com.meubelpendawa.repository.DetailTransaksiRepository;
 import com.meubelpendawa.repository.PengirimanRepository;
@@ -62,7 +63,7 @@ public class DashboardServiceImpl implements DashboardService {
                 this.dashboardTrafikService = dashboardTrafikService;
         }
 
-        //pengiriman
+        // pengiriman
 
         @Override
         public DashboardPengirimanResponse getPengirimanBelumSelesai() {
@@ -113,7 +114,7 @@ public class DashboardServiceImpl implements DashboardService {
                 return response;
         }
 
-        //transaksi terbesar
+        // transaksi terbesar
 
         @Override
         public DashboardTransaksiTerbesarResponse getTransaksiTerbesarHariIni() {
@@ -152,7 +153,7 @@ public class DashboardServiceImpl implements DashboardService {
                 return response;
         }
 
-        //produk terlaris
+        // produk terlaris
         @Override
         public List<DashboardProdukTerlarisResponse> getProdukTerlarisBulanIni() {
 
@@ -181,7 +182,7 @@ public class DashboardServiceImpl implements DashboardService {
                                 .toList();
         }
 
-        //merek populer
+        // merek populer
         @Override
         public List<DashboardMerekPopulerResponse> getMerekPopulerBulanIni() {
 
@@ -208,7 +209,7 @@ public class DashboardServiceImpl implements DashboardService {
                                 .toList();
         }
 
-        //aktivitas transaksi terbaru
+        // aktivitas transaksi terbaru
         @Override
         public List<DashboardTransaksiTerbaruResponse> getTransaksiTerbaru() {
 
@@ -241,7 +242,7 @@ public class DashboardServiceImpl implements DashboardService {
                                 .toList();
         }
 
-        //top wilayah pelanggan
+        // top wilayah pelanggan
         @Override
         public List<DashboardWilayahPelangganResponse> getTopWilayahPelanggan() {
 
@@ -290,7 +291,7 @@ public class DashboardServiceImpl implements DashboardService {
                                 .toList();
         }
 
-        //delivery vs pickup
+        // delivery vs pickup
         @Override
         public DashboardDeliveryResponse getDeliveryVsPickup() {
 
@@ -351,7 +352,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         // trafik mingguan
         @Override
-        public List<DashboardTrafikTransaksiResponse> getTrafikTransaksiMingguan() {
+        public DashboardTrafikResponse getTrafikTransaksiMingguan() {
 
                 return dashboardTrafikService.getTrafikTransaksiMingguan();
 

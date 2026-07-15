@@ -7,6 +7,7 @@ import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
 import com.meubelpendawa.dto.dashboard.DashboardStokMenipisResponse;
+import com.meubelpendawa.dto.dashboard.DashboardTrafikResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTrafikTransaksiResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbaruResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbesarResponse;
@@ -30,5 +31,5 @@ public interface DashboardService {
 
     List<DashboardStokMenipisResponse> getStokMenipis();
 
-    List<DashboardTrafikTransaksiResponse> getTrafikTransaksiMingguan();
+    DashboardTrafikResponse getTrafikTransaksiMingguan();
 }
