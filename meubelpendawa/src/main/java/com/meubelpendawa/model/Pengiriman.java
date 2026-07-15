@@ -8,9 +8,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "pengiriman")
+@Getter             
+@Setter             
+@NoArgsConstructor
 public class Pengiriman {
 
     @Id
@@ -28,8 +34,6 @@ public class Pengiriman {
     @JoinColumn(name = "orderId")
     private Transaksi transaksi;
 
-    public Pengiriman() {
-    }
 
     public Pengiriman(
             String statusPengiriman,
@@ -43,43 +47,4 @@ public class Pengiriman {
         this.transaksi = transaksi;
     }
 
-    public String getIdPengiriman() {
-        return idPengiriman;
-    }
-
-    public void setIdPengiriman(String idPengiriman) {
-        this.idPengiriman = idPengiriman;
-    }
-
-    public String getStatusPengiriman() {
-        return statusPengiriman;
-    }
-
-    public void setStatusPengiriman(String statusPengiriman) {
-        this.statusPengiriman = statusPengiriman;
-    }
-
-    public LocalDateTime getTanggalSelesai() {
-        return tanggalSelesai;
-    }
-
-    public void setTanggalSelesai(LocalDateTime tanggalSelesai) {
-        this.tanggalSelesai = tanggalSelesai;
-    }
-
-    public Karyawan getDriver() {
-        return driver;
-    }
-
-    public void setDriver(Karyawan driver) {
-        this.driver = driver;
-    }
-
-    public Transaksi getTransaksi() {
-        return transaksi;
-    }
-
-    public void setTransaksi(Transaksi transaksi) {
-        this.transaksi = transaksi;
-    }
 }

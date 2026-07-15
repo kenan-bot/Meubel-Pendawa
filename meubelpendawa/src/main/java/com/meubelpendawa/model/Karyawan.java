@@ -43,8 +43,7 @@ public class Karyawan {
 
     private LocalDateTime tanggalNonaktif;
 
-    // 2. TETAP PERTAHANKAN Constructor utama Anda ini agar kode di
-    // Service/Controller tidak error
+
     public Karyawan(String namaKaryawan, String email, Boolean aksesSistem, Role role, String username,
             String password, Boolean statusAktif, LocalDateTime tanggalNonaktif) {
         this.namaKaryawan = namaKaryawan;
@@ -57,5 +56,4 @@ public class Karyawan {
         this.tanggalNonaktif = tanggalNonaktif;
     }
 
-    // Semua Getter & Setter manual di bawah ini SUDAH AMAN DIHAPUS TOTAL.
 }

@@ -4,8 +4,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "kategori")
+@Getter 
+@Setter 
+@NoArgsConstructor
 public class Kategori {
 
     @Id
@@ -13,26 +20,9 @@ public class Kategori {
 
     private String namaKategori;
 
-    public Kategori() {
-    }
-
     public Kategori(String namaKategori) {
         this.namaKategori = namaKategori;
     }
 
-    public String getIdKategori() {
-        return idKategori;
-    }
-
-    public void setIdKategori(String idKategori) {
-        this.idKategori = idKategori;
-    }
-
-    public String getNamaKategori() {
-        return namaKategori;
-    }
-
-    public void setNamaKategori(String namaKategori) {
-        this.namaKategori = namaKategori;
-    }
+    
 }

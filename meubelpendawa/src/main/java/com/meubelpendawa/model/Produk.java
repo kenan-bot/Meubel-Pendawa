@@ -6,9 +6,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "produk")
+@Getter             
+@Setter             
+@NoArgsConstructor
 public class Produk {
 
     @Id
@@ -35,8 +41,6 @@ public class Produk {
     @JoinColumn(name = "idMerek")
     private Merek merek;
 
-    public Produk() {
-    }
 
     public Produk(
             String namaProduk,
@@ -54,80 +58,7 @@ public class Produk {
         this.gambarUrl = gambarUrl;
         this.kategori = kategori;
         this.merek = merek;
-
-        //setiap produk baru otomatis aktif
         this.statusAktif = true;
     }
 
-    public String getIdProduk() {
-        return idProduk;
-    }
-
-    public void setIdProduk(String idProduk) {
-        this.idProduk = idProduk;
-    }
-
-    public String getNamaProduk() {
-        return namaProduk;
-    }
-
-    public void setNamaProduk(String namaProduk) {
-        this.namaProduk = namaProduk;
-    }
-
-    public Double getHargaDefault() {
-        return hargaDefault;
-    }
-
-    public void setHargaDefault(Double hargaDefault) {
-        this.hargaDefault = hargaDefault;
-    }
-
-    public Integer getStok() {
-        return stok;
-    }
-
-    public void setStok(Integer stok) {
-        this.stok = stok;
-    }
-
-    public String getDeskripsi() {
-        return deskripsi;
-    }
-
-    public void setDeskripsi(String deskripsi) {
-        this.deskripsi = deskripsi;
-    }
-
-    public String getGambarUrl() {
-        return gambarUrl;
-    }
-
-    public void setGambarUrl(String gambarUrl) {
-        this.gambarUrl = gambarUrl;
-    }
-
-    public Boolean getStatusAktif() {
-        return statusAktif;
-    }
-
-    public void setStatusAktif(Boolean statusAktif) {
-        this.statusAktif = statusAktif;
-    }
-
-    public Kategori getKategori() {
-        return kategori;
-    }
-
-    public void setKategori(Kategori kategori) {
-        this.kategori = kategori;
-    }
-
-    public Merek getMerek() {
-        return merek;
-    }
-
-    public void setMerek(Merek merek) {
-        this.merek = merek;
-    }
 }

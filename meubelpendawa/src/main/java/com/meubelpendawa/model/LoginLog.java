@@ -4,11 +4,18 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+
 @Entity
 @Table(name = "loginlog")
+@Getter 
+@Setter 
+@NoArgsConstructor
 public class LoginLog {
 
     @Id
@@ -26,8 +33,7 @@ public class LoginLog {
 
     private Boolean logoutDiluarJamOperasional;
 
-    public LoginLog() {
-    }
+   
 
     public LoginLog(Karyawan karyawan,
                     LocalDateTime loginAt,
@@ -42,51 +48,5 @@ public class LoginLog {
         this.logoutDiluarJamOperasional = logoutDiluarJamOperasional;
     }
 
-    public String getIdLog() {
-        return idLog;
-    }
-
-    public void setIdLog(String idLog) {
-        this.idLog = idLog;
-    }
-
-    public Karyawan getKaryawan() {
-        return karyawan;
-    }
-
-    public void setKaryawan(Karyawan karyawan) {
-        this.karyawan = karyawan;
-    }
-
-    public LocalDateTime getLoginAt() {
-        return loginAt;
-    }
-
-    public void setLoginAt(LocalDateTime loginAt) {
-        this.loginAt = loginAt;
-    }
-
-    public LocalDateTime getLogoutAt() {
-        return logoutAt;
-    }
-
-    public void setLogoutAt(LocalDateTime logoutAt) {
-        this.logoutAt = logoutAt;
-    }
-
-    public Boolean getLoginDiluarJamOperasional() {
-        return loginDiluarJamOperasional;
-    }
-
-    public void setLoginDiluarJamOperasional(Boolean loginDiluarJamOperasional) {
-        this.loginDiluarJamOperasional = loginDiluarJamOperasional;
-    }
-
-    public Boolean getLogoutDiluarJamOperasional() {
-        return logoutDiluarJamOperasional;
-    }
-
-    public void setLogoutDiluarJamOperasional(Boolean logoutDiluarJamOperasional) {
-        this.logoutDiluarJamOperasional = logoutDiluarJamOperasional;
-    }
+    
 }

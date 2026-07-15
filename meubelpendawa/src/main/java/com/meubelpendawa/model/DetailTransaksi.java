@@ -6,8 +6,15 @@ import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "detailtransaksi")
+@Getter 
+@Setter 
+@NoArgsConstructor
 public class DetailTransaksi {
 
     @Id
@@ -29,9 +36,6 @@ public class DetailTransaksi {
     @JoinColumn(name = "orderId")
     private Transaksi transaksi;
 
-    public DetailTransaksi() {
-    }
-
     public DetailTransaksi(Integer qty, Double hargaJual, Double subtotal, Produk produk, Transaksi transaksi) {
         this.qty = qty;
         this.hargaJual = hargaJual;
@@ -40,59 +44,5 @@ public class DetailTransaksi {
         this.transaksi = transaksi;
     }
 
-    public String getIdDetailTransaksi() {
-        return idDetailTransaksi;
-    }
-
-    public void setIdDetailTransaksi(String idDetailTransaksi) {
-        this.idDetailTransaksi = idDetailTransaksi;
-    }
-
-    public Integer getQty() {
-        return qty;
-    }
-
-    public void setQty(Integer qty) {
-        this.qty = qty;
-    }
-
-    public Double getHargaJual() {
-        return hargaJual;
-    }
-
-    public void setHargaJual(Double hargaJual) {
-        this.hargaJual = hargaJual;
-    }
-
-    public String getNamaProduk() {
-        return namaProduk;
-    }
-
-    public void setNamaProduk(String namaProduk) {
-        this.namaProduk = namaProduk;
-    }
-
-    public Double getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public Produk getProduk() {
-        return produk;
-    }
-
-    public void setProduk(Produk produk) {
-        this.produk = produk;
-    }
-
-    public Transaksi getTransaksi() {
-        return transaksi;
-    }
-
-    public void setTransaksi(Transaksi transaksi) {
-        this.transaksi = transaksi;
-    }
+    
 }
