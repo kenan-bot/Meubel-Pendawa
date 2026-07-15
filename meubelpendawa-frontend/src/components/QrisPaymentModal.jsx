@@ -1,10 +1,7 @@
 import { FaSpinner, FaExclamationCircle } from "react-icons/fa";
 import Modal from "./Modal";
 
-// Modal ini CUMA tampil sebentar selagi ambil Snap Token (loading), atau kalau gagal (error).
-// Begitu token didapat, modal ini otomatis ditutup dan popup pembayaran ASLI dari Midtrans
-// (window.snap.pay) yang mengambil alih layar -- jadi modal ini tidak dipakai untuk nampilkan
-// QR code-nya sendiri.
+// Modal QRIS
 const QrisPaymentModal = ({ isOpen, status = "loading", message, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Pembayaran QRIS" maxWidth="max-w-sm">

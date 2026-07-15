@@ -42,7 +42,7 @@ public class LaporanHarianServiceImpl implements LaporanHarianService {
         @Override
         public void exportLaporanHarian() {
 
-                // Mengambil seluruh transaksi SUCCESS pada hari ini
+                //mengambil seluruh transaksi SUCCESS pada hari ini
                 LocalDate hariIni = LocalDate.now();
 
                 LocalDateTime awalHari = hariIni.atStartOfDay();
@@ -53,7 +53,7 @@ public class LaporanHarianServiceImpl implements LaporanHarianService {
                                 akhirHari,
                                 "SUCCESS");
 
-                // Menghitung ringkasan laporan
+                //menghitung ringkasan laporan
 
                 double totalCash = 0;
                 double totalCashless = 0;
@@ -84,7 +84,7 @@ public class LaporanHarianServiceImpl implements LaporanHarianService {
                 List<DetailLaporanHarianDTO> detailList = new ArrayList<>();
                 int nomor = 1;
 
-                // Mapping transaksi ke DTO
+                //mapping transaksi ke DTO
 
                 for (Transaksi transaksi : transaksiHariIni) {
 
@@ -117,7 +117,7 @@ public class LaporanHarianServiceImpl implements LaporanHarianService {
                         detailList.add(detail);
                 }
 
-                // Generate PDF
+                //generate PDF
                 laporan.setTransaksi(detailList);
 
                 byte[] pdf = pdfGenerator.generate(laporan);

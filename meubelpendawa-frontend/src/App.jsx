@@ -17,11 +17,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* public */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<FormLogin />} />
 
-        {/* Protected */}
+        {/* protected */}
         <Route
           path="/owner/*"
           element={

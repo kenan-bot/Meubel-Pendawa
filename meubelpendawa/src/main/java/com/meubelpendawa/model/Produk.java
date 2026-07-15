@@ -55,7 +55,7 @@ public class Produk {
         this.kategori = kategori;
         this.merek = merek;
 
-        // Setiap produk baru otomatis aktif
+        //setiap produk baru otomatis aktif
         this.statusAktif = true;
     }
 

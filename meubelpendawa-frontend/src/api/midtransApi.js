@@ -3,6 +3,7 @@ import axiosClient from "./axiosClient";
 const BASE_URL = "/transaksi";
 
 // Membuat Snap Token Midtrans
+
 export const buatSnapToken = async (orderId) => {
   const response = await axiosClient.post(
     `${BASE_URL}/${orderId}/midtrans-token`
@@ -11,6 +12,7 @@ export const buatSnapToken = async (orderId) => {
 };
 
 // Sinkronisasi status pembayaran dari Midtrans
+
 export const cekStatusPembayaran = async (orderId) => {
   const response = await axiosClient.post(
     `${BASE_URL}/${orderId}/cek-status`
@@ -19,6 +21,7 @@ export const cekStatusPembayaran = async (orderId) => {
 };
 
 // Cache script Midtrans agar tidak dimuat berulang
+
 let loadingPromise = null;
 let loadedForClientKey = null;
 

@@ -47,7 +47,7 @@ function Karyawan() {
       return;
     }
 
-    // Modal langsung muncul
+    //modal langsung muncul
     setSelectedKaryawan(item);
     setShowOtpModal(true);
 
@@ -156,7 +156,7 @@ function Karyawan() {
 
   return (
     <div className="px-3 py-5 md:p-5">
-      {/* Judul */}
+      {/* judul */}
       <div className="md:-mt-7 mb-6">
         <h1 className="font-extrabold text-2xl md:text-3xl leading-tight">
           Kelola Karyawan
@@ -167,7 +167,7 @@ function Karyawan() {
         </p>
       </div>
 
-      {/* Search + Button */}
+      {/* search + button */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
         <SearchBar
           theme="orange"
@@ -187,7 +187,7 @@ function Karyawan() {
         </button>
       </div>
 
-      {/* Header */}
+      {/* header */}
       <div
         className="hidden lg:grid grid-cols-[3fr_2.7fr_2.8fr_2.1fr_1.9fr_0.8fr] items-center
         border border-orange-500 text-orange-500 rounded-2xl px-5 py-4 font-semibold mb-4"
@@ -200,7 +200,7 @@ function Karyawan() {
         <div className="text-center">Tindakan</div>
       </div>
 
-      {/* Card */}
+      {/* card */}
       {loading ? (
         <div className="p-6">Memuat data karyawan...</div>
       ) : (

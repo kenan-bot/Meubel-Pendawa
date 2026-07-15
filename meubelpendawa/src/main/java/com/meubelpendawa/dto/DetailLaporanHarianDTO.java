@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 
 public class DetailLaporanHarianDTO {
 
-    // ==========================
     // Data Tabel Laporan Harian
-    // ==========================
 
     private Integer no;
 

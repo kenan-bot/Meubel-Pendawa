@@ -119,7 +119,7 @@ export default function Produk() {
   return (
     <>
       <div className="px-3 py-5 md:p-5">
-        {/* Header */}
+        {/* header */}
         <div className="md:-mt-7 mb-6">
           <h1 className="font-extrabold text-2xl md:text-3xl leading-tight">
             Manajemen Produk
@@ -130,7 +130,7 @@ export default function Produk() {
           </p>
         </div>
 
-        {/* Filter */}
+        {/* filter */}
         <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
           <SearchBar
             theme="orange"
@@ -187,7 +187,7 @@ export default function Produk() {
           </button>
         </div>
 
-        {/* Card */}
+        {/* card */}
         <div className="mt-3">
           <ProductCard
             produk={paginatedData}
@@ -206,7 +206,7 @@ export default function Produk() {
         </div>
       </div>
 
-      {/* Modal Tambah */}
+      {/* modal tambah */}
       <Modal
         maxWidth="max-w-3xl"
         isOpen={openTambahProduk}
@@ -225,7 +225,7 @@ export default function Produk() {
         />
       </Modal>
 
-      {/* Modal Edit */}
+      {/* modal edit */}
       <Modal
         maxWidth="max-w-3xl"
         isOpen={openUpdateProduk}
@@ -245,7 +245,7 @@ export default function Produk() {
         />
       </Modal>
 
-      {/* Confirm Toggle */}
+      {/* confirm toggle */}
       <ConfirmModal
         isOpen={openConfirmProduk}
         title={

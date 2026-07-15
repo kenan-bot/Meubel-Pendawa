@@ -48,7 +48,7 @@ function RiwayatLogin() {
 
   return (
     <div className="px-3 py-5 md:p-5">
-      {/* Judul */}
+      {/* judul */}
       <div className="md:-mt-7 mb-6">
         <h1 className="font-extrabold text-2xl md:text-3xl">Riwayat Login</h1>
 
@@ -58,7 +58,7 @@ function RiwayatLogin() {
       </div>
 
       <div className="mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
-        {/* KIRI */}
+        {/* kiri */}
         <div className="flex flex-wrap items-center gap-3 w-full">
           <SearchBar
             theme="orange"
@@ -82,7 +82,7 @@ function RiwayatLogin() {
           />
         </div>
 
-        {/* KANAN */}
+        {/* kanan */}
         <DateRangePicker
           startDate={startDate}
           endDate={endDate}
@@ -99,7 +99,7 @@ function RiwayatLogin() {
         <div className="text-center py-8">Memuat data...</div>
       ) : (
         <>
-          {/* Header Desktop */}
+          {/* header desktop */}
           <div
             className="hidden lg:grid grid-cols-[2fr_1fr_1.6fr_1.6fr_1.2fr_1.4fr_1fr] items-center
             border border-orange-500 text-orange-500 rounded-2xl px-8 py-4 font-semibold mb-4"
@@ -113,7 +113,7 @@ function RiwayatLogin() {
             <div className="justify-self-end">Status</div>
           </div>
 
-          {/* Card */}
+          {/* card */}
           <LoginLogCard loginLogs={paginatedData} />
           <Pagination
             currentPage={currentPage}

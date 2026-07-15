@@ -15,8 +15,7 @@ const RingkasanBayar = ({ onRequestProses }) => {
   return (
     <div className="bg-orange-500 text-white rounded-lg p-3 space-y-1.5 text-xs">
       {isCashless ? (
-        // CASHLESS: nominal otomatis = totalPesanan lewat QRIS, gak ada uang tunai/kembalian
-        // yang perlu diisi manual -- jadi field itu disembunyikan biar kasir gak salah isi.
+        /* Pembayaran QRIS */
         <p className="text-[11px] text-white/80">Dibayar via QRIS, nominal otomatis sesuai total.</p>
       ) : (
         <>

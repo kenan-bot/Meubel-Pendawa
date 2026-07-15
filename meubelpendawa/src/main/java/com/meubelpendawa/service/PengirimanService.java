@@ -60,7 +60,7 @@ public class PengirimanService {
 
         pengiriman.setStatusPengiriman("COMPLETED");
 
-        // simpan waktu selesai
+        //simpan waktu selesai
         pengiriman.setTanggalSelesai(LocalDateTime.now());
 
         return pengirimanRepository.save(pengiriman);

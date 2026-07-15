@@ -36,9 +36,9 @@ function Navbar() {
         className="w-full bg-white shadow-[0_5px_5px_rgba(0,0,0,0.25)] 
       fixed top-0 left-0 z-50 h-20 md:h-24 flex items-center"
       >
-        {/* CONTAINER */}
+        {/* container */}
         <div className="w-full flex items-center justify-between px-3 sm:px-4 md:px-6 h-full">
-          {/* LEFT - LOGO */}
+          {/* left - logo */}
           <div className="flex items-center gap-2 min-w-0">
             <img
               src={kursi}
@@ -64,7 +64,7 @@ function Navbar() {
             </h1>
           </div>
 
-          {/* DESKTOP MENU */}
+          {/* desktop menu */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6 ml-auto pr-2 xl:pr-4">
             <ul className="flex items-center gap-6 lg:gap-8">
               <li
@@ -89,7 +89,7 @@ function Navbar() {
               </li>
             </ul>
 
-            {/* BUTTON PORTAL - DESKTOP */}
+            {/* button portal - desktop */}
             <button
               onClick={() => navigate("/login")}
               className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8] hover:bg-purple-800 text-white px-4 md:px-5 py-2 rounded-lg transition shadow-md text-sm md:text-base"
@@ -98,7 +98,7 @@ function Navbar() {
             </button>
           </div>
 
-          {/* MOBILE HAMBURGER */}
+          {/* mobile hamburger */}
           <button
             className="hover:scale-125 transition-all duration-300 lg:hidden text-2xl text-[#5F04E8]"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -107,7 +107,7 @@ function Navbar() {
           </button>
         </div>
 
-        {/* MOBILE MENU */}
+        {/* mobile menu */}
         <div
           className={`absolute top-20 left-0 w-full bg-white shadow-lg lg:hidden
           origin-top transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -140,7 +140,7 @@ function Navbar() {
               Contact
             </li>
 
-            {/* BUTTON PORTAL - MOBILE */}
+            {/* button portal - mobile */}
             <button
               onClick={() => navigate("/login")}
               className="transition-all duration-500 ease-in-out hover:scale-105 bg-[#5F04E8]

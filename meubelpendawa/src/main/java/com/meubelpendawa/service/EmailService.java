@@ -8,7 +8,7 @@ public interface EmailService {
             String htmlContent
     );
 
-    // [BARU] Kirim email dengan 1 lampiran file (dipakai untuk kirim struk PDF).
+    //kirim email dengan 1 lampiran file (dipakai untuk kirim struk PDF)
     void sendEmailWithAttachment(
             String to,
             String subject,

@@ -7,17 +7,17 @@ export const LoginLogProvider = ({ children }) => {
   const [loginLogs, setLoginLogs] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Search
+  //search
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter tanggal
+  //filter janggal
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Filter status
+  //filter status
   const [statusFilter, setStatusFilter] = useState(null);
 
-  // Filter jam kerja
+  //filter jam kerja
   const [jamKerjaFilter, setJamKerjaFilter] = useState(null);
 
   const fetchLoginLog = async () => {
@@ -35,25 +35,25 @@ export const LoginLogProvider = ({ children }) => {
   };
 
   const filteredLoginLogs = loginLogs.filter((item) => {
-    // Search
+    //search
     const cocokNama = item.namaKaryawan
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
-    //Tanggal
+    //tanggal
     const tanggalLogin = item.loginAt.substring(0, 10);
 
     const cocokTanggal =
       (!startDate || tanggalLogin >= startDate) &&
       (!endDate || tanggalLogin <= endDate);
 
-    // Status
+    //status
     const cocokStatus =
       !statusFilter ||
       statusFilter.value === "__ALL__" ||
       item.status === statusFilter.value;
 
-    // Jam Kerja
+    //jam kerja
     const cocokJamKerja =
       !jamKerjaFilter ||
       jamKerjaFilter.value === "__ALL__" ||

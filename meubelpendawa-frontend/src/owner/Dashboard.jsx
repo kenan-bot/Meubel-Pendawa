@@ -49,7 +49,7 @@ function Dashboard() {
     }
   };
 
-  // card produk terlaris
+  //card produk terlaris
   const [produkTerlaris, setProdukTerlaris] = useState([]);
   const loadProdukTerlaris = async () => {
     try {
@@ -61,7 +61,7 @@ function Dashboard() {
     }
   };
 
-  // card merek populer
+  //card merek populer
   const [topMerekPopuler, setTopMerekPopuler] = useState([]);
   const loadTopMerekPopuler = async () => {
     try {
@@ -73,7 +73,7 @@ function Dashboard() {
     }
   };
 
-  // card transaksi terbaru
+  //card transaksi terbaru
   const [transaksiTerbaru, setTransaksiTerbaru] = useState([]);
   const loadTransaksiTerbaru = async () => {
     try {
@@ -85,7 +85,7 @@ function Dashboard() {
     }
   };
 
-  // card top wilayah pelanggan
+  //card top wilayah pelanggan
   const [topWilayahPelanggan, setTopWilayahPelanggan] = useState([]);
   const loadTopWilayahPelanggan = async () => {
     try {
@@ -97,7 +97,7 @@ function Dashboard() {
     }
   };
 
-  // card delivery vs pickup
+  //card delivery vs pickup
   const [deliveryPickup, setDeliveryPickup] = useState(null);
   const loadDeliveryPickup = async () => {
     try {
@@ -146,7 +146,7 @@ function Dashboard() {
 
   return (
     <div className="px-3 py-5 md:p-5">
-      {/* HEADER */}
+      {/* header */}
       <div className="md:-mt-7 mb-6">
         <h1 className="font-extrabold text-2xl md:text-3xl">
           Dashboard Pintar
@@ -156,7 +156,7 @@ function Dashboard() {
         </p>
       </div>
 
-      {/* GRID DASHBOARD */}
+      {/* grid dashboard */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
         {/* Row 1 */}
         <div className="col-span-1 row-span-1">

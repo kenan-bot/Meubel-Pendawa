@@ -31,7 +31,7 @@ function isHariIni(tanggal) {
   );
 }
 
-// Card ringkasan laporan
+//card ringkasan laporan
 function buildRingkasanCards(ringkasan) {
   return [
     {
@@ -82,19 +82,19 @@ function RiwayatHarian() {
 
   const [keyword, setKeyword] = useState("");
 
-  // Export laporan
+  //export laporan
   const [exportLoading, setExportLoading] = useState(false);
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
 
-  // Toast
+  //toast
   const [toast, setToast] = useState({
     show: false,
     type: "",
     message: "",
   });
 
-  // Auto hide toast 3 detik
+  //auto hide toast 3 detik
   useEffect(() => {
     if (!toast.show) return;
 
@@ -109,7 +109,7 @@ function RiwayatHarian() {
     return () => clearTimeout(timer);
   }, [toast.show]);
 
-  // Load transaksi
+  //load transaksi
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -241,7 +241,7 @@ function RiwayatHarian() {
   
   return (
     <div className="relative px-3 py-5 md:px-5">
-      {/* Header */}
+      {/* header */}
       <div className="mb-6 md:-mt-7">
         <h1 className="text-2xl font-extrabold md:text-3xl">Laporan Harian</h1>
 
@@ -250,7 +250,7 @@ function RiwayatHarian() {
         </p>
       </div>
 
-      {/* Ringkasan */}
+      {/* ringkasan */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {ringkasanCards.map((c) => (
           <Card
@@ -278,7 +278,7 @@ function RiwayatHarian() {
         ))}
       </div>
 
-      {/* Search dan Export */}
+      {/* search dan export */}
       <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center">
         <SearchBar
           theme="orange"
@@ -301,7 +301,7 @@ function RiwayatHarian() {
         </button>
       </div>
 
-      {/* Daftar Transaksi */}
+      {/* daftar transaksi */}
       <div className="mt-3">
         {loading ? (
           <div className="py-24 text-center text-gray-500">
@@ -339,7 +339,7 @@ function RiwayatHarian() {
         )}
       </div>
 
-      {/* CONFIRM EXPORT */}
+      {/* confirm export */}
 
       <ConfirmModal
         isOpen={showConfirmExport}
@@ -351,7 +351,7 @@ function RiwayatHarian() {
         onClose={() => setShowConfirmExport(false)}
       />
 
-      {/* TOAST */}
+      {/* toast */}
 
       {toast.show && <Toast type={toast.type} message={toast.message} />}
     </div>

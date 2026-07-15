@@ -162,9 +162,7 @@ const ProductCard = ({
                         </CardBody>
                       </CardHeader>
 
-                      {/* [BARU] deskripsi disembunyikan khusus di mode cashier -- kartu jadi lebih ringkas,
-                        fokus ke info yang dibutuhkan kasir saja (nama, stok, harga). Mode home/owner
-                        tetap menampilkan deskripsi seperti semula. */}
+                      {/* Deskripsi (selain kasir) */}
                       {!isCashier &&
                         (item.deskripsi ? (
                           <CardBody className="text-[#5F04E8] text-sm leading-tight mt-0">

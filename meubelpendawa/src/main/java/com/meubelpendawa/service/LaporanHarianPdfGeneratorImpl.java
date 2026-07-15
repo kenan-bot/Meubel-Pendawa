@@ -63,7 +63,7 @@ public class LaporanHarianPdfGeneratorImpl
     }
 
 
-    // HEADER
+    //header
 
     private void tambahHeader(Document document)
             throws DocumentException {
@@ -97,7 +97,7 @@ public class LaporanHarianPdfGeneratorImpl
     }
 
 
-    // RINGKASAN
+    //ringkasan
 
     private void tambahRingkasan(
             Document document,
@@ -130,7 +130,7 @@ public class LaporanHarianPdfGeneratorImpl
     }
 
   
-    // TABEL
+    //tabel
 
     private void tambahTabel(
             Document document,
@@ -193,7 +193,7 @@ public class LaporanHarianPdfGeneratorImpl
     }
 
     
-    // FOOTER
+    //footer
 
     private void tambahFooter(Document document)
             throws DocumentException {
@@ -216,7 +216,7 @@ public class LaporanHarianPdfGeneratorImpl
     }
 
     
-    // HEADER TABLE
+    //header tabel
 
     private void addHeader(
             PdfPTable table,
@@ -236,7 +236,7 @@ public class LaporanHarianPdfGeneratorImpl
     }
 
     
-    // FORMAT RUPIAH
+    //format rupiah
 
     private String rupiah(BigDecimal value) {
 

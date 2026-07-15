@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const BASE_URL = "/api/laporan-penjualan";
 
-// SUMMARY
+// Summary
 
 export const getSummaryLaporanPenjualan = async () => {
     const response = await axiosClient.get(
@@ -29,7 +29,7 @@ export const getSummaryLaporanPenjualanByPeriode = async (
     return response.data;
 };
 
-// DETAIL PENJUALAN
+// Detail penjualan
 
 export const getDetailLaporanPenjualan = async (
     startDate,
@@ -48,7 +48,7 @@ export const getDetailLaporanPenjualan = async (
     return response.data;
 };
 
-// KONTRIBUSI PRODUK
+// Kontribusi produk
 
 export const getKontribusiProduk = async (
     startDate,
@@ -67,7 +67,7 @@ export const getKontribusiProduk = async (
     return response.data;
 };
 
-// TREN PENJUALAN
+// Tren penjualan
 
 export const getTrenPenjualan = async (
     startDate,
@@ -86,7 +86,7 @@ export const getTrenPenjualan = async (
     return response.data;
 };
 
-// EXPORT PDF & EMAIL
+// Export pdf & email
 
 export const kirimLaporanPenjualanEmail = async (
     startDate,

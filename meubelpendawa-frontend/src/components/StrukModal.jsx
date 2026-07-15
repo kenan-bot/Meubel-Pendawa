@@ -7,13 +7,7 @@ function formatRupiah(nominal) {
   return "Rp" + Number(nominal).toLocaleString("id-ID");
 }
 
-/**
- * Muncul begitu pesanan berhasil diproses (CASH langsung, atau CASHLESS begitu
- * Snap kasih callback onSuccess). Tombol "Cetak / Download PDF" membuka struk PDF
- * dari backend (GET /transaksi/{orderId}/struk) di tab baru -- kasir tinggal pakai
- * tombol print bawaan viewer PDF browser. Struk juga sudah otomatis dikirim backend
- * ke email toko begitu pembayaran berhasil, jadi tidak perlu aksi tambahan di sini.
- */
+// Modal struk
 const StrukModal = ({ data, onClose }) => {
   if (!data) return null;
 

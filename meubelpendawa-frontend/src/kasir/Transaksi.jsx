@@ -38,13 +38,10 @@ function TransaksiContent() {
     resetPage,
   } = usePagination(t.produkTersaring, 12);
 
-  // [BARU] Form Pemesan bisa dibuka/tutup -- default TERTUTUP supaya grid produk
-  // langsung dominan begitu halaman dibuka. Data yang sudah diisi tetap tersimpan
-  // di context walau form disembunyikan (tidak hilang saat toggle).
+  //buka/tutup form pemesan
   const [formTerbuka, setFormTerbuka] = useState(false);
 
-  // [BARU] Konfirmasi sebelum proses pesanan -- mencegah salah klik / salah total
-  // saat kasir menekan tombol "Proses Pesanan" di RingkasanBayar.
+  //konfirmasi sebelum proses pesanan
   const [showConfirm, setShowConfirm] = useState(false);
 
   const isDelivery = t.metodePengiriman === "DELIVERY";
@@ -57,8 +54,7 @@ function TransaksiContent() {
     .filter(Boolean)
     .join(" • ");
 
-  // kalau proses pesanan gagal (misal Nama/No.WA/Alamat belum diisi) sementara form ditutup,
-  // buka lagi otomatis supaya kasir bisa langsung lihat kolom yang perlu dilengkapi
+  //kalau proses pesanan gagal (misal Nama/No.WA/Alamat belum diisi) form terbuka
   useEffect(() => {
     if (t.pesan && t.pesanType === "error" && !formTerbuka) {
       setFormTerbuka(true);
@@ -71,10 +67,8 @@ function TransaksiContent() {
   };
 
   return (
-    // [RESPONSIVE] mobile: kolom tunggal, halaman scroll normal (natural height).
-    // lg+: dua panel berdampingan, tinggi terkunci ke viewport, masing-masing scroll sendiri (layout lama).
     <div className="flex flex-col lg:flex-row gap-4 -m-8 p-4 bg-gray-50 lg:h-[calc(100vh-2rem)] lg:overflow-hidden text-sm">
-      {/* ===== KIRI: FORM + PRODUK ===== */}
+      {/* kiri: form + produk */}
       <div className="flex-1 bg-white text-gray-800 rounded-2xl shadow-sm flex flex-col lg:min-h-0">
         <div className="p-4 lg:p-5 pb-0 flex-shrink-0">
           <PageHeader title="Form Pemesan" subtitle="Halaman Form Pemesan">
@@ -101,7 +95,7 @@ function TransaksiContent() {
           {formTerbuka && <FormPemesan />}
         </div>
 
-        {/* Search & filter — khusus untuk cari produk di bawah ini */}
+        {/* search & filter — khusus untuk cari produk di bawah ini */}
         <div className="relative z-30 flex flex-wrap items-center gap-2 px-4 lg:px-5 pt-2 pb-5">
           <SearchBar
             theme="orange"
@@ -126,8 +120,7 @@ function TransaksiContent() {
           />
         </div>
 
-        {/* Grid produk — klik untuk tambah ke keranjang.
-            [RESPONSIVE] mobile: bagian dari scroll halaman (bukan box scroll sendiri) supaya enak di-scroll pakai jari. */}
+        {/* grid produk — klik untuk tambah ke keranjang. */}
         <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto custom-scrollbar px-4 lg:px-5 pb-4 pt-2">
           {t.loading ? (
             <div className="text-center py-8 text-gray-500">
@@ -150,9 +143,7 @@ function TransaksiContent() {
         </div>
       </div>
 
-      {/* ===== KANAN: KERANJANG =====
-          [RESPONSIVE] mobile: full-width, di bawah panel produk (bukan sidebar tetap).
-          Tombol "Proses Pesanan" dibuat sticky di bawah layar supaya tetap mudah dijangkau saat scroll. */}
+      {/* kanan: keranjang */}
       <div className="relative w-full lg:w-[300px] bg-white rounded-2xl shadow-sm flex flex-col lg:min-h-0 lg:-mt-2">
         {t.pesan && <Toast message={t.pesan} type={t.pesanType} />}
 
@@ -183,7 +174,7 @@ function TransaksiContent() {
         </div>
       </div>
 
-      {/* Konfirmasi sebelum transaksi benar-benar diproses */}
+      {/* konfirmasi sebelum transaksi benar-benar diproses */}
       <ConfirmModal
         isOpen={showConfirm}
         title="Konfirmasi Pesanan"
@@ -194,8 +185,7 @@ function TransaksiContent() {
         onClose={() => setShowConfirm(false)}
       />
 
-      {/* Loading/error singkat saat menyiapkan Snap Token -- popup pembayaran aslinya
-          langsung diambil alih oleh window.snap.pay() begitu token didapat. */}
+      {/* QRIS Payment Modal */}
       <QrisPaymentModal
         isOpen={t.showQrisModal}
         status={t.qrisStatus}
@@ -203,8 +193,7 @@ function TransaksiContent() {
         onClose={t.closeQrisModal}
       />
 
-      {/* Muncul begitu pesanan berhasil diproses -- bisa dicetak/download PDF-nya,
-          dan salinannya sudah otomatis terkirim ke email toko oleh backend. */}
+      {/* Struk Modal */}
       <StrukModal data={t.strukData} onClose={t.closeStruk} />
     </div>
   );

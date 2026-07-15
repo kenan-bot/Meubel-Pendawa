@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const BASE_URL = "/api/dashboard";
 
-// PENGIRIMAN BELUM SELESAI
+// Pengiriman belum selesai
 
 export const getPengirimanBelumSelesai = async () => {
     const response = await axiosClient.get(
@@ -12,7 +12,7 @@ export const getPengirimanBelumSelesai = async () => {
     return response.data;
 };
 
-// PRODUK TERLARIS BULAN INI
+// Produk terlaris bulan ini
 
 export const getProdukTerlarisBulanIni = async () => {
     const response = await axiosClient.get(
@@ -22,7 +22,7 @@ export const getProdukTerlarisBulanIni = async () => {
     return response.data;
 };
 
-// TOP 3 MEREK TERPOPULER
+// Top 3 merek terpopuler
 
 export const getTopMerekPopuler = async () => {
     const response = await axiosClient.get(
@@ -32,7 +32,7 @@ export const getTopMerekPopuler = async () => {
     return response.data;
 };
 
-// Transaksi Terbesar Hari Ini
+// Transaksi terbesar hari ini
 
 export const getTransaksiTerbesarHariIni = async () => {
     const response = await axiosClient.get(
@@ -42,7 +42,7 @@ export const getTransaksiTerbesarHariIni = async () => {
     return response.data;
 };
 
-// STOK MENIPIS
+// Stok menipis
 
 export const getStokMenipis = async () => {
     const response = await axiosClient.get(
@@ -52,7 +52,7 @@ export const getStokMenipis = async () => {
     return response.data;
 };
 
-// pickup vs delivery
+// Pickup vs delivery
 
 export const getDeliveryVsPickup = async () => {
     const response = await axiosClient.get(
@@ -62,7 +62,7 @@ export const getDeliveryVsPickup = async () => {
     return response.data;
 };
 
-// TOP WILAYAH PELANGGAN
+// Top wilayah pelanggan
 
 export const getTopWilayahPelanggan = async () => {
     const response = await axiosClient.get(
@@ -72,7 +72,7 @@ export const getTopWilayahPelanggan = async () => {
     return response.data;
 };
 
-// TRAFIK TRANSAKSI MINGGUAN
+// Trafik transaksi mingguan
 
 export const getTrafikTransaksiMingguan = async () => {
     const response = await axiosClient.get(
@@ -82,7 +82,7 @@ export const getTrafikTransaksiMingguan = async () => {
     return response.data;
 };
 
-// TRANSAKSI TERBARU
+// Transaksi terbaru
 
 export const getTransaksiTerbaru = async () => {
     const response = await axiosClient.get(

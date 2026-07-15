@@ -43,13 +43,13 @@ public class OtpServiceImpl implements OtpService {
     @Override
     public void kirimOtp(String email) {
 
-        // Pastikan email terdaftar
+        //pastikan email terdaftar
         Karyawan karyawan = karyawanRepository
                 .findByEmailAndAksesSistemTrue(email)
                 .orElseThrow(() ->
                         new RuntimeException("Email tidak ditemukan"));
 
-        // Nonaktifkan seluruh OTP lama
+        //nonaktifkan seluruh OTP lama
         List<OtpResetPassword> otpAktif =
                 otpRepository.findByEmailAndUsedFalse(email);
 
@@ -59,7 +59,7 @@ public class OtpServiceImpl implements OtpService {
 
         otpRepository.saveAll(otpAktif);
 
-        // Generate OTP baru
+        //generate otp baru
         String kodeOtp = generateOtp();
 
         OtpResetPassword otpBaru = new OtpResetPassword();
@@ -73,7 +73,7 @@ public class OtpServiceImpl implements OtpService {
 
         otpRepository.save(otpBaru);
 
-        // Email
+        //email
         String subject = "Meubel Pendawa • Reset Password";
 
         String body = """
@@ -136,7 +136,7 @@ public class OtpServiceImpl implements OtpService {
             return false;
         }
 
-        // OTP sudah expired
+        //otp sudah expired
         if (LocalDateTime.now().isAfter(otp.getExpiredAt())) {
 
             otp.setUsed(true);
@@ -146,12 +146,12 @@ public class OtpServiceImpl implements OtpService {
             return false;
         }
 
-        // OTP salah
+        //otp salah
         if (!otp.getKodeOtp().equals(kodeOtp)) {
             return false;
         }
 
-        // OTP berhasil digunakan
+        //otp berhasil digunakan
         otp.setVerified(true);
 
         otpRepository.save(otp);

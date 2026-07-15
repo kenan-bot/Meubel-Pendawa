@@ -90,7 +90,7 @@ function LaporanPenjualan() {
     }).format(nominal || 0);
   };
 
-  // Derived State
+  //derived state
   const tidakAdaData = summary.totalTransaksi === 0;
 
   const totalPembayaran = (summary.cash || 0) + (summary.cashless || 0);
@@ -228,7 +228,7 @@ function LaporanPenjualan() {
 
   return (
     <div className="px-3 py-5 md:p-5">
-      {/* Header */}
+      {/* header */}
       <div className="md:-mt-7 mb-6">
         <h1 className="font-extrabold text-2xl md:text-3xl">
           Laporan Penjualan
@@ -244,7 +244,7 @@ function LaporanPenjualan() {
         </div>
       </div>
 
-      {/* Filter */}
+      {/* filter */}
       <div className="flex flex-col mb-3 md:flex-row gap-3 md:items-center">
         <DateRangePicker
           startDate={startDate}
@@ -309,9 +309,9 @@ function LaporanPenjualan() {
         </div>
       ) : (
         <>
-          {/* KPI CARD */}
+          {/* kpi card */}
           <div className="grid xl:grid-cols-[1.1fr_1.2fr_1.7fr_2.2fr_2fr_0fr] gap-4 mb-6 items-start">
-            {/* OMZET */}
+            {/* omzet */}
             <Card className="xl:col-span-2 shadow-lg px-5 py-3">
               <p className="text-sm md:text-lg text-gray-500 font-medium leading-none">
                 Total Penjualan
@@ -353,7 +353,7 @@ function LaporanPenjualan() {
               </div>
             </Card>
 
-            {/* TOTAL TRANSAKSI */}
+            {/* total transaksi */}
             <Card className="xl:col-span- shadow-md px-5 py-3 flex flex-col justify-between min-h-[180px] md:min-h-[220px]">
               <div>
                 <p className="text-sm md:text-lg text-gray-500 font-medium leading-none">
@@ -406,7 +406,7 @@ function LaporanPenjualan() {
               </button>
             </Card>
 
-            {/* MODAL */}
+            {/* modal */}
             <Modal
               isOpen={openDetail}
               onClose={() => setOpenDetail(false)}
@@ -420,7 +420,7 @@ function LaporanPenjualan() {
               )}
             </Modal>
 
-            {/* RATA RATA + PRODUK TERJUAL */}
+            {/* rata rata + produk terjual */}
             <div className="flex flex-col gap-1">
               <Card className="shadow-md px-4 py-2">
                 <p className="text-xs sm:text-sm md:text-[15px] text-gray-500 font-medium leading-none">
@@ -509,13 +509,13 @@ function LaporanPenjualan() {
               </Card>
             </div>
 
-            {/* METODE PEMBAYARAN */}
+            {/* metode pembayaran */}
             <Card className="shadow-md px-4 py-3 flex flex-col">
               <p className="text-sm md:text-base text-gray-500 font-medium mb-3">
                 Metode Pembayaran
               </p>
 
-              {/* CASH */}
+              {/* cash */}
               <div className="mb-3">
                 <div className="flex justify-between items-center text-sm mb-0.5">
                   <span>Cash</span>
@@ -543,7 +543,7 @@ function LaporanPenjualan() {
                 </p>
               </div>
 
-              {/* CASHLESS */}
+              {/* cashless */}
               <div>
                 <div className="flex justify-between items-center text-sm mb-0.5">
                   <span>Cashless</span>
@@ -571,7 +571,7 @@ function LaporanPenjualan() {
                 </p>
               </div>
 
-              {/* TOTAL */}
+              {/* total */}
               <div className="mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-600">
                   Total:
@@ -588,11 +588,7 @@ function LaporanPenjualan() {
             </Card>
           </div>
 
-          {/* // */}
-          {/* // */}
-          {/* // */}
-
-          {/* Grafik + Progress Bar */}
+          {/* grafik + progress bar */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
             <Card className="xl:col-span-2 shadow-md">
               <div className="flex items-center justify-between mb-4">

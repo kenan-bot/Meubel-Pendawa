@@ -21,7 +21,7 @@ public class MidtransConfig {
     @Value("${midtrans.is-production:false}")
     private boolean isProduction;
 
-    // Dipakai buat generate Snap Token (langkah 4 di alur yang saya jelaskan sebelumnya)
+    //generate Snap Token
     @Bean
     public MidtransSnapApi midtransSnapApi() {
         Config config = Config.builder()
@@ -32,8 +32,7 @@ public class MidtransConfig {
         return new ConfigFactory(config).getSnapApi();
     }
 
-    // Dipakai di webhook (langkah 6) untuk cross-check status transaksi LANGSUNG ke
-    // Midtrans -- ini rekomendasi resmi Midtrans daripada percaya isi body notifikasi mentah-mentah.
+    //midtrans
     @Bean
     public MidtransCoreApi midtransCoreApi() {
         Config config = Config.builder()

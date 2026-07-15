@@ -64,7 +64,7 @@ public class LaporanPenjualanService {
 
                 LaporanPenjualanSummaryResponse response = new LaporanPenjualanSummaryResponse();
 
-                // PERIODE SEKARANG
+                //periode sekarang
 
                 Double totalOmzet = transaksiRepository.getTotalOmzetByPeriode(
                                 startDate, endDate);
@@ -91,7 +91,7 @@ public class LaporanPenjualanService {
                 response.setCash(cash);
                 response.setCashless(cashless);
 
-                // PERIODE SEBELUMNYA
+                //periode sebelumnya
 
                 long jumlahHari = ChronoUnit.DAYS.between(
                                 startDate.toLocalDate(),
@@ -116,7 +116,7 @@ public class LaporanPenjualanService {
                                 previousStart,
                                 previousEnd);
 
-                // GROWTH
+                //growth
 
                 response.setOmzetGrowth(
                                 hitungGrowth(totalOmzet, previousOmzet));
@@ -134,7 +134,7 @@ public class LaporanPenjualanService {
                                                 produkTerjual == null ? 0.0 : produkTerjual.doubleValue(),
                                                 previousProduk == null ? 0.0 : previousProduk.doubleValue()));
 
-                // LABEL
+                //label
 
                 if (jumlahHari == 1) {
                         response.setComparisonLabel("dibanding kemarin");
@@ -142,7 +142,7 @@ public class LaporanPenjualanService {
                         response.setComparisonLabel("dibanding periode sebelumnya");
                 }
 
-                // MINI CHART
+                //mini chart
 
                 response.setTrend(
                                 getTrenPenjualan(startDate, endDate));
@@ -209,7 +209,7 @@ public class LaporanPenjualanService {
 
                         String label;
 
-                        // HARIAN
+                        //harian
                         if (jumlahHari == 0) {
 
                                 label = String.format(
@@ -218,7 +218,7 @@ public class LaporanPenjualanService {
 
                         }
 
-                        // BULANAN
+                        //bulanan
                         else if (jumlahHari <= 31) {
 
                                 label = String.valueOf(
@@ -226,7 +226,7 @@ public class LaporanPenjualanService {
 
                         }
 
-                        // TAHUNAN
+                        //tahunan
                         else {
 
                                 label = transaksi.getTanggalTransaksi()

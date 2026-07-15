@@ -18,7 +18,7 @@ const TransaksiContext = createContext(null);
 export function TransaksiProvider({ children }) {
   const { produk, loading, reloadProduk } = useProduk();
 
-  // ----- form pemesan -----
+  //form pemesan
   const [namaPemesan, setNamaPemesan] = useState("");
   const [noWhatsapp, setNoWhatsapp] = useState("");
   const [alamatPengiriman, setAlamatPengiriman] = useState("");
@@ -50,7 +50,7 @@ export function TransaksiProvider({ children }) {
     }
   }, [isDelivery]);
 
-  // ----- filter produk -----
+  //filter produk
   const [keyword, setKeyword] = useState("");
   const [kategoriPick, setKategoriPick] = useState(null);
   const [merekPick, setMerekPick] = useState(null);
@@ -90,7 +90,7 @@ export function TransaksiProvider({ children }) {
     [produk, keyword, kategoriPick, merekPick, selectedStatus],
   );
 
-  // ----- keranjang -----
+  //keranjang
   const [keranjang, setKeranjang] = useState([]);
   const [waktu] = useState(new Date());
   const [jumlahBayar, setJumlahBayar] = useState("");
@@ -98,15 +98,13 @@ export function TransaksiProvider({ children }) {
   const [pesan, setPesan] = useState("");
   const [pesanType, setPesanType] = useState("error");
 
-  // ----- pembayaran QRIS (Midtrans) -----
+  //pembayaran qris (midtrans)
   const [showQrisModal, setShowQrisModal] = useState(false);
-  const [qrisStatus, setQrisStatus] = useState("loading"); // "loading" | "error"
+  const [qrisStatus, setQrisStatus] = useState("loading"); 
   const [qrisMessage, setQrisMessage] = useState("");
   const closeQrisModal = () => setShowQrisModal(false);
 
-  // ----- struk pesanan (muncul setelah pesanan berhasil diproses) -----
-  // Diisi dari snapshot data pesanan (bukan dibaca ulang dari keranjang/form) karena
-  // keranjang & form sudah direset begitu pesanan selesai diproses.
+  //struk pesanan
   const [strukData, setStrukData] = useState(null);
   const closeStruk = () => setStrukData(null);
 
@@ -122,7 +120,7 @@ export function TransaksiProvider({ children }) {
   }, [pesan]);
 
   const tambahKeKeranjang = (item) => {
-    // Produk nonaktif tidak boleh dijual
+    //produk nonaktif tidak boleh dijual
     if (!item.statusAktif) {
       tampilkanPesan(
         `Produk "${item.namaProduk}" sedang dinonaktifkan dan tidak dapat dijual.`,
@@ -131,7 +129,7 @@ export function TransaksiProvider({ children }) {
       return;
     }
 
-    // Stok habis
+    //stok habis
     if (item.stok === 0) {
       tampilkanPesan(`${item.namaProduk} stoknya habis.`, "error");
       return;
@@ -216,15 +214,11 @@ export function TransaksiProvider({ children }) {
       return tampilkanPesan("Alamat & driver wajib diisi untuk Delivery.");
     if (keranjang.length === 0)
       return tampilkanPesan("Keranjang masih kosong.");
-    // Untuk CASHLESS, nominal yang dibayar mengikuti gross_amount di Midtrans (persis totalPesanan),
-    // jadi input "Jumlah Bayar" manual tidak wajib divalidasi seperti alur CASH.
+    
     if (!isCashless && (!jumlahBayar || Number(jumlahBayar) < totalPesanan)) {
       return tampilkanPesan("Jumlah bayar belum mencukupi total pesanan.");
     }
 
-    // Snapshot data pesanan SEBELUM keranjang/form direset -- dipakai untuk tampilkan
-    // struk setelah pesanan selesai diproses (baik jalur CASH langsung, maupun CASHLESS
-    // yang baru "selesai" setelah callback Snap sukses, saat form sudah kosong lagi).
     const snapshotItems = keranjang.map((c) => ({
       namaProduk: c.produk.namaProduk,
       qty: c.qty,
@@ -253,6 +247,8 @@ export function TransaksiProvider({ children }) {
         metodePembayaran,
         driver: isDelivery ? { idKaryawan: driverId } : null,
       });
+
+      //simpan detail
       for (const item of keranjang) {
         await createDetailTransaksi({
           qty: item.qty,
@@ -260,19 +256,17 @@ export function TransaksiProvider({ children }) {
           produk: { idProduk: item.produk.idProduk },
           transaksi: { orderId: transaksiBaru.orderId },
         });
-        // Backend sudah decrement stok di titik ini (lihat DetailTransaksiService), jadi
-        // sinkronkan juga stok di ProdukContext biar grid produk ikut update tanpa refresh manual.
       }
 
+      //bayar qris
       if (isCashless) {
-        // Order & detail sudah tersimpan; sisanya (buka Snap, tunggu bayar) ditangani terpisah.
-        // Kalau gagal siapkan Snap Token, JANGAN resetForm -- biarkan kasir retry tanpa input ulang.
         const berhasilSiapkanQris = await bayarViaMidtrans(
           transaksiBaru.orderId,
           () => buatSnapshotStruk(transaksiBaru.orderId, totalPesanan, 0),
         );
         if (!berhasilSiapkanQris) return;
       } else {
+        //bayar cash
         await prosesPembayaran(transaksiBaru.orderId, Number(jumlahBayar));
         const kembalianFinal = Number(jumlahBayar) - totalPesanan;
         tampilkanPesan(
@@ -299,9 +293,7 @@ export function TransaksiProvider({ children }) {
     }
   };
 
-  // Dipanggil saat popup QRIS ditutup/error tanpa selesai bayar. Order dihapus di backend
-  // (kecuali ternyata sudah terlanjur SUCCESS -- lihat batalkanTransaksi di TransaksiService),
-  // lalu daftar produk di-reload supaya stok yang dikembalikan backend ikut kesinkron di UI.
+  //batalkan qris
   const batalkanOrderQris = async (orderId) => {
     try {
       await batalkanTransaksi(orderId);
@@ -314,9 +306,7 @@ export function TransaksiProvider({ children }) {
     }
   };
 
-  // Ambil Snap Token dari backend lalu buka popup pembayaran Midtrans.
-  // Status akhir (SUCCESS/FAILED) sebenarnya diputuskan lewat webhook backend (langkah 6),
-  // callback di sini cuma untuk feedback cepat ke kasir di layar.
+  //bayar midtrans
   const bayarViaMidtrans = async (orderId, buatSnapshotStruk) => {
     setQrisStatus("loading");
     setQrisMessage("Menyiapkan pembayaran, mohon tunggu...");
@@ -326,7 +316,7 @@ export function TransaksiProvider({ children }) {
       const { token, clientKey, isProduction } = await buatSnapToken(orderId);
       await loadMidtransScript(clientKey, isProduction);
 
-      setShowQrisModal(false); // biar popup Snap yang tampil, bukan numpuk sama modal kita
+      setShowQrisModal(false); //biar popup snap yang tampil, bukan numpuk sama modal kita
 
       window.snap.pay(token, {
         onSuccess: () => {

@@ -59,9 +59,9 @@ function ProductSection() {
 
   return (
     <section id="collections" className="scroll-mt-32 max-w-7xl mx-auto">
-      {/* Filter Area */}
+      {/* filter area */}
       <div className="mt-20 px-4 md:px-8 lg:px-12">
-        {/* Mobile */}
+        {/* mobile */}
         <div className="flex flex-col gap-3 ml-6 md:ml-0 md:hidden">
           <SearchBar
             value={searchTerm}
@@ -84,7 +84,7 @@ function ProductSection() {
           </div>
         </div>
 
-        {/* Desktop */}
+        {/* desktop */}
         <div className="hidden md:flex ml-8 items-center gap-4">
           <SearchBar
             value={searchTerm}
