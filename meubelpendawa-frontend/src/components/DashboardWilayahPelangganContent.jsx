@@ -92,7 +92,7 @@ function DashboardWilayahPelangganContent({ wilayah = [] }) {
 
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-red-600"></span>
-          ≥30
+          ≥30 (Transaksi)
         </div>
       </div>
     </div>

@@ -64,7 +64,7 @@ function DashboardProdukTerlarisContent({ produk = [] }) {
                 className={`
                   ${style.bg}
                   ${style.height}
-                  rounded-md
+                  rounded-xl
                   px-3 sm:px-4
                   flex
                   items-center

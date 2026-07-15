@@ -39,7 +39,7 @@ export default function Sidebar({ menus }) {
   return (
     <>
       <nav
-        className={`shadow-md h-screen p-2 flex flex-col duration-500 bg-orange-500 
+        className={`shadow-md z-50 h-screen p-2 flex flex-col duration-500 bg-orange-500 
           text-white ${open ? "w-40 sm:w-48 md:w-60" : "w-14 sm:w-16"}`}
       >
         {/* header */}

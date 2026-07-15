@@ -182,40 +182,40 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
 
       {/* KPI */}
 
-      <div className="mb-5 grid grid-cols-3 gap-3">
+      <div className="mb-4 grid grid-cols-3 gap-2">
         {/* Total Transaksi */}
-        <div className="rounded-xl border border-orange-500 hover:scale-105 duration-300 bg-orange-50/70 px-5 py-3 flex flex-col justify-center">
-          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+        <div className="rounded-xl border border-orange-500 bg-orange-50/70 px-4 py-2 flex flex-col justify-center transition-all duration-300 hover:scale-105">
+          <span className="text-[10px] uppercase tracking-wide text-gray-500">
             Total Transaksi
           </span>
 
-          <span className="mt-1 text-3xl font-bold text-gray-800 leading-none">
+          <span className="mt-0.5 text-2xl font-bold text-gray-800 leading-none">
             {statistik.totalTransaksi}
           </span>
         </div>
 
         {/* Peak Hour */}
-        <div className="rounded-xl border border-orange-200 hover:scale-105 duration-300 bg-white px-5 py-3 flex flex-col justify-center">
-          <span className="text-[11px] uppercase tracking-wide text-gray-500">
-            Peak Hour
+        <div className="rounded-xl border border-orange-200 bg-white px-4 py-2 flex flex-col justify-center transition-all duration-300 hover:scale-105">
+          <span className="text-[10px] uppercase tracking-wide text-gray-500">
+            Aktivitas Tersibuk
           </span>
 
-          <span className="mt-1 text-xl font-bold text-gray-800 leading-none">
+          <span className="mt-0.5 text-lg font-bold text-gray-800 leading-none">
             {statistik.peakHari}
           </span>
 
-          <span className="mt-1 text-sm text-gray-500 leading-none">
+          <span className="mt-0.5 text-xs text-gray-500 leading-none">
             {statistik.peakInterval}
           </span>
         </div>
 
         {/* Omzet */}
-        <div className="rounded-xl border border-orange-200 hover:scale-105 duration-300 bg-white px-5 py-3 flex flex-col justify-center">
-          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+        <div className="rounded-xl border border-orange-200 bg-white px-4 py-2 flex flex-col justify-center transition-all duration-300 hover:scale-105">
+          <span className="text-[10px] uppercase tracking-wide text-gray-500">
             Omzet
           </span>
 
-          <span className="mt-1 text-2xl font-bold text-gray-800 leading-none">
+          <span className="mt-0.5 text-xl font-bold text-gray-800 leading-none">
             {formatRupiah(statistik.totalOmzet)}
           </span>
         </div>

@@ -265,7 +265,7 @@ function Dashboard() {
 
         {/* Row 4 */}
         <div className="col-span-2 row-span-1">
-          <Card dashboard className="h-[430px] overflow-hidden">
+          <Card dashboard className="h-[450px] overflow-hidden">
             {topWilayahPelanggan.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-gray-400">Memuat peta...</span>
