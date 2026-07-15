@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import com.meubelpendawa.dto.dashboard.DashboardTrafikResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTrafikSummaryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTrafikTransaksiResponse;
-import com.meubelpendawa.model.Transaksi;
 import com.meubelpendawa.repository.TransaksiRepository;
 
 @Service
@@ -113,18 +112,18 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
 
             LocalDate tanggal = tanggalAwal.plusDays(hari);
 
-            for (int jam = 7; jam < 23; jam += 2) {
+            for (int offset = 0; offset < 12; offset++) {
+
+                int jam = (6 + (offset * 2)) % 24;
 
                 LocalDateTime waktuBucket = tanggal.atTime(jam, 0);
 
                 DashboardTrafikTransaksiResponse dto = createEmptyBucket(
                         waktuBucket,
                         LocalTime.of(jam, 0),
-                        LocalTime.of(jam + 2, 0));
+                        LocalTime.of((jam + 2) % 24, 0));
 
-                buckets.put(
-                        waktuBucket,
-                        dto);
+                buckets.put(waktuBucket, dto);
             }
         }
 
@@ -135,18 +134,13 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
 
         int jam = waktuTransaksi.getHour();
 
-        // sebelum jam operasional
-        if (jam < 7) {
-            jam = 7;
-        }
+        jam = (jam / 2) * 2;
 
-        // setelah jam operasional
-        if (jam >= 23) {
-            jam = 21;
+        if (jam < 6) {
+            return waktuTransaksi
+                    .toLocalDate()
+                    .atTime(jam, 0);
         }
-
-        // pembulatan ke bawah setiap 2 jam
-        jam = 7 + ((jam - 7) / 2) * 2;
 
         return waktuTransaksi
                 .toLocalDate()
@@ -179,11 +173,23 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
                 startDate,
                 endDate);
 
+        Map<LocalDate, LocalDateTime> transaksiTerakhirPerHari = new HashMap<>();
+
         for (Transaksi transaksi : transaksiList) {
 
             LocalDateTime bucketTime = getBucketTime(transaksi.getTanggalTransaksi());
 
             DashboardTrafikTransaksiResponse bucket = buckets.get(bucketTime);
+
+            LocalDate tanggal = transaksi.getTanggalTransaksi()
+                    .toLocalDate();
+
+            transaksiTerakhirPerHari.merge(
+                    tanggal,
+                    transaksi.getTanggalTransaksi(),
+                    (lama, baru) -> baru.isAfter(lama)
+                            ? baru
+                            : lama);
 
             if (bucket == null) {
                 continue;
@@ -212,13 +218,27 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
                         bucket.getTotalCashless() + nominal);
             }
 
-            // Simpan transaksi terakhir pada bucket
-            bucket.setTransaksiTerakhir(
-                    transaksi.getTanggalTransaksi());
         }
 
         // Hitung rata-rata transaksi
+
         for (DashboardTrafikTransaksiResponse bucket : buckets.values()) {
+
+            LocalDateTime waktu = bucket.getWaktu();
+
+            LocalTime jamMulai = waktu.toLocalTime();
+
+            LocalTime jamSelesai = jamMulai.plusHours(2);
+
+            bucket.setTanggal(waktu.toLocalDate());
+
+            bucket.setHari(
+                    getNamaHari(waktu.getDayOfWeek()));
+
+            bucket.setIntervalJam(
+                    formatIntervalJam(
+                            jamMulai,
+                            jamSelesai));
 
             if (bucket.getTotalTransaksi() > 0) {
 
@@ -230,27 +250,10 @@ public class DashboardTrafikServiceImpl implements DashboardTrafikService {
 
                 bucket.setRataRataTransaksi(0.0);
             }
-        }
 
-        for (DashboardTrafikTransaksiResponse bucket : buckets.values()) {
-
-            LocalDateTime waktu = bucket.getWaktu();
-
-            LocalTime jamMulai = waktu.toLocalTime();
-
-            LocalTime jamSelesai = jamMulai.plusHours(2);
-
-            bucket.setTanggal(
-                    waktu.toLocalDate());
-
-            bucket.setHari(
-                    getNamaHari(
-                            waktu.getDayOfWeek()));
-
-            bucket.setIntervalJam(
-                    formatIntervalJam(
-                            jamMulai,
-                            jamSelesai));
+            bucket.setTransaksiTerakhir(
+                    transaksiTerakhirPerHari.get(
+                            waktu.toLocalDate()));
         }
 
         List<DashboardTrafikTransaksiResponse> chart = new ArrayList<>(buckets.values());

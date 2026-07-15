@@ -7,6 +7,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Label,
 } from "recharts";
 
 import { FaRupiahSign } from "react-icons/fa6";
@@ -82,19 +83,18 @@ const CustomTooltip = ({ active, payload, label }) => {
             <span>Transaksi</span>
           </div>
 
-          <span className="font-bold text-xl text-orange-500">{item.totalTransaksi ?? 0}</span>
+          <span className="font-bold text-xl text-orange-500">
+            {item.totalTransaksi ?? 0}
+          </span>
         </div>
 
-        
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-500">
             <FaRupiahSign size={15} />
             <span>Omzet</span>
           </div>
 
-          <span className="font-bold">
-            {formatRupiah(item.totalOmzet)}
-          </span>
+          <span className="font-bold">{formatRupiah(item.totalOmzet)}</span>
         </div>
 
         <div className="border-t border-gray-100 pt-3 mt-3 space-y-2">
@@ -168,16 +168,21 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
     peakOmzet: 0,
   };
 
-  const chartData = chart.map((item, index) => ({
-    ...item,
+  const chartData = chart.map((item, index) => {
+    const previous = chart[index - 1];
 
-    hariLabel:
-      index === 0 || chart[index - 1].hari !== item.hari ? item.hari : "",
+    return {
+      ...item,
 
-    isPeak:
-      item.hari === statistik.peakHari &&
-      item.intervalJam === statistik.peakInterval,
-  }));
+      hariLabel: !previous || previous.hari !== item.hari ? item.hari : "",
+
+      isPeak:
+        item.hari === statistik.peakHari &&
+        item.intervalJam === statistik.peakInterval,
+
+      value: item.totalTransaksi === 0 ? null : item.totalTransaksi,
+    };
+  });
 
   return (
     <motion.div
@@ -340,6 +345,7 @@ function DashboardTrafikTransaksiContent({ summary, chart = [] }) {
               tick={{
                 fill: "#9ca3af",
                 fontSize: 11,
+                fontWeight: 550,
               }}
             />
 
