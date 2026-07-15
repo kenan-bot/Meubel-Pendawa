@@ -8,6 +8,8 @@ import {
   getTransaksiTerbaru,
   getTopWilayahPelanggan,
   getDeliveryVsPickup,
+  getStokMenipis,
+  getTrafikTransaksiMingguan,
 } from "../api/dashboardApi";
 
 import AnimatedCount from "../components/AnimatedCount";
@@ -19,6 +21,8 @@ import DashboardMerekPopulerContent from "../components/DashboardMerekPopuler";
 import DashboardTransaksiTerbaruContent from "../components/DashboardTransaksiTerbaruContent";
 import DashboardWilayahPelangganContent from "../components/DashboardWilayahPelangganContent";
 import DashboardDeliveryVsPickupContent from "../components/DashboardDeliveryVsPickupContent";
+import DashboardStokMenipisContent from "../components/DashboardStokMenipisContent";
+import DashboardTrafikTransaksiContent from "../components/DashboardTrafikTransaksiContent";
 
 function Dashboard() {
   //card pengiriman
@@ -104,6 +108,30 @@ function Dashboard() {
       console.error("Gagal memuat data delivery vs pickup", error);
     }
   };
+
+  // card stok menipis
+  const [stokMenipis, setStokMenipis] = useState([]);
+  const loadStokMenipis = async () => {
+    try {
+      const response = await getStokMenipis();
+
+      setStokMenipis(response);
+    } catch (error) {
+      console.error("Gagal memuat stok menipis", error);
+    }
+  };
+
+  // card trafik transaksi mingguan
+  const [trafikTransaksi, setTrafikTransaksi] = useState([]);
+  const loadTrafikTransaksi = async () => {
+    try {
+      const response = await getTrafikTransaksiMingguan();
+
+      setTrafikTransaksi(response);
+    } catch (error) {
+      console.error("Gagal memuat trafik transaksi", error);
+    }
+  };
   useEffect(() => {
     loadPengiriman();
     loadTransaksiTerbesar();
@@ -112,6 +140,8 @@ function Dashboard() {
     loadTransaksiTerbaru();
     loadTopWilayahPelanggan();
     loadDeliveryPickup();
+    loadStokMenipis();
+    loadTrafikTransaksi();
   }, []);
 
   return (
@@ -149,7 +179,7 @@ function Dashboard() {
 
         <div className="col-span-1 row-span-1">
           <Card dashboard className="h-[170px]">
-            {topMerekPopuler.length === 0 ? (
+            {!topMerekPopuler || topMerekPopuler.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <span className="text-gray-400">Memuat merek populer...</span>
               </div>
@@ -190,7 +220,13 @@ function Dashboard() {
         {/* Row 2-3 */}
         <div className="col-span-2 row-span-2">
           <Card dashboard className="h-[480px]">
-            <p className="font-bold text-center">Trafik Transaksi Mingguan</p>
+            {trafikTransaksi.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-gray-400">Memuat grafik...</span>
+              </div>
+            ) : (
+              <DashboardTrafikTransaksiContent data={trafikTransaksi} />
+            )}
           </Card>
         </div>
 
@@ -214,7 +250,13 @@ function Dashboard() {
 
         <div className="col-span-1 row-span-1">
           <Card dashboard className="h-[270px]">
-            <p className="font-bold text-center">Stok Menipis</p>
+            {stokMenipis.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <span className="text-gray-400">Memuat stok menipis...</span>
+              </div>
+            ) : (
+              <DashboardStokMenipisContent produk={stokMenipis} />
+            )}
           </Card>
         </div>
 

@@ -3,6 +3,7 @@ package com.meubelpendawa.repository;
 import com.meubelpendawa.model.Produk;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface ProdukRepository extends JpaRepository<Produk, String> {
 
@@ -26,4 +27,8 @@ public interface ProdukRepository extends JpaRepository<Produk, String> {
 
     List<Produk> findByNamaProdukContainingIgnoreCaseAndStatusAktifTrue(
             String keyword);
+
+    List<Produk> findAllByOrderByStokAsc(Pageable pageable);
+
+    List<Produk> findByStokLessThanEqualOrderByStokAsc(Integer stok);
 }

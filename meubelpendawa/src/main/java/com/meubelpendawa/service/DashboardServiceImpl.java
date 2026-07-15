@@ -1,5 +1,6 @@
 package com.meubelpendawa.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -7,9 +8,11 @@ import java.util.List;
 
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
+import com.meubelpendawa.dto.dashboard.DashboardStokMenipisResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbaruResponse;
 import com.meubelpendawa.repository.DetailTransaksiRepository;
 import com.meubelpendawa.repository.PengirimanRepository;
+import com.meubelpendawa.repository.ProdukRepository;
 import com.meubelpendawa.repository.TransaksiRepository;
 import com.meubelpendawa.utils.WilayahUtil;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbesarResponse;
@@ -17,18 +20,24 @@ import com.meubelpendawa.dto.dashboard.DashboardWilayahPelangganResponse;
 import com.meubelpendawa.model.Transaksi;
 import com.meubelpendawa.utils.Koordinat;
 import com.meubelpendawa.utils.WilayahMap;
-
+import java.sql.Date;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
+
+import com.meubelpendawa.dto.dashboard.DashboardTrafikTransaksiResponse;
 import java.util.stream.Collectors;
 
 import com.meubelpendawa.dto.dashboard.DashboardDeliveryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardDriverResponse;
 import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.model.Pengiriman;
+import com.meubelpendawa.model.Produk;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -36,15 +45,21 @@ public class DashboardServiceImpl implements DashboardService {
         private final PengirimanRepository pengirimanRepository;
         private final TransaksiRepository transaksiRepository;
         private final DetailTransaksiRepository detailTransaksiRepository;
+        private final ProdukRepository produkRepository;
+        private final DashboardTrafikService dashboardTrafikService;
 
         public DashboardServiceImpl(
                         PengirimanRepository pengirimanRepository,
                         TransaksiRepository transaksiRepository,
-                        DetailTransaksiRepository detailTransaksiRepository) {
+                        DetailTransaksiRepository detailTransaksiRepository,
+                        ProdukRepository produkRepository,
+                        DashboardTrafikService dashboardTrafikService) {
 
                 this.pengirimanRepository = pengirimanRepository;
                 this.transaksiRepository = transaksiRepository;
                 this.detailTransaksiRepository = detailTransaksiRepository;
+                this.produkRepository = produkRepository;
+                this.dashboardTrafikService = dashboardTrafikService;
         }
 
         // pengiriman
@@ -320,4 +335,26 @@ public class DashboardServiceImpl implements DashboardService {
                                 persentasePickup,
                                 insight);
         }
+
+        // stok menipis
+        @Override
+        public List<DashboardStokMenipisResponse> getStokMenipis() {
+
+                List<Produk> produkList = produkRepository.findByStokLessThanEqualOrderByStokAsc(5);
+
+                return produkList.stream()
+                                .map(produk -> new DashboardStokMenipisResponse(
+                                                produk.getNamaProduk(),
+                                                produk.getStok()))
+                                .toList();
+        }
+
+        // trafik mingguan
+        @Override
+        public List<DashboardTrafikTransaksiResponse> getTrafikTransaksiMingguan() {
+
+                return dashboardTrafikService.getTrafikTransaksiMingguan();
+
+        }
+
 }

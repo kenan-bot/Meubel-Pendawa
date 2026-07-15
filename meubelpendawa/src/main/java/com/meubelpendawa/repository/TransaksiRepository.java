@@ -153,4 +153,15 @@ public interface TransaksiRepository extends JpaRepository<Transaksi, String> {
         List<Transaksi> getTrenPenjualanByPeriode(
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
+
+        @Query("""
+                            SELECT t
+                            FROM Transaksi t
+                            WHERE t.statusPembayaran = 'SUCCESS'
+                            AND t.tanggalTransaksi BETWEEN :startDate AND :endDate
+                            ORDER BY t.tanggalTransaksi ASC
+                        """)
+        List<Transaksi> getTrafikTransaksi(
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 }

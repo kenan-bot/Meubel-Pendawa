@@ -11,6 +11,8 @@ import com.meubelpendawa.dto.dashboard.DashboardDeliveryResponse;
 import com.meubelpendawa.dto.dashboard.DashboardMerekPopulerResponse;
 import com.meubelpendawa.dto.dashboard.DashboardPengirimanResponse;
 import com.meubelpendawa.dto.dashboard.DashboardProdukTerlarisResponse;
+import com.meubelpendawa.dto.dashboard.DashboardStokMenipisResponse;
+import com.meubelpendawa.dto.dashboard.DashboardTrafikTransaksiResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbaruResponse;
 import com.meubelpendawa.dto.dashboard.DashboardTransaksiTerbesarResponse;
 import com.meubelpendawa.dto.dashboard.DashboardWilayahPelangganResponse;
@@ -73,5 +75,18 @@ public class DashboardController {
 
         return ResponseEntity.ok(
                 dashboardService.getDeliveryVsPickup());
+    }
+
+    @GetMapping("/stok-menipis")
+    public ResponseEntity<List<DashboardStokMenipisResponse>> getStokMenipis() {
+
+        return ResponseEntity.ok(
+                dashboardService.getStokMenipis());
+    }
+
+    @GetMapping("/trafik-mingguan")
+    public List<DashboardTrafikTransaksiResponse> getTrafikTransaksiMingguan() {
+
+        return dashboardService.getTrafikTransaksiMingguan();
     }
 }
