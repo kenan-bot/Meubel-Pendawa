@@ -37,7 +37,7 @@ public interface TransaksiRepository extends JpaRepository<Transaksi, String> {
 
         Transaksi findFirstByOrderIdStartingWithOrderByOrderIdDesc(String prefix);
 
-        // KPI LAPORAN PENJUALAN
+        //kpi laporan penjualan
 
         @Query("""
                         SELECT COALESCE(SUM(t.totalPesanan), 0)
@@ -60,7 +60,7 @@ public interface TransaksiRepository extends JpaRepository<Transaksi, String> {
                         """)
         Double getRataRataPembelian();
 
-        // FILTER TANGGAL
+        //filter tanggal
 
         @Query("""
                         SELECT COALESCE(SUM(t.totalPesanan), 0)
@@ -92,7 +92,7 @@ public interface TransaksiRepository extends JpaRepository<Transaksi, String> {
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
 
-        // METODE PEMBAYARAN
+        // metode pembayaran
 
         @Query("""
                             SELECT COALESCE(SUM(t.totalPesanan),0)

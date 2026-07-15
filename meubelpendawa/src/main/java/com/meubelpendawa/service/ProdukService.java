@@ -58,7 +58,7 @@ public class ProdukService {
             throw new RuntimeException("Stok tidak boleh negatif");
         }
 
-        // Produk baru selalu aktif
+        //produk baru selalu aktif
         produk.setStatusAktif(true);
 
         return produkRepository.save(produk);
@@ -90,8 +90,8 @@ public class ProdukService {
         existing.setKategori(produk.getKategori());
         existing.setMerek(produk.getMerek());
 
-        // statusAktif sengaja tidak diubah di sini
-        // karena perubahan status hanya melalui endpoint aktif/nonaktif
+        //statusAktif sengaja tidak diubah di sini
+        //karena perubahan status hanya melalui endpoint aktif/nonaktif
 
         return produkRepository.save(existing);
     }

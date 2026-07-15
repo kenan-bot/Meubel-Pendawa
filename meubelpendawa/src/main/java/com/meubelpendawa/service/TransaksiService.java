@@ -156,7 +156,7 @@ public class TransaksiService {
 
         Map<String, Object> transactionDetails = new HashMap<>();
         transactionDetails.put("order_id", transaksi.getOrderId());
-        // Midtrans butuh gross_amount bulat (tanpa desimal)
+        //midtrans butuh gross_amount bulat (tanpa desimal)
         transactionDetails.put("gross_amount", transaksi.getTotalPesanan().longValue());
 
         Map<String, Object> customerDetails = new HashMap<>();
@@ -166,8 +166,7 @@ public class TransaksiService {
         Map<String, Object> params = new HashMap<>();
         params.put("transaction_details", transactionDetails);
         params.put("customer_details", customerDetails);
-        // Batasi cuma QRIS -- kalau tidak di-set, Snap nampilin SEMUA metode pembayaran
-        // aktif di akun Midtrans (VA, kartu, dst), bukan cuma QRIS.
+        
         params.put("enabled_payments", java.util.List.of("other_qris"));
 
         String token = midtransSnapApi.createTransactionToken(params);

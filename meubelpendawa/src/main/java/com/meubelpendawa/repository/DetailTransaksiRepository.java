@@ -18,7 +18,7 @@ public interface DetailTransaksiRepository extends JpaRepository<DetailTransaksi
 
         DetailTransaksi findFirstByOrderByIdDetailTransaksiDesc();
 
-        // KPI LAPORAN PENJUALAN
+        //kpi laporan penjualan
 
         @Query("""
                         SELECT COALESCE(SUM(d.qty), 0)

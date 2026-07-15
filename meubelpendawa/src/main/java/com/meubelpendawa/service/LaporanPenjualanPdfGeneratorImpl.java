@@ -56,9 +56,7 @@ public class LaporanPenjualanPdfGeneratorImpl
                         pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new PdfFooterHandler());
                         Document document = new Document(pdf);
 
-                        // =========================
-                        // HEADER
-                        // =========================
+                        //header
 
                         document.add(new Paragraph("LAPORAN PENJUALAN")
                                         .setBold().setFontSize(20).setFontColor(ORANGE)
@@ -71,9 +69,7 @@ public class LaporanPenjualanPdfGeneratorImpl
                         document.add(new Paragraph("Tanggal Cetak : " + data.getTanggalCetak()));
                         document.add(new Paragraph(" "));
 
-                        // =========================
-                        // KPI SUMMARY
-                        // =========================
+                        // kpi summary
 
                         document.add(new Paragraph("Ringkasan Penjualan")
                                         .setBold().setFontSize(14).setFontColor(ORANGE));
@@ -88,19 +84,19 @@ public class LaporanPenjualanPdfGeneratorImpl
                         Table kpiTable = new Table(UnitValue.createPercentArray(new float[] { 50, 50 }))
                                         .useAllAvailableWidth();
 
-                        // Total Omzet
+                        //total omzet
                         kpiTable.addCell(new Cell().add(new Paragraph("Total Omzet"))
                                         .add(new Paragraph(formatRupiah(summary.getTotalOmzet())).setBold()));
 
-                        // Total Transaksi
+                        //total transaksi
                         kpiTable.addCell(new Cell().add(new Paragraph("Total Transaksi"))
                                         .add(new Paragraph(String.valueOf(summary.getTotalTransaksi())).setBold()));
 
-                        // Produk Terjual
+                        //produk terjual
                         kpiTable.addCell(new Cell().add(new Paragraph("Produk Terjual"))
                                         .add(new Paragraph(String.valueOf(summary.getProdukTerjual())).setBold()));
 
-                        // Rata-rata Pembelian
+                        //rata-rata pembelian
                         kpiTable.addCell(new Cell().add(new Paragraph("Rata-rata Pembelian"))
                                         .add(new Paragraph(formatRupiah(summary.getRataRataPembelian())).setBold()));
 
@@ -124,9 +120,7 @@ public class LaporanPenjualanPdfGeneratorImpl
 
                         document.add(new Paragraph(" "));
 
-                        // =========================
-                        // TOP 5 PRODUK
-                        // =========================
+                        // top 5 produk
 
                         document.add(new Paragraph("Kontribusi Produk")
                                         .setBold().setFontSize(14).setFontColor(ORANGE));
@@ -160,9 +154,7 @@ public class LaporanPenjualanPdfGeneratorImpl
 
                         document.add(new Paragraph(" "));
 
-                        // =========================
-                        // GRAFIK TREN PENJUALAN
-                        // =========================
+                        //grafik tren penjualan
 
                         document.add(new Paragraph("Tren Penjualan").setBold().setFontSize(14)
                                         .setFontColor(ORANGE));
@@ -170,9 +162,7 @@ public class LaporanPenjualanPdfGeneratorImpl
 
                         document.add(new AreaBreak());
 
-                        // DETAIL PENJUALAN
-                        // =========================
-
+                        // detail penjualan
 
                         document.add(new Paragraph(" "));
 

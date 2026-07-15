@@ -34,7 +34,7 @@ public class LaporanPenjualanController {
         }
 
         
-        // SUMMARY
+        //summary
 
         @GetMapping("/summary")
         public ResponseEntity<LaporanPenjualanSummaryResponse> getSummary(
@@ -53,7 +53,7 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        // DETAIL PENJUALAN
+        //detail penjualan
 
         @GetMapping("/detail")
         public ResponseEntity<List<LaporanPenjualanDetailResponse>> getDetailPenjualan(
@@ -66,7 +66,7 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        // KONTRIBUSI PRODUK
+        //kontribusi produk
 
         @GetMapping("/kontribusi-produk")
         public ResponseEntity<List<KontribusiProdukResponse>> getKontribusiProduk(
@@ -79,7 +79,7 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        // TREN PENJUALAN
+        //tren penjualan
 
         @GetMapping("/tren")
         public ResponseEntity<List<LaporanPenjualanTrenResponse>> getTrenPenjualan(
@@ -92,7 +92,7 @@ public class LaporanPenjualanController {
                                                 LocalDateTime.parse(endDate)));
         }
 
-        // EXPORT PDF & EMAIL
+        //export pdf & email
 
         @PostMapping("/export")
         public ResponseEntity<ApiResponse> exportLaporanPenjualan(
@@ -121,7 +121,7 @@ public class LaporanPenjualanController {
         }
 
 
-        // API RESPONSE
+        //api response
 
         static class ApiResponse {
 

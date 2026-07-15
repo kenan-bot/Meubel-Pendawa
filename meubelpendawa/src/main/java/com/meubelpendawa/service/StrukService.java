@@ -29,15 +29,8 @@ import com.meubelpendawa.model.Transaksi;
 import com.meubelpendawa.repository.DetailTransaksiRepository;
 import com.meubelpendawa.repository.TransaksiRepository;
 
-/**
- * Generate struk (nota) PDF untuk 1 transaksi, dan kirim struk itu lewat email.
- *
- * Dipakai di 2 tempat:
- *  1. TransaksiController -> GET /transaksi/{orderId}/struk, supaya kasir bisa
- *     buka/cetak/download PDF-nya langsung dari browser.
- *  2. TransaksiService -> otomatis dipanggil begitu status pembayaran sebuah
- *     order jadi SUCCESS, untuk kirim salinan struk ke email toko.
- */
+//generate struk (nota) PDF untuk 1 transaksi, dan kirim struk itu lewat email.
+
 @Service
 public class StrukService {
 
@@ -55,7 +48,7 @@ public class StrukService {
     @Autowired
     private EmailService emailService;
 
-    // Alamat email toko yang menerima notifikasi/salinan struk setiap ada pesanan baru.
+    //alamat email toko yang menerima notifikasi/salinan struk setiap ada pesanan baru.
     @Value("${struk.email-tujuan:meubelpendawa@gmail.com}")
     private String emailTujuanStruk;
 
@@ -65,10 +58,8 @@ public class StrukService {
         return "Rp" + format.format(nominal == null ? 0 : nominal);
     }
 
-    /**
-     * Generate isi PDF struk untuk 1 orderId. Dipakai baik untuk endpoint cetak
-     * maupun untuk lampiran email.
-     */
+    //generate isi PDF struk untuk 1 orderId. Dipakai baik untuk endpoint cetak maupun untuk lampiran email.
+    
     public byte[] generateStrukPdf(String orderId) {
         Transaksi t = transaksiRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
@@ -121,7 +112,7 @@ public class StrukService {
             document.add(spacer);
             document.add(garis());
 
-            // ----- Tabel item pesanan -----
+            //tabel item pesanan
             PdfPTable table = new PdfPTable(new float[]{4f, 1f, 2f, 2f});
             table.setWidthPercentage(100);
             table.setSpacingBefore(8);
@@ -193,14 +184,6 @@ public class StrukService {
         return cell;
     }
 
-    /**
-     * Generate struk PDF untuk orderId lalu kirim ke email toko (struk.email-tujuan,
-     * default meubelpendawa@gmail.com). Dipanggil otomatis begitu status pembayaran
-     * sebuah order berhasil (SUCCESS) -- baik dari pembayaran CASH maupun CASHLESS.
-     *
-     * Sengaja menelan (catch) semua exception di sini dan cuma log error -- gagal
-     * kirim email TIDAK BOLEH menggagalkan proses pembayaran yang sudah berhasil.
-     */
     public void kirimStrukEmail(String orderId) {
         try {
             Transaksi t = transaksiRepository.findById(orderId)

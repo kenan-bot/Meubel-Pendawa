@@ -126,7 +126,6 @@ public class TransaksiController {
             transaksiService.cekDanUpdateStatus(orderId);
             return ResponseEntity.ok("OK");
         } catch (Exception e) {
-            // tetap 200 -- kalau balas error, Midtrans anggap gagal terkirim & akan retry terus
             return ResponseEntity.ok("Notification diterima, tapi gagal diproses: " + e.getMessage());
         }
     }

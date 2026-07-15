@@ -11,13 +11,13 @@ public class LaporanPenjualanSummaryResponse {
     private Double cash;
     private Double cashless;
 
-    // ===== Growth KPI =====
+    // Growth KPI
     private Double omzetGrowth;
     private Double transaksiGrowth;
     private Double produkGrowth;
     private Double rataRataGrowth;
 
-    // ===== Dashboard =====
+    // Dashboard
     private String comparisonLabel;
     private List<LaporanPenjualanTrenResponse> trend;
 
@@ -72,7 +72,7 @@ public class LaporanPenjualanSummaryResponse {
         this.cashless = cashless;
     }
 
-    // ===== Growth =====
+    // Growth
 
     public Double getOmzetGrowth() {
         return omzetGrowth;
@@ -106,7 +106,7 @@ public class LaporanPenjualanSummaryResponse {
         this.rataRataGrowth = rataRataGrowth;
     }
 
-    // ===== Dashboard =====
+    // Dashboard
 
     public String getComparisonLabel() {
         return comparisonLabel;

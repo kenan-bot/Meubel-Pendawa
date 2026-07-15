@@ -9,7 +9,7 @@ public final class WilayahKeyword {
 
     public static final List<String> DATA = List.of(
 
-            // Kecamatan Kabupaten Semarang
+            //Kecamatan Kabupaten Semarang
             "Ambarawa",
             "Bancak",
             "Bandungan",

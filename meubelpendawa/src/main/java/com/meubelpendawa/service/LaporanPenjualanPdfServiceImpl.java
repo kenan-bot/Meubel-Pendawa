@@ -41,7 +41,7 @@ public class LaporanPenjualanPdfServiceImpl
 
                 DateTimeFormatter cetakFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm", locale);
 
-                // Ambil seluruh data laporan
+                //ambil seluruh data laporan
                 LaporanPenjualanPdfData laporan = new LaporanPenjualanPdfData();
 
                 laporan.setSummary(
@@ -64,7 +64,7 @@ public class LaporanPenjualanPdfServiceImpl
                                                 startDate,
                                                 endDate));
 
-                // Tambahkan informasi PDF
+                //tambahkan informasi PDF
                 laporan.setPeriode(
                                 startDate.format(periodeFormatter)
                                                 + " s/d "
@@ -73,7 +73,7 @@ public class LaporanPenjualanPdfServiceImpl
                 laporan.setTanggalCetak(
                                 LocalDateTime.now().format(cetakFormatter));
 
-                // Generate PDF
+                //generate pdf
                 byte[] pdf = pdfGenerator.generate(laporan);
 
                 String subject = "Laporan Penjualan Meubel Pendawa";
