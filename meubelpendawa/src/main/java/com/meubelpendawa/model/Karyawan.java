@@ -9,8 +9,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.EnumType;
 
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "karyawan")
+@Getter 
+@Setter 
+@NoArgsConstructor
 public class Karyawan {
 
     @Id
@@ -35,9 +43,8 @@ public class Karyawan {
 
     private LocalDateTime tanggalNonaktif;
 
-    public Karyawan() {
-    }
-
+    // 2. TETAP PERTAHANKAN Constructor utama Anda ini agar kode di
+    // Service/Controller tidak error
     public Karyawan(String namaKaryawan, String email, Boolean aksesSistem, Role role, String username,
             String password, Boolean statusAktif, LocalDateTime tanggalNonaktif) {
         this.namaKaryawan = namaKaryawan;
@@ -50,76 +57,5 @@ public class Karyawan {
         this.tanggalNonaktif = tanggalNonaktif;
     }
 
-    public String getIdKaryawan() {
-        return idKaryawan;
-    }
-
-    public void setIdKaryawan(String idKaryawan) {
-        this.idKaryawan = idKaryawan;
-    }
-
-    public String getNamaKaryawan() {
-        return namaKaryawan;
-    }
-
-    public void setNamaKaryawan(String namaKaryawan) {
-        this.namaKaryawan = namaKaryawan;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Boolean getAksesSistem() {
-        return aksesSistem;
-    }
-
-    public void setAksesSistem(Boolean aksesSistem) {
-        this.aksesSistem = aksesSistem;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Boolean getStatusAktif() {
-        return statusAktif;
-    }
-
-    public void setStatusAktif(Boolean statusAktif) {
-        this.statusAktif = statusAktif;
-    }
-
-    public LocalDateTime getTanggalNonaktif() {
-        return tanggalNonaktif;
-    }
-
-    public void setTanggalNonaktif(LocalDateTime tanggalNonaktif) {
-        this.tanggalNonaktif = tanggalNonaktif;
-    }
-
+    // Semua Getter & Setter manual di bawah ini SUDAH AMAN DIHAPUS TOTAL.
 }
