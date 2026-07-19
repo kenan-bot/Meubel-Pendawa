@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiPlus } from "react-icons/fi";
 
+import SearchBar from "../components/SearchBar";
 import Modal from "../components/Modal";
 import Toast from "../components/Toast";
 import ConfirmModal from "../components/ConfirmModal";
@@ -42,6 +43,18 @@ export default function AtributProduk() {
   const [selectedKategori, setSelectedKategori] = useState(null);
 
   const [selectedMerek, setSelectedMerek] = useState(null);
+
+  const [keywordKategori, setKeywordKategori] = useState("");
+
+  const [keywordMerek, setKeywordMerek] = useState("");
+
+  const kategoriTersaring = kategori.filter((item) =>
+    item.namaKategori.toLowerCase().includes(keywordKategori.toLowerCase()),
+  );
+
+  const merekTersaring = merek.filter((item) =>
+    item.namaMerek.toLowerCase().includes(keywordMerek.toLowerCase()),
+  );
 
   useEffect(() => {
     if (!toast) return;
@@ -143,11 +156,20 @@ export default function AtributProduk() {
               </button>
             </div>
 
+            <div className="mb-4">
+              <SearchBar
+                value={keywordKategori}
+                onChange={(e) => setKeywordKategori(e.target.value)}
+                placeholder="Cari kategori..."
+                theme="purple"
+              />
+            </div>
+
             <div className="space-y-3">
               {kategoriLoading ? (
                 <div>Memuat kategori...</div>
               ) : (
-                kategori.map((item) => (
+                kategoriTersaring.map((item) => (
                   <AtributCard
                     key={item.idKategori}
                     nama={item.namaKategori}
@@ -182,11 +204,20 @@ export default function AtributProduk() {
               </button>
             </div>
 
+            <div className="mb-4">
+              <SearchBar
+                value={keywordMerek}
+                onChange={(e) => setKeywordMerek(e.target.value)}
+                placeholder="Cari merek..."
+                theme="purple"
+              />
+            </div>
+
             <div className="space-y-3">
               {merekLoading ? (
                 <div>Memuat merek...</div>
               ) : (
-                merek.map((item) => (
+                merekTersaring.map((item) => (
                   <AtributCard
                     key={item.idMerek}
                     nama={item.namaMerek}
