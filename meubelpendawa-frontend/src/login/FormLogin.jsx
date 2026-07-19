@@ -79,7 +79,7 @@ export default function FormLogin() {
       <div className="w-full max-w-4xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
         {/* left panel - branding card */}
         <AnimatedSection delay={0.1}>
-          <div className="bg-white rounded-2xl shadow-xl transition-all duration-300 flex flex-col items-center justify-center px-10 py-12 w-full w-full max-w-xs sm:max-w-sm flex-shrink-0">
+          <div className="bg-white rounded-2xl shadow-xl transition-all duration-300 flex flex-col items-center justify-center px-10 py-12 w-full max-w-xs sm:max-w-sm flex-shrink-0 mx-auto">
             {/* Icon Box */}
             <div
               className="bg-[#5B21F5] rounded-2xl w-32 h-32 sm:w-40 sm:h-40
@@ -124,7 +124,7 @@ export default function FormLogin() {
         </AnimatedSection>
 
         {/* right panel - login form */}
-        <div className="w-full max-w-sm md:max-w-md flex flex-col">
+        <div className="w-full max-w-sm md:max-w-md flex flex-col mx-auto">
           <AnimatedSection delay={0.2}>
             <>
               {/* heading */}
